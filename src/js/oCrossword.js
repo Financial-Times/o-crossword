@@ -152,15 +152,16 @@ OCrossword.prototype.assemble = function assemble() {
 			}
 
 			cluesEl.style.transform = `translateY(${e.center.y}px)`;
-			cluesEl.classList.add('dragging');
-			cluesEl.classList.add('window');
-			cluesEl.classList.remove('expanded');
+			if (cluesEl.className.indexOf('dragging') === -1) cluesEl.classList.add('dragging');
+			if (cluesEl.className.indexOf('window') === -1) cluesEl.classList.add('window');
+			if (cluesEl.className.indexOf('expanded') !== -1)cluesEl.classList.remove('expanded');
 		}.bind(this);
 
 		const onPanEnd = function onPanEnd() {
 			cluesEl.classList.remove('dragging');
 			cluesEl.classList.add('window');
 			cluesEl.classList.remove('expanded');
+			cluesEl.scrollTop = 0;
 		}
 
 		this.previewMc.on('press', onPanMove);

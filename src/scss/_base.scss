@@ -83,19 +83,28 @@
 			cursor: default;
 			display: none;
 
-			span {
-				@include oColorsFor(o-crossword-hidden, text);
-				@include oColorsFor(o-crossword-hidden, background);
+			.o-crossword-clues-down {
+				span {
+					@include oColorsFor(o-crossword-hidden-down, text);
+					@include oColorsFor(o-crossword-hidden-down, background);
+				}
+
+				&:before {
+					@include oColorsFor(o-crossword-hidden-down, text);
+					@include oColorsFor(o-crossword-hidden-down, background);
+				}
 			}
 
-			.o-crossword-clues-down:before {
-				@include oColorsFor(o-crossword-hidden, text);
-				@include oColorsFor(o-crossword-hidden, background);
-			}
+			.o-crossword-clues-across {
+				span {
+					@include oColorsFor(o-crossword-hidden-across, text);
+					@include oColorsFor(o-crossword-hidden-across, background);
+				}
 
-			.o-crossword-clues-across:before {
-				@include oColorsFor(o-crossword-hidden, text);
-				@include oColorsFor(o-crossword-hidden, background);
+				&:before {
+					@include oColorsFor(o-crossword-hidden-across, text);
+					@include oColorsFor(o-crossword-hidden-across, background);
+				}
 			}
 		}
 	}
