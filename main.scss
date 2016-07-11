@@ -1,0 +1,16 @@
+$o-crossword-is-silent: true !default;
+
+@import "o-colors/main";
+@import "o-grid/main";
+@import "o-typography/main";
+
+@import "src/scss/color-use-cases";
+@import "src/scss/mixins";
+@import "src/scss/base";
+
+@if ($o-crossword-is-silent == false) {
+	@include oCrosswordAll;
+
+	// Set crossword to silent again to avoid being output twice
+	$o-crossword-is-silent: true !global;
+}

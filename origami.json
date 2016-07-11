@@ -1,0 +1,28 @@
+{
+	"description": "FT-branded crosswords",
+	"origamiType": "module",
+	"origamiVersion": 1,
+	"support": "https://github.com/ftlabs/o-crossword/issues",
+	"supportStatus": "experimental",
+	"ci": {
+		"circle": "https://circleci.com/api/v1/project/ftlabs/o-crossword"
+	},
+	"browserFeatures": {
+		"required": [
+			"fetch",
+			"Array.from"
+		]
+	},
+	"demosDefaults": {
+		"js": "demos/src/demo.js",
+		"sass": "demos/src/demo.scss"
+	},
+	"demos": [
+		{
+			"name": "basic",
+			"template": "demos/src/basic.mustache",
+			"expanded": true,
+			"description": ""
+		}
+	]
+}

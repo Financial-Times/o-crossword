@@ -1,0 +1,14 @@
+////
+/// @group o-crossword
+/// @link http://registry.origami.ft.com/components/o-crossword
+////
+
+/// Crossword styles boilerplate
+/// Generates all styles available, with a set of modifiers for alternative styles
+///
+/// @param {string} $classname
+@mixin oCrosswordAll($classname: o-crossword) {
+	.#{$classname} {
+		@include oCrosswordBase;
+	}
+}

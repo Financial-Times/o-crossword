@@ -1,0 +1,139 @@
+////
+/// @group o-crossword
+/// @link http://registry.origami.ft.com/components/o-crossword
+////
+
+/// Base crosswords styles - add to <crossword>
+@mixin oCrosswordBase {
+	// scss-lint:disable QualifyingElement
+	@include oTypographyBody;
+	background-color: oColorsGetColorFor(o-crossword page, background);
+	@include oTypographySans(s);
+	font-size: 0.8em;
+	position: relative;
+	display: inline-block;
+
+	table {
+		border-collapse: collapse;
+		border-spacing: 0;
+
+		td {
+			border: 1px solid;
+			@include oColorsFor(o-crossword-border, border);
+
+			&.empty {
+				@include oColorsFor(o-crossword-empty, background);
+			}
+
+			line-height: 1.428571429;
+			text-align: left;
+			vertical-align: top;
+			position: relative;
+			min-width: 1.5em;
+			height: 1.5em;
+
+			.o-crossword-gridnum {
+				font-size: 0.5em;
+				position: absolute;
+				top: 0;
+				left: 0.25em;
+			}
+		}
+	}
+
+	.o-crossword-clues-wrapper {
+		position: absolute;
+		z-index: 2;
+	}
+
+	.o-crossword-clues {
+		float: left;
+		width: 25em;
+		max-width: 100vw;
+
+		&, ul {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			padding-bottom: 1em;
+
+			li {
+				line-height: 1.5em;
+				padding-bottom: 0.5em;
+				margin-left: 1em;
+			}
+		}
+
+		.o-crossword-clues-down:before {
+			content: 'Down';
+			line-height: 1.3em;
+			font-size: 1.2em;
+			padding-bottom: 0.5em;
+		}
+
+		.o-crossword-clues-across:before {
+			content: 'Across';
+			line-height: 1.3em;
+			font-size: 1.2em;
+			padding-bottom: 0.5em;
+		}
+
+		&.preview {
+			transform-origin: 0 0;
+			cursor: default;
+			display: none;
+
+			span {
+				@include oColorsFor(o-crossword-hidden, text);
+				@include oColorsFor(o-crossword-hidden, background);
+			}
+
+			.o-crossword-clues-down:before {
+				@include oColorsFor(o-crossword-hidden, text);
+				@include oColorsFor(o-crossword-hidden, background);
+			}
+
+			.o-crossword-clues-across:before {
+				@include oColorsFor(o-crossword-hidden, text);
+				@include oColorsFor(o-crossword-hidden, background);
+			}
+		}
+	}
+
+	&.collapsable-clues .o-crossword-clues {
+		position: absolute;
+		&.window {
+			background: white;
+			border: 1px solid grey;
+			height: 6em;
+			overflow: hidden;
+			margin: 0 1em;
+			box-shadow: 0 0 1em black;
+			pointer-events: none;
+			opacity: 0;
+			transition: opacity 0.15s ease;
+
+			&.dragging {
+				opacity: 1;
+			}
+		}
+		&.expanded {
+			overflow-y: scroll;
+			max-height: 100%;
+			background: white;
+			box-shadow: 0 0 1em black;
+			overflow-x: hidden;
+			padding-right: 1em;
+		}
+		&.preview {
+			display: block;
+			position: relative;
+		}
+	}
+}
+
+/// Add to crossword's wrapper element (if there is one)
+@mixin oCrosswordWrapper {
+	overflow: auto;
+	width: 100%;
+}
