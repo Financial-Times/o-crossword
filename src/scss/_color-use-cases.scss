@@ -1,4 +1,4 @@
-@include oColorsSetUseCase(o-crossword, background, 'transparent');
+@include oColorsSetUseCase(o-crossword, background, 'white');
 @include oColorsSetUseCase(o-crossword-border, border, 'section-green');
 @include oColorsSetUseCase(o-crossword-empty, background, 'section-green');
 @include oColorsSetUseCase(o-crossword-hidden-across, background, 'section-light-green');

@@ -80,7 +80,7 @@ function OCrossword(rootEl) {
 	} else if (!(rootEl instanceof HTMLElement)) {
 		rootEl = document.querySelector(rootEl);
 	}
-	if (rootEl.getAttribute('data-o-component') === "o-crossword") {
+	if (rootEl.getAttribute('data-o-component') === 'o-crossword') {
 		this.rootEl = rootEl;
 	} else {
 		this.rootEl = rootEl.querySelector('[data-o-component~="o-crossword"]');
@@ -114,73 +114,84 @@ OCrossword.prototype.assemble = function assemble() {
 
 		// TODO: DEBOUNCE!!!
 		const onResize = (function onResize() {
-			cluesEl.classList.remove('window');
+			cluesEl.classList.remove('magnify');
 			this.rootEl.classList.remove('collapsable-clues');
 			cluesEl.style.opacity = '0';
 			const height1 = cluesEl.clientHeight;
 			const width1 = cluesEl.clientWidth;
 			const height2 = tableEl.clientHeight;
-			this._height = height2;
 			this._cluesElHeight = height1;
 			let scale = height2/height1;
 			if (scale > 0.2) scale = 0.2;
-			tableEl.style.marginLeft = `${width1 * scale}px`;
+			this._height = height1 * scale;
+			cluesEl.style.marginLeft = tableEl.style.marginLeft = `${width1 * scale}px`;
 			previewEl.style.marginBottom = `${-height1 * (1-scale)}px`;
 			previewEl.style.transform = `scale(${scale})`;
 			wrapper.style.height = tableEl.height;
 			this.rootEl.classList.add('collapsable-clues');
-			cluesEl.classList.add('window');
+			if (cluesEl.className.indexOf('magnify') === -1) cluesEl.classList.add('magnify');
 			cluesEl.style.opacity = '';
 		}).bind(this);
 
 		this.onResize = onResize;
 
-		this.previewMc = new Hammer.Manager(previewEl, {
+		this.previewMc = new Hammer.Manager(this.rootEl, {
 			recognizers: [
-				[Hammer.Pan, { direction: Hammer.DIRECTION_VERTICAL }],
-				[Hammer.Press, { time: 250 }],
-				[Hammer.Swipe, { direction: Hammer.DIRECTION_HORIZONTAL }]
+				[Hammer.Pan, { direction: Hammer.DIRECTION_ALL }],
+				[Hammer.Press, { time: 150 }],
+				[Hammer.Swipe, { direction: Hammer.DIRECTION_ALL }]
 			]
 		});
 
-		const onPanMove = function onPanMove(e) {
-			const proportion = e.center.y/this._height;
-			const offset = this._cluesElHeight * proportion;
-
-			for (const li of cluesUlEls) {
-				li.style.transform = `translateY(${-offset}px)`;
+		const onPanVert = function onPanVert(e) {
+			if (e.isFirst || (e.type.indexOf('start') !== -1 && (e.additionalEvent === 'panup' || e.additionalEvent === 'pandown'))){
+				if (e.center.x < Number(tableEl.style.marginLeft.match(/([0-9.]+)px/)[1])) {
+					if (cluesEl.className.indexOf('magnify-drag') === -1) cluesEl.classList.add('magnify-drag');
+					if (cluesEl.className.indexOf('magnify') === -1) cluesEl.classList.add('magnify');
+					if (cluesEl.className.indexOf('expanded') !== -1)cluesEl.classList.remove('expanded');
+				}
 			}
+			if (cluesEl.className.indexOf('magnify-drag') !== -1) {
 
-			cluesEl.style.transform = `translateY(${e.center.y}px)`;
-			if (cluesEl.className.indexOf('dragging') === -1) cluesEl.classList.add('dragging');
-			if (cluesEl.className.indexOf('window') === -1) cluesEl.classList.add('window');
-			if (cluesEl.className.indexOf('expanded') !== -1)cluesEl.classList.remove('expanded');
+				e.preventDefault();
+				const proportion = e.center.y/this._height;
+				const offset = this._cluesElHeight * proportion;
+
+				for (const li of cluesUlEls) {
+					li.style.transform = `translateY(${-offset}px)`;
+				}
+
+				cluesEl.style.transform = `translateY(${e.center.y}px)`;
+			}
+		}.bind(this);
+
+		const onPanHoriz = function onPanHoriz(e) {
+			console.log(e);
 		}.bind(this);
 
 		const onPanEnd = function onPanEnd() {
-			cluesEl.classList.remove('dragging');
-			cluesEl.classList.add('window');
+			cluesEl.classList.remove('magnify-drag');
+			cluesEl.classList.add('magnify');
 			cluesEl.classList.remove('expanded');
 			cluesEl.scrollTop = 0;
-		}
+		};
 
-		this.previewMc.on('press', onPanMove);
-		this.previewMc.on('panmove', onPanMove);
-		this.previewMc.on('panstart', onPanMove);
-		this.previewMc.on('panend', onPanEnd);
+		this.previewMc.on('panup pandown swipeup swipedown panstart press', onPanVert);
+		this.previewMc.on('panleft panright', onPanHoriz);
+		this.previewMc.on('panend pressup pancancel', onPanEnd);
 
 		this.addEventListener(this.rootEl, 'click', onPanEnd);
 
-		this.previewMc.on('swiperight', function () {
-			cluesEl.classList.remove('dragging');
-			cluesEl.classList.remove('window');
+		this.previewMc.on('swipeleft swiperight', function (e) {
+			e.preventDefault();
+			cluesEl.classList.remove('magnify-drag');
+			cluesEl.classList.remove('magnify');
 			cluesEl.classList.add('expanded');
 			cluesEl.style.transform = '';
 			for (const li of cluesUlEls) {
 				li.style.transform = '';
 			}
 		});
-
 
 		onResize.bind(this)();
 		this.addEventListener(window, 'resize', onResize);
