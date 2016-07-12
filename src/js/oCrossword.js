@@ -235,4 +235,10 @@ OCrossword.prototype.removeAllEventListeners = function() {
 	});
 };
 
+OCrossword.prototype.destroy = function destroy() {
+	this.removeAllEventListeners();
+	if () this.hammerMC.destroy();
+
+}
+
 module.exports = OCrossword;
