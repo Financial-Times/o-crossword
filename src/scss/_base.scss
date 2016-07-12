@@ -115,7 +115,7 @@
 
 	&.collapsable-clues .o-crossword-clues {
 		position: absolute;
-		&.magnify {
+		&.magnify, &.magnify-drag {
 			background-color: oColorsGetColorFor(o-crossword page, background);
 			border: 1px solid grey;
 			height: 6em;
@@ -131,7 +131,7 @@
 			}
 		}
 		&.expanded {
-			overflow-y: scroll;
+			overflow-y: auto;
 			max-height: 100%;
 			background: white;
 			box-shadow: 0 0 1em black;

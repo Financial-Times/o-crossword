@@ -8,6 +8,8 @@
 'use strict';
 
 const Hammer = require('hammerjs');
+const HORIZ_PAN_SCALE = 1.3;
+const HORIZ_PAN_SPRING = 0.2;
 
 function buildGrid(
 	rootEl,
@@ -125,6 +127,7 @@ OCrossword.prototype.assemble = function assemble() {
 			if (scale > 0.2) scale = 0.2;
 			this._height = height1 * scale;
 			cluesEl.style.marginLeft = tableEl.style.marginLeft = `${width1 * scale}px`;
+			this._cluesPanHorizTarget = this._cluesPanHoriz = this._cluesPanHorizStart = -(width1 + width1 * scale + 20);
 			previewEl.style.marginBottom = `${-height1 * (1-scale)}px`;
 			previewEl.style.transform = `scale(${scale})`;
 			wrapper.style.height = tableEl.height;
@@ -135,7 +138,15 @@ OCrossword.prototype.assemble = function assemble() {
 
 		this.onResize = onResize;
 
-		this.previewMc = new Hammer.Manager(this.rootEl, {
+		this._raf = requestAnimationFrame(function animate() {
+			if (cluesEl.className.indexOf('expanded') !== -1 && !this._isGrabbed) {
+				this._cluesPanHoriz = this._cluesPanHoriz + (this._cluesPanHorizTarget - this._cluesPanHoriz) * HORIZ_PAN_SPRING;
+				cluesEl.style.transform = `translateX(${this._cluesPanHoriz}px)`;
+			}
+			this._raf = requestAnimationFrame(animate.bind(this));
+		}.bind(this));
+
+		this.hammerMC = new Hammer.Manager(this.rootEl, {
 			recognizers: [
 				[Hammer.Pan, { direction: Hammer.DIRECTION_ALL }],
 				[Hammer.Press, { time: 150 }],
@@ -147,14 +158,17 @@ OCrossword.prototype.assemble = function assemble() {
 			if (e.isFirst || (e.type.indexOf('start') !== -1 && (e.additionalEvent === 'panup' || e.additionalEvent === 'pandown'))){
 				if (e.center.x < Number(tableEl.style.marginLeft.match(/([0-9.]+)px/)[1])) {
 					if (cluesEl.className.indexOf('magnify-drag') === -1) cluesEl.classList.add('magnify-drag');
-					if (cluesEl.className.indexOf('magnify') === -1) cluesEl.classList.add('magnify');
-					if (cluesEl.className.indexOf('expanded') !== -1)cluesEl.classList.remove('expanded');
 				}
 			}
 			if (cluesEl.className.indexOf('magnify-drag') !== -1) {
 
+				if (cluesEl.className.indexOf('magnify') === -1) cluesEl.classList.add('magnify');
+				if (cluesEl.className.indexOf('expanded') !== -1) cluesEl.classList.remove('expanded');
+				if (cluesEl.scrollTop) cluesEl.scrollTop = 0;
+				this._isGrabbed = true;
+
 				e.preventDefault();
-				const proportion = e.center.y/this._height;
+				const proportion = (e.center.y/this._height) - 0.05;
 				const offset = this._cluesElHeight * proportion;
 
 				for (const li of cluesUlEls) {
@@ -166,32 +180,43 @@ OCrossword.prototype.assemble = function assemble() {
 		}.bind(this);
 
 		const onPanHoriz = function onPanHoriz(e) {
-			console.log(e);
+			if (Math.abs(e.deltaX) > 20) {
+				this._isGrabbed = true;
+				e.preventDefault();
+				if (cluesEl.className.indexOf('magnify-drag') !== -1) cluesEl.classList.remove('magnify-drag');
+				if (cluesEl.className.indexOf('magnify') !== -1) cluesEl.classList.remove('magnify');
+				if (cluesEl.className.indexOf('expanded') === -1) cluesEl.classList.add('expanded');
+				cluesEl.style.transform = `translateX(${this._cluesPanHoriz + e.deltaX * HORIZ_PAN_SCALE}px)`;
+				for (const li of cluesUlEls) {
+					li.style.transform = '';
+				}
+			}
 		}.bind(this);
 
-		const onPanEnd = function onPanEnd() {
-			cluesEl.classList.remove('magnify-drag');
-			cluesEl.classList.add('magnify');
-			cluesEl.classList.remove('expanded');
-			cluesEl.scrollTop = 0;
-		};
+		const onPanEnd = function onPanEnd(e) {
+			if ( this._isGrabbed && cluesEl.className.indexOf('expanded') !== -1 ) {
+				this._cluesPanHoriz = e.deltaX * HORIZ_PAN_SCALE + this._cluesPanHoriz;
+				this._isGrabbed = false;
+				if (this._cluesPanHoriz > 0) {
+					this._cluesPanHorizTarget = 0;
+				} else {
+					this._cluesPanHorizTarget = this._cluesPanHorizStart;
+				}
+			} else if (
+				this._isGrabbed && cluesEl.className.indexOf('magnify') !== -1
+			) {
+				this._isGrabbed = false;
+				cluesEl.classList.remove('magnify-drag');
+				cluesEl.classList.add('magnify');
+				cluesEl.classList.remove('expanded');
+			}
+		}.bind(this);
 
-		this.previewMc.on('panup pandown swipeup swipedown panstart press', onPanVert);
-		this.previewMc.on('panleft panright', onPanHoriz);
-		this.previewMc.on('panend pressup pancancel', onPanEnd);
+		this.hammerMC.on('panup pandown swipeup swipedown panstart press', onPanVert);
+		this.hammerMC.on('panleft panright', onPanHoriz);
+		this.hammerMC.on('panend pressup pancancel', onPanEnd);
 
 		this.addEventListener(this.rootEl, 'click', onPanEnd);
-
-		this.previewMc.on('swipeleft swiperight', function (e) {
-			e.preventDefault();
-			cluesEl.classList.remove('magnify-drag');
-			cluesEl.classList.remove('magnify');
-			cluesEl.classList.add('expanded');
-			cluesEl.style.transform = '';
-			for (const li of cluesUlEls) {
-				li.style.transform = '';
-			}
-		});
 
 		onResize.bind(this)();
 		this.addEventListener(window, 'resize', onResize);

@@ -10,7 +10,9 @@
 	"browserFeatures": {
 		"required": [
 			"fetch",
-			"Array.from"
+			"Array.from",
+			"Element.prototype.classList",
+			"requestAnimationFrame"
 		]
 	},
 	"demosDefaults": {
