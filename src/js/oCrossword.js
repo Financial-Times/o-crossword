@@ -112,6 +112,7 @@ function OCrossword(rootEl) {
 }
 
 OCrossword.prototype.assemble = function assemble() {
+	return false;
 	const tableEl = this.rootEl.querySelector('table');
 	const cluesEl = this.rootEl.querySelector('ul.o-crossword-clues');
 	if (cluesEl) {
