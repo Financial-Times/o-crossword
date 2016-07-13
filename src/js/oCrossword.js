@@ -18,6 +18,13 @@ function isChildOf(el, parent) {
 	return false;
 }
 
+
+function prevAll(node) {
+	const nodes = Array.from(node.parentNode.children);
+	const pos = nodes.indexOf(node);
+	return nodes.slice(0, pos);
+};
+
 const Hammer = require('hammerjs');
 const HORIZ_PAN_SCALE = 1;
 const HORIZ_PAN_SPRING = 0.2;
@@ -269,7 +276,7 @@ OCrossword.prototype.assemble = function assemble() {
 		}.bind(this);
 
 
-		function highlightGridByEl(el) {
+		function highlightGridByCluesEl(el) {
 			while(el.parentNode) {
 				if (el.dataset.oCrosswordNumber) {
 					highlightGridByNumber(Number(el.dataset.oCrosswordNumber), el.dataset.oCrosswordDirection, el.dataset.oCrosswordAnswerLength);
@@ -279,14 +286,6 @@ OCrossword.prototype.assemble = function assemble() {
 				}
 			}
 			return false;
-		}
-
-		function highlightAcross(startEl, length) {
-			while (length--) {
-				startEl.dataset.oCrosswordHighlighted = 'across';
-				startEl = startEl.nextElementSibling;
-				if (!startEl) break;
-			}
 		}
 
 		function setClue(number, direction) {
@@ -302,15 +301,23 @@ OCrossword.prototype.assemble = function assemble() {
 				delete o.dataset.oCrosswordHighlighted;
 			}
 			if (el) {
-				if (direction === 'across' || (!direction && el.dataset.oCrosswordHighlighted === 'down')) {
-					highlightAcross(el, length);
+				if (direction === 'across') {
+					while (length--) {
+						el.dataset.oCrosswordHighlighted = 'across';
+						if (length === 0) break;
+						el = el.nextElementSibling;
+						if (!el) break;
+					}
 				}
-				else if (direction === 'down' || (!direction && el.dataset.oCrosswordHighlighted === 'across')) {
-					el.dataset.oCrosswordHighlighted = 'down';
-				}
-				else {
-					el.dataset.oCrosswordHighlighted = 'across';
-					highlightAcross(el, length);
+				else if (direction === 'down') {
+					const index = prevAll(el).length;
+					while (length--) {
+						el.dataset.oCrosswordHighlighted = 'down';
+						if (length === 0) break;
+						if (!el.parentNode.nextElementSibling) break;
+						el = el.parentNode.nextElementSibling.children[index];
+						if (!el) break;
+					}
 				}
 			}
 		}
@@ -340,8 +347,8 @@ OCrossword.prototype.assemble = function assemble() {
 			]
 		});
 
-		this.addEventListener(cluesEl, 'mousemove', e => highlightGridByEl(e.target));
-		this.addEventListener(cluesEl, 'click', e => highlightGridByEl(e.target));
+		this.addEventListener(cluesEl, 'mousemove', e => highlightGridByCluesEl(e.target));
+		this.addEventListener(cluesEl, 'click', e => highlightGridByCluesEl(e.target));
 
 		this.hammerMC.on('panup pandown swipeup swipedown panstart press', onPanVert);
 		this.hammerMC.on('panleft panright', onPanHoriz);
