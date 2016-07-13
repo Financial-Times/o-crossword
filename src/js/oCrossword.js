@@ -253,7 +253,7 @@ OCrossword.prototype.assemble = function assemble() {
 			if ( this._isGrabbed && cluesEl.className.indexOf('expanded') !== -1 ) {
 				this._cluesPanHoriz = e.deltaX * HORIZ_PAN_SCALE + this._cluesPanHoriz;
 				this._isGrabbed = false;
-				if (this._cluesPanHoriz > 0) {
+				if (this._cluesPanHoriz > -this._previewElWidth/2) {
 					this._cluesPanHorizTarget = 0;
 				} else {
 					this._cluesPanHorizTarget = this._cluesPanHorizStart;
