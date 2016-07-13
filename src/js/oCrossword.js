@@ -28,7 +28,8 @@ function buildGrid(
 	size,
 	gridnums,
 	grid,
-	clues
+	clues,
+	answers
 }) {
 	const tableEl = rootEl.querySelector('table');
 	const cluesEl = rootEl.querySelector('ul.o-crossword-clues');
@@ -40,10 +41,7 @@ function buildGrid(
 			const td = document.createElement('td');
 			tr.appendChild(td);
 			if (gridnums[count]) {
-				const label = document.createElement('span');
-				label.classList.add('o-crossword-gridnum');
-				label.textContent = gridnums[count];
-				td.appendChild(label);
+				td.dataset.oCrosswordNumber = gridnums[count];
 			}
 			if (grid[count] === '.') {
 				td.classList.add('empty');
@@ -69,20 +67,27 @@ function buildGrid(
 		downWrapper.appendChild(downEl);
 		cluesEl.appendChild(downWrapper);
 
-		for (const across of clues.across) {
+		clues.across.forEach(function across(across, i) {
 			const tempLi = document.createElement('li');
 			const tempSpan = document.createElement('span');
-			tempSpan.textContent = across;
+			const answerLength = answers.across[i].length;
+			tempSpan.textContent = across + ` (${answerLength})`;
+			tempLi.dataset.oCrosswordNumber = Number(across.match(/^(\d+)./)[1]);
+			tempLi.dataset.oCrosswordDirection = 'across';
 			acrossEl.appendChild(tempLi);
 			tempLi.appendChild(tempSpan);
-		}
-		for (const down of clues.down) {
+		});
+
+		clues.down.forEach(function down(down, i) {
 			const tempLi = document.createElement('li');
 			const tempSpan = document.createElement('span');
-			tempSpan.textContent = down;
+			const answerLength = answers.down[i].length;
+			tempSpan.textContent = down + ` (${answerLength})`;
+			tempLi.dataset.oCrosswordNumber = Number(down.match(/^(\d+)./)[1]);
+			tempLi.dataset.oCrosswordDirection = 'down';
 			downEl.appendChild(tempLi);
 			tempLi.appendChild(tempSpan);
-		}
+		});
 	}
 }
 
@@ -112,7 +117,6 @@ function OCrossword(rootEl) {
 }
 
 OCrossword.prototype.assemble = function assemble() {
-	return false;
 	const tableEl = this.rootEl.querySelector('table');
 	const cluesEl = this.rootEl.querySelector('ul.o-crossword-clues');
 	if (cluesEl) {
@@ -252,6 +256,10 @@ OCrossword.prototype.assemble = function assemble() {
 
 		onResize.bind(this)();
 		this.addEventListener(window, 'resize', onResize);
+	}
+
+	if (tableEl) {
+
 	}
 };
 

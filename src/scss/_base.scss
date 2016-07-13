@@ -70,7 +70,8 @@
 			vertical-align: top;
 			position: relative;
 
-			.o-crossword-gridnum {
+			&[data-o-crossword-number]:before {
+				content: attr(data-o-crossword-number);
 				font-size: 0.5em;
 				position: absolute;
 				top: 0;
