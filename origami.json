@@ -27,7 +27,7 @@
 			"description": ""
 		},
 		{
-			"name": "basic",
+			"name": "force-compact",
 			"template": "demos/src/force-compact.mustache",
 			"expanded": false,
 			"description": "Force a compact view even on desktops."
