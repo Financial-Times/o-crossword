@@ -25,26 +25,28 @@
 	margin: auto;
 	overflow: hidden;
 
-	@include oGridRespondTo(M) {
-		display: flex;
-
-		.o-crossword-clues-wrapper {
-			flex-grow: 1;
+	&:not([data-o-crossword-force-compact]) {
+		@include oGridRespondTo(M) {
 			display: flex;
-		}
 
-		ul, li {
-			flex-basis: 18em;
-			flex-grow: 1;
-		}
+			.o-crossword-clues-wrapper {
+				flex-grow: 1;
+				display: flex;
+			}
 
-		ul {
-			display: flex;
-			flex-grow: 1;
-			flex-flow: wrap;
+			ul, li {
+				flex-basis: 18em;
+				flex-grow: 1;
+			}
 
-			.o-crossword-clues-across, .o-crossword-clues-down {
-				display: block;
+			ul {
+				display: flex;
+				flex-grow: 1;
+				flex-flow: wrap;
+
+				.o-crossword-clues-across, .o-crossword-clues-down {
+					display: block;
+				}
 			}
 		}
 	}
@@ -81,24 +83,23 @@
 	.o-crossword-clues-wrapper {
 		position: absolute;
 		z-index: 2;
+		width: 20em;
+	}
 
-		@include oGridRespondTo(M) {
-			position: relative;
-			float: left;
+	&:not([data-o-crossword-force-compact]) {
+		.o-crossword-clues-wrapper {
+			@include oGridRespondTo(M) {
+				position: relative;
+				float: left;
+				width: auto;
+			}
 		}
 	}
 
 	.o-crossword-clues {
 		float: left;
-		width: 20em;
 		max-width: 80vw;
-
-
-		@include oGridRespondTo(L) {
-			& > li {
-				float: left;
-			}
-		}
+		width: 100%;
 
 		&, ul {
 			list-style: none;
@@ -187,28 +188,32 @@
 			display: block;
 			position: relative;
 		}
+	}
 
-		@include oGridRespondTo(M) {
-			position: relative;
-
-			&.magnify {
-				opacity: 1;
-				height: auto;
-				margin-left: 1em !important;
-				box-shadow: none;
-				border: none;
-				transition: none;
-				pointer-events: all;
-				transform: none !important;
-
-				ul {
-					transform: none !important;
-				}
-			}
-
-			&.preview {
-				display: none;
+	&:not([data-o-crossword-force-compact]) {
+		&.collapsable-clues .o-crossword-clues {
+			@include oGridRespondTo(M) {
 				position: relative;
+
+				&.magnify {
+					opacity: 1;
+					height: auto;
+					margin-left: 1em !important;
+					box-shadow: none;
+					border: none;
+					transition: none;
+					pointer-events: all;
+					transform: none !important;
+
+					ul {
+						transform: none !important;
+					}
+				}
+
+				&.preview {
+					display: none;
+					position: relative;
+				}
 			}
 		}
 	}
