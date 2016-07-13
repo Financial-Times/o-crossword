@@ -140,7 +140,6 @@ OCrossword.prototype.assemble = function assemble() {
 			this._previewElWidth = width1 * scale;
 			this._height = height1 * scale;
 			this._cluesPanHorizTarget = this._cluesPanHoriz = this._cluesPanHorizStart = -(width1 + this._previewElWidth + 20);
-			cluesEl.style.marginLeft = tableEl.style.marginLeft = `${this._previewElWidth}px`;
 			previewEl.style.marginBottom = `${-height1 * (1-scale)}px`;
 			previewEl.style.transform = `scale(${scale})`;
 			wrapper.style.height = tableEl.height;
@@ -148,6 +147,11 @@ OCrossword.prototype.assemble = function assemble() {
 			if (cluesEl.className.indexOf('magnify') === -1) cluesEl.classList.add('magnify');
 			cluesEl.style.opacity = '';
 			this._doFancyBehaviour = window.getComputedStyle(previewEl).display !== 'none';
+			if (this._doFancyBehaviour) {
+				cluesEl.style.marginLeft = tableEl.style.marginLeft = `${this._previewElWidth}px`;
+			} else {
+				cluesEl.style.marginLeft = tableEl.style.marginLeft = '';
+			}
 		}).bind(this);
 
 		this.onResize = onResize;

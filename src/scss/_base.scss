@@ -20,8 +20,34 @@
 	@include oTypographySans(s);
 	position: relative;
 	display: inline-block;
-	max-width: 100%;
+	width: 100%;
+	max-width: 80em;
+	margin: auto;
 	overflow: hidden;
+
+	@include oGridRespondTo(M) {
+		display: flex;
+
+		.o-crossword-clues-wrapper {
+			flex-grow: 1;
+			display: flex;
+		}
+
+		ul, li {
+			flex-basis: 18em;
+			flex-grow: 1;
+		}
+
+		ul {
+			display: flex;
+			flex-grow: 1;
+			flex-flow: wrap;
+
+			.o-crossword-clues-across, .o-crossword-clues-down {
+				display: block;
+			}
+		}
+	}
 
 	table {
 		border-collapse: collapse;
