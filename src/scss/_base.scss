@@ -14,6 +14,7 @@
 
 /// Base crosswords styles - add to <crossword>
 @mixin oCrosswordBase {
+
 	// scss-lint:disable QualifyingElement
 	@include oTypographyBody;
 	background-color: oColorsGetColorFor(o-crossword page, background);
@@ -24,6 +25,24 @@
 	max-width: 80em;
 	margin: auto;
 	overflow: hidden;
+
+	* {
+		box-sizing: border-box;
+	}
+
+	.o-crossword-grid-wrapper {
+		flex-shrink: 0;
+		overflow: hidden;
+
+		.o-crossword-clue-displayer {
+			min-height: 1.5em;
+			padding: 0.5em;
+			border: 1px solid;
+			border-top-width: 0;
+			box-sizing: border-box;
+			@include oColorsFor(o-crossword-border, border);
+		}
+	}
 
 	&:not([data-o-crossword-force-compact]) {
 		@include oGridRespondTo(M) {
@@ -63,6 +82,14 @@
 
 			&.empty {
 				@include oColorsFor(o-crossword-empty, background);
+			}
+
+			&[data-o-crossword-highlighted="across"] {
+				@include oColorsFor(o-crossword-hidden-across, background);
+			}
+
+			&[data-o-crossword-highlighted="down"] {
+				@include oColorsFor(o-crossword-hidden-down, background);
 			}
 
 			line-height: 1.428571429;

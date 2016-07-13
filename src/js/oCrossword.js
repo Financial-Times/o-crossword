@@ -31,7 +31,7 @@ function buildGrid(
 	clues,
 	answers
 }) {
-	const tableEl = rootEl.querySelector('table');
+	const gridEl = rootEl.querySelector('table');
 	const cluesEl = rootEl.querySelector('ul.o-crossword-clues');
 	const {cols, rows} = size;
 	let count = 0;
@@ -48,7 +48,7 @@ function buildGrid(
 			}
 			count++;
 		}
-		tableEl.appendChild(tr);
+		gridEl.appendChild(tr);
 	}
 
 	if (clues) {
@@ -71,8 +71,9 @@ function buildGrid(
 			const tempLi = document.createElement('li');
 			const tempSpan = document.createElement('span');
 			const answerLength = answers.across[i].length;
-			tempSpan.textContent = across + ` (${answerLength})`;
+			tempSpan.textContent = across + ` (${answerLength}) [DEBUG: ${answers.across[i]}]`;
 			tempLi.dataset.oCrosswordNumber = Number(across.match(/^(\d+)./)[1]);
+			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'across';
 			acrossEl.appendChild(tempLi);
 			tempLi.appendChild(tempSpan);
@@ -82,8 +83,9 @@ function buildGrid(
 			const tempLi = document.createElement('li');
 			const tempSpan = document.createElement('span');
 			const answerLength = answers.down[i].length;
-			tempSpan.textContent = down + ` (${answerLength})`;
+			tempSpan.textContent = down + ` (${answerLength}) [DEBUG: ${answers.down[i]}]`;
 			tempLi.dataset.oCrosswordNumber = Number(down.match(/^(\d+)./)[1]);
+			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'down';
 			downEl.appendChild(tempLi);
 			tempLi.appendChild(tempSpan);
@@ -117,15 +119,25 @@ function OCrossword(rootEl) {
 }
 
 OCrossword.prototype.assemble = function assemble() {
-	const tableEl = this.rootEl.querySelector('table');
+	const gridEl = this.rootEl.querySelector('table');
 	const cluesEl = this.rootEl.querySelector('ul.o-crossword-clues');
 	if (cluesEl) {
 		const cluesUlEls = Array.from(cluesEl.querySelectorAll('ul'));
-		const wrapper = document.createElement('div');
-		wrapper.classList.add('o-crossword-clues-wrapper');
+
 		const previewEl = cluesEl.cloneNode(true);
 		previewEl.classList.add('preview');
 
+		const gridWrapper = document.createElement('div');
+		gridWrapper.classList.add('o-crossword-grid-wrapper');
+		this.rootEl.insertBefore(gridWrapper, gridEl);
+		gridWrapper.appendChild(gridEl);
+
+		const clueDisplayer = document.createElement('div');
+		clueDisplayer.classList.add('o-crossword-clue-displayer');
+		gridWrapper.appendChild(clueDisplayer);
+
+		const wrapper = document.createElement('div');
+		wrapper.classList.add('o-crossword-clues-wrapper');
 		this.rootEl.insertBefore(wrapper, cluesEl);
 		wrapper.appendChild(previewEl);
 		wrapper.appendChild(cluesEl);
@@ -135,9 +147,12 @@ OCrossword.prototype.assemble = function assemble() {
 			cluesEl.classList.remove('magnify');
 			this.rootEl.classList.remove('collapsable-clues');
 			cluesEl.style.opacity = '0';
-			const height1 = cluesEl.clientHeight;
-			const width1 = cluesEl.clientWidth;
-			const height2 = tableEl.clientHeight;
+			const d1 = cluesEl.getBoundingClientRect();
+			const d2 = gridEl.getBoundingClientRect();
+			const width1 = d2.width;
+			const height1 = d1.height;
+			const width2 = d2.width;
+			const height2 = d2.height;
 			let scale = height2/height1;
 			if (scale > 0.2) scale = 0.2;
 			this._cluesElHeight = height1;
@@ -147,15 +162,16 @@ OCrossword.prototype.assemble = function assemble() {
 			this._cluesPanHorizTarget = this._cluesPanHoriz = this._cluesPanHorizStart = -(width1 + this._previewElWidth + 20);
 			previewEl.style.marginBottom = `${-height1 * (1-scale)}px`;
 			previewEl.style.transform = `scale(${scale})`;
-			wrapper.style.height = tableEl.height;
+			wrapper.style.height = gridEl.height;
+			clueDisplayer.style.width = width2 + 'px';
 			this.rootEl.classList.add('collapsable-clues');
 			if (cluesEl.className.indexOf('magnify') === -1) cluesEl.classList.add('magnify');
 			cluesEl.style.opacity = '';
 			this._doFancyBehaviour = window.getComputedStyle(previewEl).display !== 'none';
 			if (this._doFancyBehaviour) {
-				cluesEl.style.marginLeft = tableEl.style.marginLeft = `${this._previewElWidth}px`;
+				clueDisplayer.style.marginLeft = cluesEl.style.marginLeft = gridEl.style.marginLeft = `${this._previewElWidth}px`;
 			} else {
-				cluesEl.style.marginLeft = tableEl.style.marginLeft = '';
+				clueDisplayer.style.marginLeft = cluesEl.style.marginLeft = gridEl.style.marginLeft = '';
 			}
 		}).bind(this);
 
@@ -181,7 +197,7 @@ OCrossword.prototype.assemble = function assemble() {
 		const onPanVert = function onPanVert(e) {
 			if(!this._doFancyBehaviour) return;
 			if (e.isFirst || (e.type.indexOf('start') !== -1 && (e.additionalEvent === 'panup' || e.additionalEvent === 'pandown'))){
-				if (e.center.x < Number(tableEl.style.marginLeft.match(/([0-9.]+)px/)[1])) {
+				if (e.center.x < Number(gridEl.style.marginLeft.match(/([0-9.]+)px/)[1])) {
 					if (cluesEl.className.indexOf('magnify-drag') === -1) cluesEl.classList.add('magnify-drag');
 				}
 			}
@@ -248,6 +264,56 @@ OCrossword.prototype.assemble = function assemble() {
 			}
 		}.bind(this);
 
+
+		function highlightGridByEl(el) {
+			while(el.parentNode) {
+				if (el.dataset.oCrosswordNumber) {
+					highlightGridByNumber(Number(el.dataset.oCrosswordNumber), el.dataset.oCrosswordDirection, el.dataset.oCrosswordAnswerLength);
+					return;
+				} else {
+					el = el.parentNode;
+				}
+			}
+			return false;
+		}
+
+		function highlightAcross(startEl, length) {
+			while (length--) {
+				startEl.dataset.oCrosswordHighlighted = 'across';
+				startEl = startEl.nextElementSibling;
+				if (!startEl) break;
+			}
+		}
+
+		function setClue(number, direction) {
+			const el = cluesEl.querySelector(`li[data-o-crossword-number="${number}"][data-o-crossword-direction="${direction}"]`);
+			if (el) clueDisplayer.textContent = el.textContent;
+		}
+
+		function highlightGridByNumber(number, direction, length) {
+			let el = gridEl.querySelector(`td[data-o-crossword-number="${number}"]`);
+			const els = Array.from(gridEl.querySelectorAll('td[data-o-crossword-highlighted]'));
+			setClue(number, direction);
+			for (const o of els) {
+				delete o.dataset.oCrosswordHighlighted;
+			}
+			if (el) {
+				if (direction === 'across' || (!direction && el.dataset.oCrosswordHighlighted === 'down')) {
+					highlightAcross(el, length);
+				}
+				else if (direction === 'down' || (!direction && el.dataset.oCrosswordHighlighted === 'across')) {
+					el.dataset.oCrosswordHighlighted = 'down';
+				}
+				else {
+					el.dataset.oCrosswordHighlighted = 'across';
+					highlightAcross(el, length);
+				}
+			}
+		}
+
+		this.addEventListener(cluesEl, 'mousemove', e => highlightGridByEl(e.target));
+		this.addEventListener(cluesEl, 'click', e => highlightGridByEl(e.target));
+
 		this.hammerMC.on('panup pandown swipeup swipedown panstart press', onPanVert);
 		this.hammerMC.on('panleft panright', onPanHoriz);
 		this.hammerMC.on('panend pressup pancancel', onPanEnd);
@@ -256,10 +322,6 @@ OCrossword.prototype.assemble = function assemble() {
 
 		onResize.bind(this)();
 		this.addEventListener(window, 'resize', onResize);
-	}
-
-	if (tableEl) {
-
 	}
 };
 
