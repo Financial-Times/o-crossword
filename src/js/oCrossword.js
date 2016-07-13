@@ -7,8 +7,19 @@
 
 'use strict';
 
+function isChildOf(el, parent) {
+	while(el.parentNode) {
+		if (el.parentNode === parent) {
+			return true;
+		} else {
+			el = el.parentNode;
+		}
+	}
+	return false;
+}
+
 const Hammer = require('hammerjs');
-const HORIZ_PAN_SCALE = 1.3;
+const HORIZ_PAN_SCALE = 1;
 const HORIZ_PAN_SPRING = 0.2;
 
 function buildGrid(
@@ -122,28 +133,32 @@ OCrossword.prototype.assemble = function assemble() {
 			const height1 = cluesEl.clientHeight;
 			const width1 = cluesEl.clientWidth;
 			const height2 = tableEl.clientHeight;
-			this._cluesElHeight = height1;
 			let scale = height2/height1;
 			if (scale > 0.2) scale = 0.2;
+			this._cluesElHeight = height1;
+			this._cluesElWidth = width1;
+			this._previewElWidth = width1 * scale;
 			this._height = height1 * scale;
-			cluesEl.style.marginLeft = tableEl.style.marginLeft = `${width1 * scale}px`;
-			this._cluesPanHorizTarget = this._cluesPanHoriz = this._cluesPanHorizStart = -(width1 + width1 * scale + 20);
+			this._cluesPanHorizTarget = this._cluesPanHoriz = this._cluesPanHorizStart = -(width1 + this._previewElWidth + 20);
+			cluesEl.style.marginLeft = tableEl.style.marginLeft = `${this._previewElWidth}px`;
 			previewEl.style.marginBottom = `${-height1 * (1-scale)}px`;
 			previewEl.style.transform = `scale(${scale})`;
 			wrapper.style.height = tableEl.height;
 			this.rootEl.classList.add('collapsable-clues');
 			if (cluesEl.className.indexOf('magnify') === -1) cluesEl.classList.add('magnify');
 			cluesEl.style.opacity = '';
+			this._doFancyBehaviour = window.getComputedStyle(previewEl).display !== 'none';
 		}).bind(this);
 
 		this.onResize = onResize;
 
 		this._raf = requestAnimationFrame(function animate() {
+			this._raf = requestAnimationFrame(animate.bind(this));
+			if(!this._doFancyBehaviour) return;
 			if (cluesEl.className.indexOf('expanded') !== -1 && !this._isGrabbed) {
 				this._cluesPanHoriz = this._cluesPanHoriz + (this._cluesPanHorizTarget - this._cluesPanHoriz) * HORIZ_PAN_SPRING;
 				cluesEl.style.transform = `translateX(${this._cluesPanHoriz}px)`;
 			}
-			this._raf = requestAnimationFrame(animate.bind(this));
 		}.bind(this));
 
 		this.hammerMC = new Hammer.Manager(this.rootEl, {
@@ -155,6 +170,7 @@ OCrossword.prototype.assemble = function assemble() {
 		});
 
 		const onPanVert = function onPanVert(e) {
+			if(!this._doFancyBehaviour) return;
 			if (e.isFirst || (e.type.indexOf('start') !== -1 && (e.additionalEvent === 'panup' || e.additionalEvent === 'pandown'))){
 				if (e.center.x < Number(tableEl.style.marginLeft.match(/([0-9.]+)px/)[1])) {
 					if (cluesEl.className.indexOf('magnify-drag') === -1) cluesEl.classList.add('magnify-drag');
@@ -180,13 +196,23 @@ OCrossword.prototype.assemble = function assemble() {
 		}.bind(this);
 
 		const onPanHoriz = function onPanHoriz(e) {
-			if (Math.abs(e.deltaX) > 20) {
+			if(!this._doFancyBehaviour) return;
+			if (
+				isChildOf(e.target, cluesEl) ||
+				(e.center.x < this._previewElWidth || this._isGrabbed) &&
+				Math.abs(e.deltaX) > 20
+			) {
 				this._isGrabbed = true;
 				e.preventDefault();
 				if (cluesEl.className.indexOf('magnify-drag') !== -1) cluesEl.classList.remove('magnify-drag');
 				if (cluesEl.className.indexOf('magnify') !== -1) cluesEl.classList.remove('magnify');
 				if (cluesEl.className.indexOf('expanded') === -1) cluesEl.classList.add('expanded');
-				cluesEl.style.transform = `translateX(${this._cluesPanHoriz + e.deltaX * HORIZ_PAN_SCALE}px)`;
+				let offset = this._cluesPanHoriz + e.deltaX * HORIZ_PAN_SCALE;
+				if (offset + this._cluesElWidth - 5 < e.center.x) {
+					this._cluesPanHoriz += 4;
+					offset = this._cluesPanHoriz + e.deltaX * HORIZ_PAN_SCALE;
+				}
+				cluesEl.style.transform = `translateX(${offset}px)`;
 				for (const li of cluesUlEls) {
 					li.style.transform = '';
 				}
@@ -194,6 +220,7 @@ OCrossword.prototype.assemble = function assemble() {
 		}.bind(this);
 
 		const onPanEnd = function onPanEnd(e) {
+			if(!this._doFancyBehaviour) return;
 			if ( this._isGrabbed && cluesEl.className.indexOf('expanded') !== -1 ) {
 				this._cluesPanHoriz = e.deltaX * HORIZ_PAN_SCALE + this._cluesPanHoriz;
 				this._isGrabbed = false;
@@ -237,8 +264,8 @@ OCrossword.prototype.removeAllEventListeners = function() {
 
 OCrossword.prototype.destroy = function destroy() {
 	this.removeAllEventListeners();
-	if () this.hammerMC.destroy();
-
+	if (this.hammerMC) this.hammerMC.destroy();
+	if (this._raf) cancelAnimationFrame(this._raf);
 }
 
 module.exports = OCrossword;

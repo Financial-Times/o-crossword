@@ -3,6 +3,15 @@
 /// @link http://registry.origami.ft.com/components/o-crossword
 ////
 
+@mixin oCrosswordType {
+	letter-spacing: 1ch;
+	font-family: monospace;
+	min-width: 1.5em;
+	min-width: 2ch;
+	height: 1.5em;
+	height: 2ch;
+}
+
 /// Base crosswords styles - add to <crossword>
 @mixin oCrosswordBase {
 	// scss-lint:disable QualifyingElement
@@ -12,15 +21,17 @@
 	position: relative;
 	display: inline-block;
 	max-width: 100%;
-	overflow-x: hidden;
+	overflow: hidden;
 
 	table {
 		border-collapse: collapse;
 		border-spacing: 0;
+		font-size: 1.5em;
 
 		td {
 			border: 1px solid;
 			@include oColorsFor(o-crossword-border, border);
+			@include oCrosswordType;
 
 			&.empty {
 				@include oColorsFor(o-crossword-empty, background);
@@ -30,14 +41,13 @@
 			text-align: left;
 			vertical-align: top;
 			position: relative;
-			min-width: 1.5em;
-			height: 1.5em;
 
 			.o-crossword-gridnum {
 				font-size: 0.5em;
 				position: absolute;
 				top: 0;
 				left: 0.25em;
+				letter-spacing: 0;
 			}
 		}
 	}
