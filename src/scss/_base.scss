@@ -112,6 +112,7 @@
 
 	.o-crossword-clues-wrapper {
 		position: absolute;
+		pointer-events: none;
 		z-index: 2;
 		width: 20em;
 	}
@@ -193,11 +194,15 @@
 
 	&.collapsable-clues .o-crossword-clues {
 		position: absolute;
+		width: 100%;
 		&.magnify, &.magnify-drag {
 			background-color: oColorsGetColorFor(o-crossword page, background);
 			border: 1px solid grey;
-			height: 6em;
+			height: 8em;
 			padding-top: 3em;
+			@include oGridRespondTo(M) {
+				padding-top: 0;
+			}
 			overflow: hidden;
 			margin: 0 1em;
 			box-shadow: 0 0 1em black;
@@ -211,11 +216,13 @@
 		}
 		&.expanded {
 			overflow-y: auto;
+			height: 100%;
 			max-height: 100%;
 			background: white;
 			box-shadow: 0 0 1em black;
 			overflow-x: hidden;
 			padding-right: 1em;
+			pointer-events: all;
 		}
 		&.preview {
 			display: block;

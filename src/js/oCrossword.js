@@ -253,6 +253,7 @@ OCrossword.prototype.assemble = function assemble() {
 					const number = hoverEl.dataset.oCrosswordNumber;
 					const direction = hoverEl.dataset.oCrosswordDirection;
 					setClue(number, direction);
+					highlightGridByCluesEl(hoverEl);
 				}
 
 				e.preventDefault();
