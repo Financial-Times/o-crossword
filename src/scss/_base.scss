@@ -21,10 +21,12 @@
 	@include oTypographySans(s);
 	position: relative;
 	display: inline-block;
-	width: 100%;
 	max-width: 80em;
 	margin: auto;
 	padding: 1em 0;
+	box-sizing: border-box;
+	overflow-x: hidden;
+	overflow-y: visible;
 
 	* {
 		box-sizing: border-box;
@@ -127,7 +129,6 @@
 	.o-crossword-clues {
 		float: left;
 		max-width: 80vw;
-		width: 100%;
 
 		&, ul {
 			list-style: none;
@@ -139,6 +140,9 @@
 				line-height: 1.5em;
 				padding-bottom: 0.5em;
 				margin-left: 1em;
+				.has-hover {
+					color: green;
+				}
 			}
 		}
 
@@ -193,6 +197,7 @@
 			background-color: oColorsGetColorFor(o-crossword page, background);
 			border: 1px solid grey;
 			height: 6em;
+			padding-top: 3em;
 			overflow: hidden;
 			margin: 0 1em;
 			box-shadow: 0 0 1em black;

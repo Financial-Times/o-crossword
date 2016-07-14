@@ -12,7 +12,8 @@
 			"fetch",
 			"Array.from",
 			"Element.prototype.classList",
-			"requestAnimationFrame"
+			"requestAnimationFrame",
+			"Node.prototype.contains"
 		]
 	},
 	"demosDefaults": {

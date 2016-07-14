@@ -7,18 +7,6 @@
 
 'use strict';
 
-function isChildOf(el, parent) {
-	while(el.parentNode) {
-		if (el.parentNode === parent) {
-			return true;
-		} else {
-			el = el.parentNode;
-		}
-	}
-	return false;
-}
-
-
 function prevAll(node) {
 	const nodes = Array.from(node.parentNode.children);
 	const pos = nodes.indexOf(node);
@@ -26,7 +14,6 @@ function prevAll(node) {
 };
 
 const Hammer = require('hammerjs');
-const HORIZ_PAN_SCALE = 1;
 const HORIZ_PAN_SPRING = 0.2;
 
 function buildGrid(
@@ -133,9 +120,53 @@ function OCrossword(rootEl) {
 	}
 }
 
+function getGridCellsByNumber(gridEl, number, direction, length) {
+	const out = [];
+	let el = gridEl.querySelector(`td[data-o-crossword-number="${number}"]`);
+	const els = Array.from(gridEl.querySelectorAll('td[data-o-crossword-highlighted]'));
+	for (const o of els) {
+		delete o.dataset.oCrosswordHighlighted;
+	}
+	if (el) {
+		if (direction === 'across') {
+			while (length--) {
+				out.push(el);
+				if (length === 0) break;
+				el = el.nextElementSibling;
+				if (!el) break;
+			}
+		}
+		else if (direction === 'down') {
+			const index = prevAll(el).length;
+			while (length--) {
+				out.push(el);
+				if (length === 0) break;
+				if (!el.parentNode.nextElementSibling) break;
+				el = el.parentNode.nextElementSibling.children[index];
+				if (!el) break;
+			}
+		}
+	}
+	return out;
+}
+
 OCrossword.prototype.assemble = function assemble() {
 	const gridEl = this.rootEl.querySelector('table');
 	const cluesEl = this.rootEl.querySelector('ul.o-crossword-clues');
+	const gridMap = new Map();
+	let currentlySelectedGridItem = null;
+	for (const el of cluesEl.querySelectorAll('[data-o-crossword-number]')) {
+		const els = getGridCellsByNumber(gridEl, el.dataset.oCrosswordNumber,el.dataset.oCrosswordDirection, el.dataset.oCrosswordAnswerLength);
+		els.forEach(cell => {
+			const arr = gridMap.get(cell) || [];
+			arr.push({
+				number: el.dataset.oCrosswordNumber,
+				direction: el.dataset.oCrosswordDirection,
+				answerLength: el.dataset.oCrosswordAnswerLength
+			});
+			gridMap.set(cell, arr);
+		});
+	}
 	if (cluesEl) {
 		const cluesUlEls = Array.from(cluesEl.querySelectorAll('ul'));
 
@@ -171,7 +202,6 @@ OCrossword.prototype.assemble = function assemble() {
 			let scale = height2/height1;
 			if (scale > 0.2) scale = 0.2;
 			this._cluesElHeight = height1;
-			this._cluesElWidth = width1;
 			this._previewElWidth = width1 * scale;
 			this._height = height1 * scale;
 			this._cluesPanHorizTarget = this._cluesPanHoriz = this._cluesPanHorizStart = -(width1 + this._previewElWidth + 20);
@@ -218,6 +248,13 @@ OCrossword.prototype.assemble = function assemble() {
 				this._cluesPanHorizTarget = this._cluesPanHorizStart;
 				this._isGrabbed = true;
 
+				const hoverEl = document.elementsFromPoint(e.center.x, e.center.y).filter(el => !!el.dataset.oCrosswordNumber)[0];
+				if (hoverEl) {
+					const number = hoverEl.dataset.oCrosswordNumber;
+					const direction = hoverEl.dataset.oCrosswordDirection;
+					setClue(number, direction);
+				}
+
 				e.preventDefault();
 				const proportion = (e.relativeCenter.y/this._height);
 				const offset = this._cluesElHeight * proportion;
@@ -234,7 +271,7 @@ OCrossword.prototype.assemble = function assemble() {
 			if(!this._doFancyBehaviour) return;
 			getRelativeCenter(e, previewEl);
 			if (
-				isChildOf(e.target, cluesEl) ||
+				cluesEl.contains(e.target) ||
 				(e.relativeCenter.x < this._previewElWidth || this._isGrabbed) &&
 				Math.abs(e.deltaX) > 20
 			) {
@@ -242,14 +279,17 @@ OCrossword.prototype.assemble = function assemble() {
 				e.preventDefault();
 				if (cluesEl.className.indexOf('magnify-drag') !== -1) cluesEl.classList.remove('magnify-drag');
 				if (cluesEl.className.indexOf('magnify') !== -1) cluesEl.classList.remove('magnify');
-				if (cluesEl.className.indexOf('expanded') === -1) cluesEl.classList.add('expanded');
+				if (cluesEl.className.indexOf('expanded') === -1) {
+					cluesEl.classList.add('expanded');
+					this._cluesElWidth = cluesEl.clientWidth;
+				}
 				for (const li of cluesUlEls) {
 					li.style.transform = '';
 				}
-				let offset = this._cluesPanHoriz + e.deltaX * HORIZ_PAN_SCALE;
+				let offset = this._cluesPanHoriz + e.deltaX;
 				if (offset + this._cluesElWidth - 5 < e.relativeCenter.x) {
 					this._cluesPanHoriz += 4;
-					offset = this._cluesPanHoriz + e.deltaX * HORIZ_PAN_SCALE;
+					offset = this._cluesPanHoriz + e.deltaX;
 				}
 				cluesEl.style.transform = `translateX(${offset}px)`;
 			}
@@ -258,7 +298,7 @@ OCrossword.prototype.assemble = function assemble() {
 		const onPanEnd = function onPanEnd(e) {
 			if(!this._doFancyBehaviour) return;
 			if ( this._isGrabbed && cluesEl.className.indexOf('expanded') !== -1 ) {
-				this._cluesPanHoriz = e.deltaX * HORIZ_PAN_SCALE + this._cluesPanHoriz;
+				this._cluesPanHoriz = e.deltaX + this._cluesPanHoriz;
 				this._isGrabbed = false;
 				if (this._cluesPanHoriz > -this._previewElWidth/2) {
 					this._cluesPanHorizTarget = 0;
@@ -290,42 +330,37 @@ OCrossword.prototype.assemble = function assemble() {
 
 		function setClue(number, direction) {
 			const el = cluesEl.querySelector(`li[data-o-crossword-number="${number}"][data-o-crossword-direction="${direction}"]`);
-			if (el) clueDisplayer.textContent = el.textContent;
+			if (el) {
+				clueDisplayer.textContent = el.textContent;
+				const els = Array.from(cluesEl.getElementsByClassName('has-hover'));
+				els.filter(el2 => el2 !== el).forEach(el => el.classList.remove('has-hover'));
+				el.classList.add('has-hover');
+			}
 		}
 
 		function highlightGridByNumber(number, direction, length) {
-			let el = gridEl.querySelector(`td[data-o-crossword-number="${number}"]`);
-			const els = Array.from(gridEl.querySelectorAll('td[data-o-crossword-highlighted]'));
 			setClue(number, direction);
-			for (const o of els) {
-				delete o.dataset.oCrosswordHighlighted;
-			}
-			if (el) {
-				if (direction === 'across') {
-					while (length--) {
-						el.dataset.oCrosswordHighlighted = 'across';
-						if (length === 0) break;
-						el = el.nextElementSibling;
-						if (!el) break;
-					}
-				}
-				else if (direction === 'down') {
-					const index = prevAll(el).length;
-					while (length--) {
-						el.dataset.oCrosswordHighlighted = 'down';
-						if (length === 0) break;
-						if (!el.parentNode.nextElementSibling) break;
-						el = el.parentNode.nextElementSibling.children[index];
-						if (!el) break;
-					}
-				}
-			}
+			const els = getGridCellsByNumber(gridEl, number, direction, length);
+			els.forEach(el => el.dataset.oCrosswordHighlighted = direction);
 		}
 
 		const onTap = function onTap(e) {
+			if (gridEl.contains(e.target)) {
+				const cell = e.target;
+				const clues = gridMap.get(cell);
+				if (!clues) return;
+				let index = clues.indexOf(currentlySelectedGridItem);
+				if (index + 1 === clues.length) index = -1;
+				currentlySelectedGridItem = clues[index + 1];
+				highlightGridByNumber(
+					currentlySelectedGridItem.number,
+					currentlySelectedGridItem.direction,
+					currentlySelectedGridItem.answerLength
+				);
+			}
 			if(!this._doFancyBehaviour) return;
-			const previewHit = isChildOf(e.target, previewEl);
-			if (previewHit || isChildOf(e.target, cluesEl)) {
+			const previewHit = previewEl.contains(e.target);
+			if (previewHit || cluesEl.contains(e.target)) {
 				getRelativeCenter(e, previewEl);
 				if (cluesEl.className.indexOf('magnify-drag') !== -1) cluesEl.classList.remove('magnify-drag');
 				if (cluesEl.className.indexOf('magnify') !== -1) cluesEl.classList.remove('magnify');
