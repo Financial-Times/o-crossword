@@ -4,12 +4,16 @@
 ////
 
 @mixin oCrosswordType {
-	letter-spacing: 1ch;
 	font-family: monospace;
 	min-width: 1.5em;
 	min-width: 2ch;
+	max-width: 1.5em;
+	max-width: 2ch;
 	height: 1.5em;
 	height: 2ch;
+	line-height: 1.5em;
+	line-height: 2ch;
+	text-align: center;
 }
 
 /// Base crosswords styles - add to <crossword>
@@ -79,6 +83,7 @@
 
 		td {
 			border: 1px solid;
+			padding: 0;
 			@include oColorsFor(o-crossword-border, border);
 			@include oCrosswordType;
 
@@ -94,7 +99,6 @@
 				@include oColorsFor(o-crossword-hidden-down, background);
 			}
 
-			line-height: 1.428571429;
 			text-align: left;
 			vertical-align: top;
 			position: relative;
@@ -104,8 +108,18 @@
 				font-size: 0.5em;
 				position: absolute;
 				top: 0;
-				left: 0.25em;
 				letter-spacing: 0;
+				line-height: 1em;
+			}
+
+			input {
+				@include oCrosswordType;
+				margin: 0;
+				border: none;
+				outline: none;
+				box-sizing: border-box;
+				background: transparent;
+				font-size: inherit;
 			}
 		}
 	}
@@ -165,6 +179,7 @@
 			transform-origin: 0 0;
 			cursor: default;
 			display: none;
+			pointer-events: all;
 
 			.o-crossword-clues-down {
 				span {

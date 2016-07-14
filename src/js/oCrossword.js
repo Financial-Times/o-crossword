@@ -123,10 +123,6 @@ function OCrossword(rootEl) {
 function getGridCellsByNumber(gridEl, number, direction, length) {
 	const out = [];
 	let el = gridEl.querySelector(`td[data-o-crossword-number="${number}"]`);
-	const els = Array.from(gridEl.querySelectorAll('td[data-o-crossword-highlighted]'));
-	for (const o of els) {
-		delete o.dataset.oCrosswordHighlighted;
-	}
 	if (el) {
 		if (direction === 'across') {
 			while (length--) {
@@ -187,6 +183,31 @@ OCrossword.prototype.assemble = function assemble() {
 		this.rootEl.insertBefore(wrapper, cluesEl);
 		wrapper.appendChild(previewEl);
 		wrapper.appendChild(cluesEl);
+
+		const magicInput = document.createElement('input');
+		this.addEventListener(magicInput, 'input', function () {
+			const oldEl = magicInput.parentNode;
+			const oldValue = magicInput.value;
+			if (magicInput.nextEls) {
+				const index = magicInput.nextEls.indexOf(magicInput.parentNode);
+				if (magicInput.nextEls[index + 1]) {
+					takeInput(magicInput.nextEls[index + 1], magicInput.nextEls);
+					oldEl.textContent = oldValue;
+					return;
+				}
+			}
+			oldEl.textContent = oldValue;
+			magicInput.blur();
+		});
+		magicInput.type = 'text';
+		function takeInput(el, nextEls) {
+			magicInput.value = el.textContent;
+			el.textContent = '';
+			el.appendChild(magicInput);
+			magicInput.value = '';
+			magicInput.focus();
+			magicInput.nextEls = nextEls;
+		}
 
 		// TODO: DEBOUNCE!!!
 		const onResize = (function onResize() {
@@ -289,7 +310,7 @@ OCrossword.prototype.assemble = function assemble() {
 				}
 				let offset = this._cluesPanHoriz + e.deltaX;
 				if (offset + this._cluesElWidth - 5 < e.relativeCenter.x) {
-					this._cluesPanHoriz += 4;
+					this._cluesPanHoriz += 8;
 					offset = this._cluesPanHoriz + e.deltaX;
 				}
 				cluesEl.style.transform = `translateX(${offset}px)`;
@@ -341,13 +362,24 @@ OCrossword.prototype.assemble = function assemble() {
 
 		function highlightGridByNumber(number, direction, length) {
 			setClue(number, direction);
-			const els = getGridCellsByNumber(gridEl, number, direction, length);
-			els.forEach(el => el.dataset.oCrosswordHighlighted = direction);
+			const els = Array.from(gridEl.querySelectorAll('td[data-o-crossword-highlighted]'));
+			for (const o of els) {
+				delete o.dataset.oCrosswordHighlighted;
+			}
+			getGridCellsByNumber(gridEl, number, direction, length)
+				.forEach(el => el.dataset.oCrosswordHighlighted = direction);
 		}
 
 		const onTap = function onTap(e) {
 			if (gridEl.contains(e.target)) {
-				const cell = e.target;
+				let cell = e.target;
+				while(cell.parentNode) {
+					if (cell.tagName === 'TD') {
+						break;
+					} else {
+						cell = cell.parentNode;
+					}
+				}
 				const clues = gridMap.get(cell);
 				if (!clues) return;
 				let index = clues.indexOf(currentlySelectedGridItem);
@@ -358,6 +390,12 @@ OCrossword.prototype.assemble = function assemble() {
 					currentlySelectedGridItem.direction,
 					currentlySelectedGridItem.answerLength
 				);
+				takeInput(cell, getGridCellsByNumber(
+					gridEl,
+					currentlySelectedGridItem.number,
+					currentlySelectedGridItem.direction,
+					currentlySelectedGridItem.answerLength
+				));
 			}
 			if(!this._doFancyBehaviour) return;
 			const previewHit = previewEl.contains(e.target);
@@ -369,8 +407,16 @@ OCrossword.prototype.assemble = function assemble() {
 				for (const li of cluesUlEls) {
 					li.style.transform = '';
 				}
-				this._cluesPanHorizTarget = !previewHit && this._cluesPanHorizTarget === 0 ? this._cluesPanHorizStart : 0 ;
-				cluesEl.scrollTop = e.relativeCenter.y / this._scale;
+
+				// if the preview is clicked on open it and bring to that point
+				// if the box is clicked on highlight that row and close it
+				if (previewHit) {
+					cluesEl.scrollTop = e.relativeCenter.y / this._scale;
+					this._cluesPanHorizTarget = 0;
+				} else {
+					this._cluesPanHorizTarget = this._cluesPanHorizTarget === 0 ? this._cluesPanHorizStart : 0;
+					highlightGridByCluesEl(e.target);
+				}
 			}
 		}.bind(this);
 
@@ -384,7 +430,6 @@ OCrossword.prototype.assemble = function assemble() {
 		});
 
 		this.addEventListener(cluesEl, 'mousemove', e => highlightGridByCluesEl(e.target));
-		this.addEventListener(cluesEl, 'click', e => highlightGridByCluesEl(e.target));
 
 		this.hammerMC.on('panup pandown swipeup swipedown panstart press', onPanVert);
 		this.hammerMC.on('panleft panright', onPanHoriz);
@@ -414,6 +459,6 @@ OCrossword.prototype.destroy = function destroy() {
 	this.removeAllEventListeners();
 	if (this.hammerMC) this.hammerMC.destroy();
 	if (this._raf) cancelAnimationFrame(this._raf);
-}
+};
 
 module.exports = OCrossword;
