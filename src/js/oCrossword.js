@@ -196,16 +196,21 @@ OCrossword.prototype.assemble = function assemble() {
 					return;
 				}
 			}
+			oldEl.removeChild(magicInput);
 			oldEl.textContent = oldValue;
 			magicInput.blur();
 		});
+
 		magicInput.type = 'text';
 		function takeInput(el, nextEls) {
+			if (magicInput.parentNode) {
+				magicInput.parentNode.textContent = magicInput.value;
+			}
 			magicInput.value = el.textContent;
 			el.textContent = '';
 			el.appendChild(magicInput);
-			magicInput.value = '';
 			magicInput.focus();
+			magicInput.select();
 			magicInput.nextEls = nextEls;
 		}
 
