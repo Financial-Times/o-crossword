@@ -185,33 +185,77 @@ OCrossword.prototype.assemble = function assemble() {
 		wrapper.appendChild(cluesEl);
 
 		const magicInput = document.createElement('input');
-		this.addEventListener(magicInput, 'input', function () {
-			const oldEl = magicInput.parentNode;
-			const oldValue = magicInput.value;
-			if (magicInput.nextEls) {
-				const index = magicInput.nextEls.indexOf(magicInput.parentNode);
-				if (magicInput.nextEls[index + 1]) {
-					takeInput(magicInput.nextEls[index + 1], magicInput.nextEls);
-					oldEl.textContent = oldValue;
-					return;
-				}
+		gridWrapper.appendChild(magicInput);
+		magicInput.classList.add('o-crossword-magic-input');
+		let magicInputTargetEl = null;
+		let magicInputNextEls = null;
+		magicInput.type = 'text';
+
+		this.addEventListener(magicInput, 'keydown', function (e) {
+			if (e.keyCode === 13) {
+				e.preventDefault();
+				magicInputNextEls = null;
+				progress();
 			}
-			oldEl.removeChild(magicInput);
-			oldEl.textContent = oldValue;
-			magicInput.blur();
+			if (
+				e.keyCode === 9 ||
+				e.keyCode === 40 ||
+				e.keyCode === 39
+			) {
+				e.preventDefault();
+				progress();
+			}
+			if (
+				e.keyCode === 37 ||
+				e.keyCode === 38 ||
+				e.keyCode === 8
+			) {
+				e.preventDefault();
+				progress(-1);
+			}
 		});
 
-		magicInput.type = 'text';
-		function takeInput(el, nextEls) {
-			if (magicInput.parentNode) {
-				magicInput.parentNode.textContent = magicInput.value;
+		function progress(direction) {
+			direction = direction === -1 ? -1 : 1;
+			if (
+				magicInputTargetEl &&
+				magicInput.value.match(/^[^\s]/)
+			) {
+				magicInputTargetEl.textContent = magicInput.value;
 			}
+			if (magicInputNextEls) {
+				const index = magicInputNextEls.indexOf(magicInputTargetEl);
+				if (magicInputNextEls[index + direction]) {
+					return takeInput(magicInputNextEls[index + direction], magicInputNextEls);
+				}
+			}
+			magicInputTargetEl = null;
+			magicInputNextEls = null;
+			magicInput.value = '';
+			magicInput.blur();
+		}
+		this.addEventListener(magicInput, 'input', progress);
+
+		function takeInput(el, nextEls) {
+			const oldClue = currentlySelectedGridItem;
+			const clues = gridMap.get(el);
+			if (!clues) return;
+			currentlySelectedGridItem = clues.find(item => (
+				item.direction === oldClue.direction &&
+				item.number === oldClue.number &&
+				item.answerLength === oldClue.answerLength
+			)) || currentlySelectedGridItem;
+
+			Array.from(gridEl.getElementsByClassName('receiving-input')).forEach(el => el.classList.remove('receiving-input'));
+			el.classList.add('receiving-input');
 			magicInput.value = el.textContent;
 			el.textContent = '';
-			el.appendChild(magicInput);
+			magicInputTargetEl = el;
+			magicInputNextEls = nextEls;
+			magicInput.style.left = magicInputTargetEl.offsetLeft + 'px';
+			magicInput.style.top = magicInputTargetEl.offsetTop + 'px';
 			magicInput.focus();
 			magicInput.select();
-			magicInput.nextEls = nextEls;
 		}
 
 		// TODO: DEBOUNCE!!!
@@ -241,9 +285,9 @@ OCrossword.prototype.assemble = function assemble() {
 			cluesEl.style.opacity = '';
 			this._doFancyBehaviour = window.getComputedStyle(previewEl).display !== 'none';
 			if (this._doFancyBehaviour) {
-				clueDisplayer.style.marginLeft = cluesEl.style.marginLeft = gridEl.style.marginLeft = `${this._previewElWidth}px`;
+				cluesEl.style.marginLeft = gridWrapper.style.marginLeft = `${this._previewElWidth}px`;
 			} else {
-				clueDisplayer.style.marginLeft = cluesEl.style.marginLeft = gridEl.style.marginLeft = '';
+				cluesEl.style.marginLeft = gridWrapper.style.marginLeft = '';
 			}
 		}).bind(this);
 
@@ -262,7 +306,7 @@ OCrossword.prototype.assemble = function assemble() {
 			if(!this._doFancyBehaviour) return;
 			getRelativeCenter(e, previewEl);
 			if (e.isFirst || (e.type.indexOf('start') !== -1 && (e.additionalEvent === 'panup' || e.additionalEvent === 'pandown'))){
-				if (e.relativeCenter.x < Number(gridEl.style.marginLeft.match(/([0-9.]+)px/)[1])) {
+				if (e.relativeCenter.x < this._previewElWidth) {
 					if (cluesEl.className.indexOf('magnify-drag') === -1) cluesEl.classList.add('magnify-drag');
 				}
 			}
@@ -376,6 +420,9 @@ OCrossword.prototype.assemble = function assemble() {
 		}
 
 		const onTap = function onTap(e) {
+			if (e.target === magicInput) {
+				e.target = magicInputTargetEl;
+			}
 			if (gridEl.contains(e.target)) {
 				let cell = e.target;
 				while(cell.parentNode) {

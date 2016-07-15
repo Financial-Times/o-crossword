@@ -13,7 +13,8 @@
 			"Array.from",
 			"Element.prototype.classList",
 			"requestAnimationFrame",
-			"Node.prototype.contains"
+			"Node.prototype.contains",
+			"Array.prototype.find"
 		]
 	},
 	"demosDefaults": {
