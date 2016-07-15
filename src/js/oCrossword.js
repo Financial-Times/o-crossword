@@ -174,11 +174,15 @@ OCrossword.prototype.assemble = function assemble() {
 		const gridWrapper = document.createElement('div');
 		gridWrapper.classList.add('o-crossword-grid-wrapper');
 		this.rootEl.insertBefore(gridWrapper, gridEl);
-		gridWrapper.appendChild(gridEl);
+
+		const gridScaleWrapper = document.createElement('div');
+		gridScaleWrapper.classList.add('o-crossword-grid-scale-wrapper');
+		gridWrapper.appendChild(gridScaleWrapper);
+		gridScaleWrapper.appendChild(gridEl);
 
 		const clueDisplayer = document.createElement('div');
 		clueDisplayer.classList.add('o-crossword-clue-displayer');
-		gridWrapper.appendChild(clueDisplayer);
+		gridScaleWrapper.appendChild(clueDisplayer);
 
 		const wrapper = document.createElement('div');
 		wrapper.classList.add('o-crossword-clues-wrapper');
@@ -187,7 +191,7 @@ OCrossword.prototype.assemble = function assemble() {
 		wrapper.appendChild(cluesEl);
 
 		const magicInput = document.createElement('input');
-		gridWrapper.appendChild(magicInput);
+		gridScaleWrapper.appendChild(magicInput);
 		magicInput.classList.add('o-crossword-magic-input');
 		let magicInputTargetEl = null;
 		let magicInputNextEls = null;
@@ -280,12 +284,13 @@ OCrossword.prototype.assemble = function assemble() {
 			magicInput.select();
 		}
 
-		const onResize = debounce(function onResize() {
+		const onResize = function onResize() {
 			cluesEl.classList.remove('magnify');
 			this.rootEl.classList.remove('collapsable-clues');
 			cluesEl.style.opacity = '0';
 			const d1 = cluesEl.getBoundingClientRect();
 			const d2 = gridEl.getBoundingClientRect();
+			const d3 = gridWrapper.getBoundingClientRect();
 			const width1 = d2.width;
 			const height1 = d1.height;
 			const width2 = d2.width;
@@ -310,9 +315,9 @@ OCrossword.prototype.assemble = function assemble() {
 			} else {
 				cluesEl.style.marginLeft = gridWrapper.style.marginLeft = '';
 			}
-		}, 100).bind(this);
+		}.bind(this);
 
-		this.onResize = onResize;
+		this.onResize = debounce(onResize, 100);
 
 		this._raf = requestAnimationFrame(function animate() {
 			this._raf = requestAnimationFrame(animate.bind(this));
@@ -437,8 +442,8 @@ OCrossword.prototype.assemble = function assemble() {
 			for (const o of els) {
 				delete o.dataset.oCrosswordHighlighted;
 			}
-			getGridCellsByNumber(gridEl, number, direction, length)
-				.forEach(el => el.dataset.oCrosswordHighlighted = direction);
+			const gridElsToHighlight = getGridCellsByNumber(gridEl, number, direction, length);
+			gridElsToHighlight.forEach(el => el.dataset.oCrosswordHighlighted = direction);
 		}
 
 		const onTap = function onTap(e) {
@@ -529,8 +534,8 @@ OCrossword.prototype.assemble = function assemble() {
 
 		this.addEventListener(this.rootEl, 'click', onPanEnd);
 
-		onResize.bind(this)();
-		this.addEventListener(window, 'resize', onResize);
+		onResize();
+		this.addEventListener(window, 'resize', this.onResize);
 	}
 };
 
