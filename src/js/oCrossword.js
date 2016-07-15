@@ -67,7 +67,7 @@ function buildGrid(
 			const tempLi = document.createElement('li');
 			const tempSpan = document.createElement('span');
 			const answerLength = answers.across[i].length;
-			tempSpan.textContent = across + ` (${answerLength}) [DEBUG: ${answers.across[i]}]`;
+			tempSpan.textContent = across + ` (${answerLength})`;
 			tempLi.dataset.oCrosswordNumber = Number(across.match(/^(\d+)./)[1]);
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'across';
@@ -79,7 +79,7 @@ function buildGrid(
 			const tempLi = document.createElement('li');
 			const tempSpan = document.createElement('span');
 			const answerLength = answers.down[i].length;
-			tempSpan.textContent = down + ` (${answerLength}) [DEBUG: ${answers.down[i]}]`;
+			tempSpan.textContent = down + ` (${answerLength})`;
 			tempLi.dataset.oCrosswordNumber = Number(down.match(/^(\d+)./)[1]);
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'down';
