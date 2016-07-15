@@ -25,3 +25,4 @@ NB: The preview bar refers to the green and blue clues thumbnail on small screen
 1. tapping again should highlight the other direction
 1. the grid you tapped on you can enter characters into
 1. the next cell will then be selected and ready for entering a character
+1. clicking on the now selected cell should switch between across/row on that cell if available.

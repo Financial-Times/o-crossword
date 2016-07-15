@@ -7,6 +7,8 @@
 
 'use strict';
 
+const debounce = require('o-viewport/src/utils').debounce;
+
 function prevAll(node) {
 	const nodes = Array.from(node.parentNode.children);
 	const pos = nodes.indexOf(node);
@@ -190,41 +192,51 @@ OCrossword.prototype.assemble = function assemble() {
 		let magicInputTargetEl = null;
 		let magicInputNextEls = null;
 		magicInput.type = 'text';
+		magicInput.style.display = 'none';
 
-		this.addEventListener(magicInput, 'keydown', function (e) {
+		this.addEventListener(magicInput, 'keyup', function (e) {
 			if (e.keyCode === 13) {
 				e.preventDefault();
 				magicInputNextEls = null;
-				progress();
+				return progress();
 			}
 			if (
 				e.keyCode === 9 ||
 				e.keyCode === 40 ||
-				e.keyCode === 39
+				e.keyCode === 39 ||
+				e.keyCode === 32
 			) {
 				e.preventDefault();
-				progress();
+				return progress();
 			}
 			if (
 				e.keyCode === 37 ||
-				e.keyCode === 38 ||
+				e.keyCode === 38
+			) {
+				e.preventDefault();
+				return progress(-1);
+			}
+			if (
 				e.keyCode === 8
 			) {
 				e.preventDefault();
-				progress(-1);
+				return magicInput.value = '';
 			}
+			progress();
 		});
 
-		function progress(direction) {
+		const progress = debounce(function progress(direction) {
 			direction = direction === -1 ? -1 : 1;
+			const oldMagicInputEl = magicInputTargetEl;
 			if (
 				magicInputTargetEl &&
 				magicInput.value.match(/^[^\s]/)
 			) {
-				magicInputTargetEl.textContent = magicInput.value;
+				magicInputTargetEl.textContent = magicInput.value[0];
 			}
+			magicInputTargetEl = null;
 			if (magicInputNextEls) {
-				const index = magicInputNextEls.indexOf(magicInputTargetEl);
+				const index = magicInputNextEls.indexOf(oldMagicInputEl);
 				if (magicInputNextEls[index + direction]) {
 					return takeInput(magicInputNextEls[index + direction], magicInputNextEls);
 				}
@@ -233,10 +245,20 @@ OCrossword.prototype.assemble = function assemble() {
 			magicInputNextEls = null;
 			magicInput.value = '';
 			magicInput.blur();
-		}
-		this.addEventListener(magicInput, 'input', progress);
+		}, 16);
+		this.addEventListener(magicInput, 'focus', magicInput.select());
 
 		function takeInput(el, nextEls) {
+
+			if (
+				magicInputTargetEl &&
+				magicInput.value.match(/^[^\s]/)
+			) {
+				magicInputTargetEl.textContent = magicInput.value[0];
+			}
+
+			magicInput.style.display = '';
+
 			const oldClue = currentlySelectedGridItem;
 			const clues = gridMap.get(el);
 			if (!clues) return;
@@ -258,8 +280,7 @@ OCrossword.prototype.assemble = function assemble() {
 			magicInput.select();
 		}
 
-		// TODO: DEBOUNCE!!!
-		const onResize = (function onResize() {
+		const onResize = debounce(function onResize() {
 			cluesEl.classList.remove('magnify');
 			this.rootEl.classList.remove('collapsable-clues');
 			cluesEl.style.opacity = '0';
@@ -289,7 +310,7 @@ OCrossword.prototype.assemble = function assemble() {
 			} else {
 				cluesEl.style.marginLeft = gridWrapper.style.marginLeft = '';
 			}
-		}).bind(this);
+		}, 100).bind(this);
 
 		this.onResize = onResize;
 
@@ -410,6 +431,7 @@ OCrossword.prototype.assemble = function assemble() {
 		}
 
 		function highlightGridByNumber(number, direction, length) {
+			magicInput.style.display = 'none';
 			setClue(number, direction);
 			const els = Array.from(gridEl.querySelectorAll('td[data-o-crossword-highlighted]'));
 			for (const o of els) {
@@ -434,9 +456,26 @@ OCrossword.prototype.assemble = function assemble() {
 				}
 				const clues = gridMap.get(cell);
 				if (!clues) return;
+
+				// iterate through list of answers associated with that cell
 				let index = clues.indexOf(currentlySelectedGridItem);
-				if (index + 1 === clues.length) index = -1;
-				currentlySelectedGridItem = clues[index + 1];
+
+				// if a new item is selected find what ever matches the current selection
+				if (index === -1 && currentlySelectedGridItem) {
+					const oldClue = currentlySelectedGridItem;
+					currentlySelectedGridItem = clues.find(item => (
+						item.direction === oldClue.direction &&
+						item.number === oldClue.number &&
+						item.answerLength === oldClue.answerLength
+					));
+				}
+				if (index !== -1 || !currentlySelectedGridItem) {
+
+					// the same cell has been clicked on again so
+					if (index + 1 === clues.length) index = -1;
+					currentlySelectedGridItem = clues[index + 1];
+				}
+
 				highlightGridByNumber(
 					currentlySelectedGridItem.number,
 					currentlySelectedGridItem.direction,

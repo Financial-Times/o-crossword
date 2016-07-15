@@ -61,7 +61,7 @@
 			border: none;
 			outline: none;
 			box-sizing: border-box;
-			background: transparent;
+			background: rgba(0,0,0,0.2);
 			font-size: inherit;
 		}
 	}
@@ -117,10 +117,6 @@
 			text-align: left;
 			vertical-align: top;
 			position: relative;
-
-			&.receiving-input {
-				border-width: 2px;
-			}
 
 			&[data-o-crossword-number]:before {
 				content: attr(data-o-crossword-number);
