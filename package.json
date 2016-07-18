@@ -1,6 +1,6 @@
 {
   "name": "o-crossword",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "FT-branded crosswords",
   "devDependencies": {
     "babel-loader": "^5.3.2",
