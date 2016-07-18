@@ -115,7 +115,7 @@
 				@include oColorsFor(o-crossword-hidden-down, background);
 			}
 
-			text-align: left;
+			text-align: right;
 			vertical-align: top;
 			position: relative;
 
@@ -124,6 +124,7 @@
 				font-size: 0.5em;
 				position: absolute;
 				top: 0;
+				left: 0;
 				letter-spacing: 0;
 				line-height: 1em;
 			}
