@@ -14,7 +14,8 @@
 			"Element.prototype.classList",
 			"requestAnimationFrame",
 			"Node.prototype.contains",
-			"Array.prototype.find"
+			"Array.prototype.find",
+			"Array.prototype.filter"
 		]
 	},
 	"demosDefaults": {
@@ -29,9 +30,15 @@
 			"description": ""
 		},
 		{
+			"name": "answered",
+			"template": "demos/src/answered.mustache",
+			"expanded": false,
+			"description": ""
+		},
+		{
 			"name": "pre-compiled",
 			"template": "demos/src/pre-compiled.mustache",
-			"expanded": true,
+			"expanded": false,
 			"description": ""
 		},
 		{

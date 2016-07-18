@@ -30,19 +30,17 @@ function buildGrid(
 	const gridEl = rootEl.querySelector('table');
 	const cluesEl = rootEl.querySelector('ul.o-crossword-clues');
 	const {cols, rows} = size;
-	let count = 0;
 	for (let i=0; i<rows; i++) {
 		const tr = document.createElement('tr');
 		for (let j=0; j<cols; j++) {
 			const td = document.createElement('td');
 			tr.appendChild(td);
-			if (gridnums[count]) {
-				td.dataset.oCrosswordNumber = gridnums[count];
+			if (gridnums[i][j]) {
+				td.dataset.oCrosswordNumber = gridnums[i][j];
 			}
-			if (grid[count] === '.') {
+			if (grid[i][j] === '.') {
 				td.classList.add('empty');
 			}
-			count++;
 		}
 		gridEl.appendChild(tr);
 	}
@@ -63,28 +61,47 @@ function buildGrid(
 		downWrapper.appendChild(downEl);
 		cluesEl.appendChild(downWrapper);
 
-		clues.across.forEach(function across(across, i) {
+		clues.across.forEach(function across(across) {
 			const tempLi = document.createElement('li');
 			const tempSpan = document.createElement('span');
-			const answerLength = answers.across[i].length;
-			tempSpan.textContent = across + ` (${answerLength})`;
-			tempLi.dataset.oCrosswordNumber = Number(across.match(/^(\d+)./)[1]);
+			const answerLength = across[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
+			tempSpan.textContent = across[1] + ` (${across[2].filter(isFinite).join(', ')})`;
+			tempLi.dataset.oCrosswordNumber = across[0];
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'across';
 			acrossEl.appendChild(tempLi);
 			tempLi.appendChild(tempSpan);
 		});
 
-		clues.down.forEach(function down(down, i) {
+		clues.down.forEach(function down(down) {
 			const tempLi = document.createElement('li');
 			const tempSpan = document.createElement('span');
-			const answerLength = answers.down[i].length;
-			tempSpan.textContent = down + ` (${answerLength})`;
-			tempLi.dataset.oCrosswordNumber = Number(down.match(/^(\d+)./)[1]);
+			const answerLength = down[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
+			tempSpan.textContent = down[1] + ` (${down[2].filter(isFinite).join(', ')})`;
+			tempLi.dataset.oCrosswordNumber = down[0];
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'down';
 			downEl.appendChild(tempLi);
 			tempLi.appendChild(tempSpan);
+		});
+	}
+
+	if (answers) {
+		clues.across.forEach(function across(across, i) {
+			const answer = answers.across[i];
+			const answerLength = answer.length;
+			getGridCellsByNumber(gridEl, across[0], 'across', answerLength);
+			getGridCellsByNumber(gridEl, across[0], 'across', answerLength).forEach((td, i) => {
+				td.textContent = answer[i];
+			});
+		});
+
+		clues.down.forEach(function down(down, i) {
+			const answer = answers.down[i];
+			const answerLength = answer.length;
+			getGridCellsByNumber(gridEl, down[0], 'down', answerLength).forEach((td, i) => {
+				td.textContent = answer[i];
+			});
 		});
 	}
 }
