@@ -4,6 +4,7 @@
 
 * Toggle for changing side of preview bar
 * Note pad for
+* Touch/scroll functionality did not work on iPhone
 
 # Testing Script
 

@@ -545,6 +545,11 @@ OCrossword.prototype.assemble = function assemble() {
 		this.hammerMC.on('panleft panright', onPanHoriz);
 		this.hammerMC.on('panend pressup pancancel', onPanEnd);
 		this.hammerMC.on('tap', onTap);
+		this.hammerMC.on('hammer.input', function (e) {
+			if (!cluesEl.contains(e.target) && !gridWrapper.contains(e.target)) {
+				e.preventDefault();
+			}
+		});
 
 		this.addEventListener(this.rootEl, 'click', onPanEnd);
 

@@ -39,6 +39,7 @@
 	.o-crossword-grid-wrapper {
 		flex-shrink: 0;
 		overflow: auto;
+		-webkit-overflow-scrolling: touch;
 		position: relative;
 		font-size: 1.5em;
 
@@ -239,6 +240,7 @@
 		}
 		&.expanded {
 			overflow-y: auto;
+			-webkit-overflow-scrolling: touch;
 			height: 100%;
 			max-height: 100%;
 			background: white;
@@ -280,10 +282,4 @@
 			}
 		}
 	}
-}
-
-/// Add to crossword's wrapper element (if there is one)
-@mixin oCrosswordWrapper {
-	overflow: auto;
-	width: 100%;
 }
