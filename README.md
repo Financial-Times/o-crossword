@@ -1,5 +1,10 @@
 # o-crossword
 
+# Features it could do with:
+
+* Toggle for changing side of preview bar
+* Note pad for
+
 # Testing Script
 
 NB: The preview bar refers to the green and blue clues thumbnail on small screen.
@@ -21,8 +26,15 @@ NB: The preview bar refers to the green and blue clues thumbnail on small screen
 1. tapping again again on the preview bar whilst the box is visible should scroll the box to that position
 
 1. The grid should allow you to tap on a grid cell
-1. This highlights it across
-1. tapping again should highlight the other direction
+1. This highlights it across (if available)
+1. tapping on the same character again should highlight the other direction
+1. tapping on another character in the highlighted word should select that character and keep the highlight the same
 1. the grid you tapped on you can enter characters into
+1. entering a character will replace the contents of the cell
 1. the next cell will then be selected and ready for entering a character
 1. clicking on the now selected cell should switch between across/row on that cell if available.
+1. highlighted words can be navigated by pressing the arrow keys
+1. pressing return exits the character entry
+
+1. building from JSON
+1. building from json with answers
