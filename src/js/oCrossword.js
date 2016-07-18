@@ -5,8 +5,6 @@
  * @returns {OCrossword} - A single OCrossword instance
  */
 
-'use strict';
-
 const debounce = require('o-viewport/src/utils').debounce;
 
 function prevAll(node) {
