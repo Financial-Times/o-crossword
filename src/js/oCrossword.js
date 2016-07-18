@@ -59,7 +59,7 @@ function buildGrid(
 		downWrapper.appendChild(downEl);
 		cluesEl.appendChild(downWrapper);
 
-		clues.across.forEach(function across(across) {
+		clues.across.forEach(function acrossForEach(across) {
 			const tempLi = document.createElement('li');
 			const tempSpan = document.createElement('span');
 			const answerLength = across[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
@@ -71,7 +71,7 @@ function buildGrid(
 			tempLi.appendChild(tempSpan);
 		});
 
-		clues.down.forEach(function down(down) {
+		clues.down.forEach(function acrossForEach(down) {
 			const tempLi = document.createElement('li');
 			const tempSpan = document.createElement('span');
 			const answerLength = down[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
@@ -85,7 +85,7 @@ function buildGrid(
 	}
 
 	if (answers) {
-		clues.across.forEach(function across(across, i) {
+		clues.across.forEach(function acrossForEach(across, i) {
 			const answer = answers.across[i];
 			const answerLength = answer.length;
 			getGridCellsByNumber(gridEl, across[0], 'across', answerLength);
@@ -94,7 +94,7 @@ function buildGrid(
 			});
 		});
 
-		clues.down.forEach(function down(down, i) {
+		clues.down.forEach(function downForEach(down, i) {
 			const answer = answers.down[i];
 			const answerLength = answer.length;
 			getGridCellsByNumber(gridEl, down[0], 'down', answerLength).forEach((td, i) => {
