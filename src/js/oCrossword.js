@@ -112,7 +112,6 @@ function getRelativeCenter(e, el) {
 	};
 }
 
-'use strict';
 function OCrossword(rootEl) {
 	if (!rootEl) {
 		rootEl = document.body;
