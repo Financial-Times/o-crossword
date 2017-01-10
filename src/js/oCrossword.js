@@ -132,11 +132,9 @@ function OCrossword(rootEl) {
 				.then(json => buildGrid(rootEl, json))
 				.then(()   => this.assemble());
 			} else { // assume this is json text
-				return new Promise(() => {
-					let json = JSON.parse(this.rootEl.dataset.oCrosswordData);
-					buildGrid(rootEl, json);
-				})
-				.then(()   => this.assemble());
+				return new Promise((resolve) => resolve( JSON.parse(this.rootEl.dataset.oCrosswordData) ) )
+				.then(json => buildGrid(rootEl, json))
+				.then(()   => this.assemble() );
 			}
 		} else {
 			this.assemble();
