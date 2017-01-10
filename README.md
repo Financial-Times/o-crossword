@@ -1,12 +1,35 @@
 # o-crossword
 
-# Features it could do with:
+An experimental Origami component to implement a responsive crossword.
+
+## To build this locally
+
+* set up the Origami [Manual build process](http://origami.ft.com/docs/developer-guide/modules/building-modules/)
+   * checkout clone of o-crossword repo
+   * cd to repo code
+   * check node and ruby are installed
+   * $ `npm install -g gulp`
+   * $ `npm install -g origami-build-tools`
+   * $ `obt build`
+* deploy locally as described in the [Origami build tools doc](https://github.com/Financial-Times/origami-build-tools#developing-modules-locally)
+   * $ `obt demo --runServer --watch`
+   * $ see a demo of it running at http://0.0.0.0:8080/demos/local/basic.html
+* [Bower linking a component](https://oncletom.io/2013/live-development-bower-component/)
+* general Origami [Developer Guide](http://origami.ft.com/docs/developer-guide/)
+
+## main code
+
+* src/js/oCrossword.js
+
+# Old notes
+
+## Features it could do with:
 
 * Toggle for changing side of preview bar
 * Note pad for
 * Touch/scroll functionality did not work on iPhone
 
-# Testing Script
+## Testing Script
 
 NB: The preview bar refers to the green and blue clues thumbnail on small screen.
 
