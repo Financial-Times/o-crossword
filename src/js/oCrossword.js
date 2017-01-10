@@ -126,10 +126,18 @@ function OCrossword(rootEl) {
 
 	if (this.rootEl !== undefined) {
 		if (this.rootEl.dataset.oCrosswordData) {
-			return fetch(this.rootEl.dataset.oCrosswordData)
-			.then(res => res.json())
-			.then(json => buildGrid(rootEl, json))
-			.then(() => this.assemble());
+			if (this.rootEl.dataset.oCrosswordData.startsWith('http')) {
+				return fetch(this.rootEl.dataset.oCrosswordData)
+				.then(res  => res.json())
+				.then(json => buildGrid(rootEl, json))
+				.then(()   => this.assemble());
+			} else { // assume this is json text
+				return new Promise(() => {
+					let json = JSON.parse(this.rootEl.dataset.oCrosswordData);
+					buildGrid(rootEl, json);
+				})
+				.then(()   => this.assemble());
+			}
 		} else {
 			this.assemble();
 		}
