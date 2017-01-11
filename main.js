@@ -10,3 +10,4 @@ const constructAll = function() {
 	document.removeEventListener('o.DOMContentLoaded', constructAll);
 };
 document.addEventListener('o.DOMContentLoaded', constructAll);
+document.addEventListener('o.CrosswordDataUpdated', constructAll);

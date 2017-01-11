@@ -26,7 +26,9 @@ function buildGrid(
 	answers
 }) {
 	const gridEl = rootEl.querySelector('table');
-	const cluesEl = rootEl.querySelector('ul.o-crossword-clues');
+	gridEl.innerHTML = "";
+	const cluesEl = rootEl.querySelector('ul.o-crossword-clues')
+	cluesEl.innerHTML = "";
 	const {cols, rows} = size;
 	for (let i=0; i<rows; i++) {
 		const tr = document.createElement('tr');
