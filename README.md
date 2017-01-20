@@ -13,7 +13,7 @@ An experimental Origami component to implement a responsive crossword.
    * $ `obt build`
 * deploy locally as described in the [Origami build tools doc](https://github.com/Financial-Times/origami-build-tools#developing-modules-locally)
    * $ `obt demo --runServer --watch`
-   * $ see a demo of it running at http://0.0.0.0:8080/demos/local/basic.html
+   * $ see a demo of it running at http://localhost:8080/demos/local/basic.html
 * [Bower linking a component](https://oncletom.io/2013/live-development-bower-component/)
 * general Origami [Developer Guide](http://origami.ft.com/docs/developer-guide/)
 
