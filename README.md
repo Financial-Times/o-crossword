@@ -10,6 +10,8 @@ An experimental Origami component to implement a responsive crossword.
    * check node and ruby are installed
    * $ `npm install -g gulp`
    * $ `npm install -g origami-build-tools`
+   * $ `npm install -g bower`
+   * $ `bower install`
    * $ `obt build`
 * deploy locally as described in the [Origami build tools doc](https://github.com/Financial-Times/origami-build-tools#developing-modules-locally)
    * $ `obt demo --runServer --watch`
