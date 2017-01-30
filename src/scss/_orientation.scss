@@ -1,0 +1,12 @@
+//below forces portrait mode on mobile phones
+//it uses "min-aspect-ratio" to detect landscape,
+//since keyboard popping will make "orientation" wrong in some cases
+@media screen and (min-aspect-ratio: 13/9) and (max-width: 767px) {
+  #main-container {
+    background-color: #4f1828;
+    transform: rotate(-90deg);
+    width: 100% /* screen width */ ;
+    height: 100% /* screen height */ ;
+    overflow: scroll;
+  }
+}

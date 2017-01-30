@@ -7,6 +7,7 @@ $o-crossword-is-silent: true !default;
 @import "src/scss/color-use-cases";
 @import "src/scss/mixins";
 @import "src/scss/base";
+@import "src/scss/orientation";
 
 @if ($o-crossword-is-silent == false) {
 	@include oCrosswordAll;
