@@ -304,10 +304,12 @@ OCrossword.prototype.assemble = function assemble() {
 
 		const onResize = function onResize() {
 			var isMobile = false;
-			if(typeof screen != 'undefined' && screen.width <= 480) {
+			if(typeof screen != 'undefined' && screen.width <= 750) { //phone
 				isMobile = true;
-			} else if (window.innerWidth <= 480) {
+			} else if (window.innerWidth <= 750) { //phones that do not support screen and other small devices
 				isMobile = true;
+			} else if (window.innerWidth > window.innerHeight && window.innerHeight <=750) { //rotated phones and small devices
+
 			}
 
 
@@ -321,6 +323,11 @@ OCrossword.prototype.assemble = function assemble() {
 			const height1 = d1.height;
 			const width2 = d2.width;
 			const height2 = d2.height;
+
+
+
+
+
 			let scale = height2/height1;
 			if (scale > 0.2) scale = 0.2;
 			this._cluesElHeight = height1;
@@ -488,6 +495,8 @@ OCrossword.prototype.assemble = function assemble() {
 				}
 				const clues = gridMap.get(cell);
 				if (!clues) return;
+
+        cell.scrollIntoView();
 
 				// iterate through list of answers associated with that cell
 				let index = clues.indexOf(currentlySelectedGridItem);

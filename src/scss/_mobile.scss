@@ -1,4 +1,4 @@
-$break-phone: 480px;
+$break-phone: 750px; //iPhone 7 Plus width
 @media screen and (max-width: $break-phone) {
   .o-crossword table, .o-crossword .o-crossword-grid-wrapper .o-crossword-magic-input {
     font-size: 1.2rem;
