@@ -15,3 +15,5 @@ $o-crossword-is-silent: true !default;
 	// Set crossword to silent again to avoid being output twice
 	$o-crossword-is-silent: true !global;
 }
+
+@import "src/scss/mobile";

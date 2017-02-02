@@ -303,6 +303,14 @@ OCrossword.prototype.assemble = function assemble() {
 		}
 
 		const onResize = function onResize() {
+			var isMobile = false;
+			if(typeof screen != 'undefined' && screen.width <= 480) {
+				isMobile = true;
+			} else if (window.innerWidth <= 480) {
+				isMobile = true;
+			}
+
+
 			cluesEl.classList.remove('magnify');
 			this.rootEl.classList.remove('collapsable-clues');
 			cluesEl.style.opacity = '0';
@@ -327,7 +335,8 @@ OCrossword.prototype.assemble = function assemble() {
 			this.rootEl.classList.add('collapsable-clues');
 			if (cluesEl.className.indexOf('magnify') === -1) cluesEl.classList.add('magnify');
 			cluesEl.style.opacity = '';
-			this._doFancyBehaviour = window.getComputedStyle(previewEl).display !== 'none';
+			this._doFancyBehaviour = window.getComputedStyle(previewEl).display !== 'none' && !isMobile;
+
 			if (this._doFancyBehaviour) {
 				cluesEl.style.marginLeft = gridWrapper.style.marginLeft = `${this._previewElWidth}px`;
 			} else {
