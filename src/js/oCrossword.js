@@ -309,7 +309,8 @@ OCrossword.prototype.assemble = function assemble() {
 			} else if (window.innerWidth <= 750) { //phones that do not support screen and other small devices
 				isMobile = true;
 			} else if (window.innerWidth > window.innerHeight && window.innerHeight <=750) { //rotated phones and small devices
-
+        isMobile = true;
+        document.getElementById('main-container').width = window.innerHeight + 'px !important';
 			}
 
 
