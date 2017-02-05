@@ -13,7 +13,7 @@ function prevAll(node) {
 	return nodes.slice(0, pos);
 };
 
-// const Hammer = require('hammerjs');
+const Hammer = require('hammerjs');
 const HORIZ_PAN_SPRING = 0.2;
 
 function buildGrid(
@@ -596,21 +596,21 @@ OCrossword.prototype.assemble = function assemble() {
 			}
 		}.bind(this);
 
-		// this.hammerMC = new Hammer.Manager(this.rootEl, {
-		// 	recognizers: [
-		// 		[Hammer.Tap],
+		this.hammerMC = new Hammer.Manager(this.rootEl, {
+			recognizers: [
+				[Hammer.Tap]//,
 		// 		[Hammer.Pan, { direction: Hammer.DIRECTION_ALL }],
 		// 		[Hammer.Press, { time: 150 }],
 		// 		[Hammer.Swipe, { direction: Hammer.DIRECTION_ALL }]
-		// 	]
-		// });
+			]
+		});
 
 		this.addEventListener(cluesEl, 'mousemove', e => highlightGridByCluesEl(e.target));
 
 		// this.hammerMC.on('panup pandown swipeup swipedown panstart press', onPanVert);
 		// this.hammerMC.on('panleft panright', onPanHoriz);
 		// this.hammerMC.on('panend pressup pancancel', onPanEnd);
-		// this.hammerMC.on('tap', onTap);
+		this.hammerMC.on('tap', onTap);
 		// this.hammerMC.on('hammer.input', function (e) {
 		// 	if (!cluesEl.contains(e.target) && !gridWrapper.contains(e.target)) {
 		// 		e.preventDefault();
@@ -642,7 +642,7 @@ OCrossword.prototype.removeAllEventListeners = function() {
 
 OCrossword.prototype.destroy = function destroy() {
 	this.removeAllEventListeners();
-	// if (this.hammerMC) this.hammerMC.destroy();
+	if (this.hammerMC) this.hammerMC.destroy();
 	if (this._raf) cancelAnimationFrame(this._raf);
 };
 
