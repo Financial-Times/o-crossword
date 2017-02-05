@@ -13,7 +13,7 @@ function prevAll(node) {
 	return nodes.slice(0, pos);
 };
 
-const Hammer = require('hammerjs');
+// const Hammer = require('hammerjs');
 const HORIZ_PAN_SPRING = 0.2;
 
 function buildGrid(
@@ -304,15 +304,11 @@ OCrossword.prototype.assemble = function assemble() {
 
 		const onResize = function onResize() {
 			var isMobile = false;
-			if(typeof screen != 'undefined' && screen.width <= 750) { //phone
+			if (window.innerWidth <= 400) {
 				isMobile = true;
-			} else if (window.innerWidth <= 750) { //phones that do not support screen and other small devices
+			} else if (window.innerWidth > window.innerHeight && window.innerHeight <=400 ) { //rotated phones and small devices, but not iOS
 				isMobile = true;
-			} else if (window.innerWidth > window.innerHeight && window.innerHeight <=750) { //rotated phones and small devices
-				isMobile = true;
-				document.getElementById('main-container').width = window.innerHeight + 'px !important';
 			}
-
 
 			cluesEl.classList.remove('magnify');
 			this.rootEl.classList.remove('collapsable-clues');
@@ -357,19 +353,22 @@ OCrossword.prototype.assemble = function assemble() {
 
 
 			//update grid size to fill 100% on mobile view
-			const fullWidth = document.querySelector('#main-container').offsetWidth;
+			const fullWidth = Math.min(window.innerHeight, window.innerWidth);
+			document.getElementById('main-container').width = fullWidth + 'px !important';
 			const gridTDs = gridEl.querySelectorAll('td');
 			const gridSize = gridEl.querySelectorAll('tr').length;
 			const newTdWidth = parseInt(fullWidth / gridSize);
 			const inputEl = document.querySelector('.o-crossword-magic-input');
-			console.log(inputEl);
 
+			console.log(isMobile);
+			console.log(fullWidth);
 			if(isMobile) {
 				for (let i = 0; i < gridTDs.length; i++) {
 					let td = gridTDs[i];
 					td.style.width = newTdWidth + "px";
 					td.style.height = newTdWidth + "px";
 					td.style.maxWidth = "initial";
+					td.style.minWidth = "initial";
 				}
 				previewEl.style.width = fullWidth + "px";
 				previewEl.style.maxWidth = "initial";
@@ -383,6 +382,7 @@ OCrossword.prototype.assemble = function assemble() {
 					td.style.removeProperty('width');
 					td.style.removeProperty('height');
 					td.style.removeProperty('maxWidth');
+					td.style.removeProperty('minWidth');
 				}
 				previewEl.style.removeProperty('width');
 				previewEl.style.removeProperty('maxWidth');
@@ -540,7 +540,7 @@ OCrossword.prototype.assemble = function assemble() {
 				const clues = gridMap.get(cell);
 				if (!clues) return;
 
-		cell.scrollIntoView();
+				// cell.scrollIntoView();
 
 				// iterate through list of answers associated with that cell
 				let index = clues.indexOf(currentlySelectedGridItem);
@@ -596,26 +596,26 @@ OCrossword.prototype.assemble = function assemble() {
 			}
 		}.bind(this);
 
-		this.hammerMC = new Hammer.Manager(this.rootEl, {
-			recognizers: [
-				[Hammer.Tap],
-				[Hammer.Pan, { direction: Hammer.DIRECTION_ALL }],
-				[Hammer.Press, { time: 150 }],
-				[Hammer.Swipe, { direction: Hammer.DIRECTION_ALL }]
-			]
-		});
+		// this.hammerMC = new Hammer.Manager(this.rootEl, {
+		// 	recognizers: [
+		// 		[Hammer.Tap],
+		// 		[Hammer.Pan, { direction: Hammer.DIRECTION_ALL }],
+		// 		[Hammer.Press, { time: 150 }],
+		// 		[Hammer.Swipe, { direction: Hammer.DIRECTION_ALL }]
+		// 	]
+		// });
 
 		this.addEventListener(cluesEl, 'mousemove', e => highlightGridByCluesEl(e.target));
 
-		this.hammerMC.on('panup pandown swipeup swipedown panstart press', onPanVert);
-		this.hammerMC.on('panleft panright', onPanHoriz);
-		this.hammerMC.on('panend pressup pancancel', onPanEnd);
-		this.hammerMC.on('tap', onTap);
-		this.hammerMC.on('hammer.input', function (e) {
-			if (!cluesEl.contains(e.target) && !gridWrapper.contains(e.target)) {
-				e.preventDefault();
-			}
-		});
+		// this.hammerMC.on('panup pandown swipeup swipedown panstart press', onPanVert);
+		// this.hammerMC.on('panleft panright', onPanHoriz);
+		// this.hammerMC.on('panend pressup pancancel', onPanEnd);
+		// this.hammerMC.on('tap', onTap);
+		// this.hammerMC.on('hammer.input', function (e) {
+		// 	if (!cluesEl.contains(e.target) && !gridWrapper.contains(e.target)) {
+		// 		e.preventDefault();
+		// 	}
+		// });
 
 		this.addEventListener(this.rootEl, 'click', onPanEnd);
 
@@ -642,7 +642,7 @@ OCrossword.prototype.removeAllEventListeners = function() {
 
 OCrossword.prototype.destroy = function destroy() {
 	this.removeAllEventListeners();
-	if (this.hammerMC) this.hammerMC.destroy();
+	// if (this.hammerMC) this.hammerMC.destroy();
 	if (this._raf) cancelAnimationFrame(this._raf);
 };
 
