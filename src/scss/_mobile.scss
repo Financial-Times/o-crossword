@@ -4,6 +4,21 @@ $break-phone: 750px; //iPhone 7 Plus width
     font-size: 1.2rem;
   }
   .o-crossword-clues-wrapper {
-    display: none;
+    display: block;
+  }
+
+  .o-crossword  div.o-crossword-clues-wrapper {
+    position: relative;
+  }
+
+  .o-crossword .o-crossword-clues li, .o-crossword .o-crossword-clues ul li {
+    line-height: 1.1em;
+  }
+
+  .o-crossword-clues.magnify {
+    display: none !important;
+  }
+  .o-crossword-clues-wrapper {
+    pointer-events: all;
   }
 }

@@ -193,24 +193,24 @@
 			.o-crossword-clues-down {
 				span {
 					@include oColorsFor(o-crossword-hidden-down, text);
-					@include oColorsFor(o-crossword-hidden-down, background);
+					//@include oColorsFor(o-crossword-hidden-down, background);
 				}
 
 				&:before {
 					@include oColorsFor(o-crossword-hidden-down, text);
-					@include oColorsFor(o-crossword-hidden-down, background);
+					//@include oColorsFor(o-crossword-hidden-down, background);
 				}
 			}
 
 			.o-crossword-clues-across {
 				span {
 					@include oColorsFor(o-crossword-hidden-across, text);
-					@include oColorsFor(o-crossword-hidden-across, background);
+					//@include oColorsFor(o-crossword-hidden-across, background);
 				}
 
 				&:before {
 					@include oColorsFor(o-crossword-hidden-across, text);
-					@include oColorsFor(o-crossword-hidden-across, background);
+					//@include oColorsFor(o-crossword-hidden-across, background);
 				}
 			}
 		}

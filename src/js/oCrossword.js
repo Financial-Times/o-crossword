@@ -128,13 +128,13 @@ function OCrossword(rootEl) {
 		if (this.rootEl.dataset.oCrosswordData) {
 			if (this.rootEl.dataset.oCrosswordData.startsWith('http')) {
 				return fetch(this.rootEl.dataset.oCrosswordData)
-				.then(res  => res.json())
+				.then(res	=> res.json())
 				.then(json => buildGrid(rootEl, json))
-				.then(()   => this.assemble());
+				.then(()	 => this.assemble());
 			} else { // assume this is json text
 				return new Promise((resolve) => resolve( JSON.parse(this.rootEl.dataset.oCrosswordData) ) )
 				.then(json => buildGrid(rootEl, json))
-				.then(()   => this.assemble() );
+				.then(()	 => this.assemble() );
 			}
 		}
 	}
@@ -309,8 +309,8 @@ OCrossword.prototype.assemble = function assemble() {
 			} else if (window.innerWidth <= 750) { //phones that do not support screen and other small devices
 				isMobile = true;
 			} else if (window.innerWidth > window.innerHeight && window.innerHeight <=750) { //rotated phones and small devices
-        isMobile = true;
-        document.getElementById('main-container').width = window.innerHeight + 'px !important';
+				isMobile = true;
+				document.getElementById('main-container').width = window.innerHeight + 'px !important';
 			}
 
 
@@ -325,19 +325,23 @@ OCrossword.prototype.assemble = function assemble() {
 			const width2 = d2.width;
 			const height2 = d2.height;
 
-
-
-
-
 			let scale = height2/height1;
 			if (scale > 0.2) scale = 0.2;
+
 			this._cluesElHeight = height1;
 			this._previewElWidth = width1 * scale;
 			this._height = height1 * scale;
 			this._cluesPanHorizTarget = this._cluesPanHoriz = this._cluesPanHorizStart = -(width1 + this._previewElWidth + 20);
 			this._scale = scale;
-			previewEl.style.marginBottom = `${-height1 * (1-scale)}px`;
-			previewEl.style.transform = `scale(${scale})`;
+
+			if(isMobile) {
+				previewEl.style.removeProperty('marginBottom');
+				previewEl.style.removeProperty('transform');
+			} else {
+				previewEl.style.marginBottom = `${-height1 * (1-scale)}px`;
+				previewEl.style.transform = `scale(${scale})`;
+			}
+
 			wrapper.style.height = gridEl.height;
 			clueDisplayer.style.width = width2 + 'px';
 			this.rootEl.classList.add('collapsable-clues');
@@ -350,6 +354,45 @@ OCrossword.prototype.assemble = function assemble() {
 			} else {
 				cluesEl.style.marginLeft = gridWrapper.style.marginLeft = '';
 			}
+
+
+			//update grid size to fill 100% on mobile view
+			const fullWidth = document.querySelector('#main-container').offsetWidth;
+			const gridTDs = gridEl.querySelectorAll('td');
+			const gridSize = gridEl.querySelectorAll('tr').length;
+			const newTdWidth = parseInt(fullWidth / gridSize);
+			const inputEl = document.querySelector('.o-crossword-magic-input');
+			console.log(inputEl);
+
+			if(isMobile) {
+				for (let i = 0; i < gridTDs.length; i++) {
+					let td = gridTDs[i];
+					td.style.width = newTdWidth + "px";
+					td.style.height = newTdWidth + "px";
+					td.style.maxWidth = "initial";
+				}
+				previewEl.style.width = fullWidth + "px";
+				previewEl.style.maxWidth = "initial";
+				clueDisplayer.style.width = fullWidth + "px";
+				inputEl.style.width = newTdWidth + "px";
+				inputEl.style.height = newTdWidth + "px";
+				inputEl.style.maxWidth = "initial";
+			} else {
+				for (let i = 0; i < gridTDs.length; i++) {
+					let td = gridTDs[i];
+					td.style.removeProperty('width');
+					td.style.removeProperty('height');
+					td.style.removeProperty('maxWidth');
+				}
+				previewEl.style.removeProperty('width');
+				previewEl.style.removeProperty('maxWidth');
+				clueDisplayer.style.removeProperty('width');
+				inputEl.style.removeProperty('width');
+				inputEl.style.removeProperty('height');
+				inputEl.style.removeProperty('maxWidth');
+			}
+			//END update grid size to fill 100% on mobile view
+
 		}.bind(this);
 
 		this.onResize = debounce(onResize, 100);
@@ -497,7 +540,7 @@ OCrossword.prototype.assemble = function assemble() {
 				const clues = gridMap.get(cell);
 				if (!clues) return;
 
-        cell.scrollIntoView();
+		cell.scrollIntoView();
 
 				// iterate through list of answers associated with that cell
 				let index = clues.indexOf(currentlySelectedGridItem);
@@ -579,6 +622,10 @@ OCrossword.prototype.assemble = function assemble() {
 		onResize();
 		this.addEventListener(window, 'resize', this.onResize);
 	}
+
+	if(isiOS()) {
+		document.getElementsByTagName('body')[0].className += " iOS";
+	}
 };
 
 OCrossword.prototype.addEventListener = function(el, type, callback) {
@@ -600,3 +647,8 @@ OCrossword.prototype.destroy = function destroy() {
 };
 
 module.exports = OCrossword;
+
+function isiOS() {
+	var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+	return iOS;
+}
