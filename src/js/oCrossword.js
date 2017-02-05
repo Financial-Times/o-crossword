@@ -304,9 +304,9 @@ OCrossword.prototype.assemble = function assemble() {
 
 		const onResize = function onResize() {
 			var isMobile = false;
-			if (window.innerWidth <= 400) {
+			if (window.innerWidth <= 739) {
 				isMobile = true;
-			} else if (window.innerWidth > window.innerHeight && window.innerHeight <=400 ) { //rotated phones and small devices, but not iOS
+			} else if (window.innerWidth > window.innerHeight && window.innerHeight <=739 ) { //rotated phones and small devices, but not iOS
 				isMobile = true;
 			}
 
@@ -330,8 +330,10 @@ OCrossword.prototype.assemble = function assemble() {
 			this._cluesPanHorizTarget = this._cluesPanHoriz = this._cluesPanHorizStart = -(width1 + this._previewElWidth + 20);
 			this._scale = scale;
 
+			magicInput.style.display = 'none';
+
 			if(isMobile) {
-				previewEl.style.removeProperty('marginBottom');
+				previewEl.style.removeProperty('margin-bottom');
 				previewEl.style.removeProperty('transform');
 			} else {
 				previewEl.style.marginBottom = `${-height1 * (1-scale)}px`;
@@ -357,11 +359,9 @@ OCrossword.prototype.assemble = function assemble() {
 			document.getElementById('main-container').width = fullWidth + 'px !important';
 			const gridTDs = gridEl.querySelectorAll('td');
 			const gridSize = gridEl.querySelectorAll('tr').length;
-			const newTdWidth = parseInt(fullWidth / gridSize);
+			const newTdWidth = parseInt(fullWidth / (gridSize + 1) );
 			const inputEl = document.querySelector('.o-crossword-magic-input');
 
-			console.log(isMobile);
-			console.log(fullWidth);
 			if(isMobile) {
 				for (let i = 0; i < gridTDs.length; i++) {
 					let td = gridTDs[i];
@@ -372,7 +372,11 @@ OCrossword.prototype.assemble = function assemble() {
 				}
 				previewEl.style.width = fullWidth + "px";
 				previewEl.style.maxWidth = "initial";
-				clueDisplayer.style.width = fullWidth + "px";
+				clueDisplayer.style.width = (newTdWidth * (gridSize) +1) + "px";
+				clueDisplayer.style.marginLeft = "auto";
+				clueDisplayer.style.marginRight = "auto";
+				gridEl.style.marginLeft = "auto";
+				gridEl.style.marginRight = "auto";
 				inputEl.style.width = newTdWidth + "px";
 				inputEl.style.height = newTdWidth + "px";
 				inputEl.style.maxWidth = "initial";
@@ -381,15 +385,15 @@ OCrossword.prototype.assemble = function assemble() {
 					let td = gridTDs[i];
 					td.style.removeProperty('width');
 					td.style.removeProperty('height');
-					td.style.removeProperty('maxWidth');
-					td.style.removeProperty('minWidth');
+					td.style.removeProperty('max-width');
+					td.style.removeProperty('min-width');
 				}
 				previewEl.style.removeProperty('width');
-				previewEl.style.removeProperty('maxWidth');
-				clueDisplayer.style.removeProperty('width');
+				previewEl.style.removeProperty('max-width');
+				// clueDisplayer.style.removeProperty('width');
 				inputEl.style.removeProperty('width');
 				inputEl.style.removeProperty('height');
-				inputEl.style.removeProperty('maxWidth');
+				inputEl.style.removeProperty('max-width');
 			}
 			//END update grid size to fill 100% on mobile view
 
