@@ -128,13 +128,13 @@ function OCrossword(rootEl) {
 		if (this.rootEl.dataset.oCrosswordData) {
 			if (this.rootEl.dataset.oCrosswordData.startsWith('http')) {
 				return fetch(this.rootEl.dataset.oCrosswordData)
-				.then(res  => res.json())
+				.then(res	=> res.json())
 				.then(json => buildGrid(rootEl, json))
-				.then(()   => this.assemble());
+				.then(()	 => this.assemble());
 			} else { // assume this is json text
 				return new Promise((resolve) => resolve( JSON.parse(this.rootEl.dataset.oCrosswordData) ) )
 				.then(json => buildGrid(rootEl, json))
-				.then(()   => this.assemble() );
+				.then(()	 => this.assemble() );
 			}
 		}
 	}
@@ -303,6 +303,13 @@ OCrossword.prototype.assemble = function assemble() {
 		}
 
 		const onResize = function onResize() {
+			var isMobile = false;
+			if (window.innerWidth <= 739) {
+				isMobile = true;
+			} else if (window.innerWidth > window.innerHeight && window.innerHeight <=739 ) { //rotated phones and small devices, but not iOS
+				isMobile = true;
+			}
+
 			cluesEl.classList.remove('magnify');
 			this.rootEl.classList.remove('collapsable-clues');
 			cluesEl.style.opacity = '0';
@@ -313,26 +320,83 @@ OCrossword.prototype.assemble = function assemble() {
 			const height1 = d1.height;
 			const width2 = d2.width;
 			const height2 = d2.height;
+
 			let scale = height2/height1;
 			if (scale > 0.2) scale = 0.2;
+
 			this._cluesElHeight = height1;
 			this._previewElWidth = width1 * scale;
 			this._height = height1 * scale;
 			this._cluesPanHorizTarget = this._cluesPanHoriz = this._cluesPanHorizStart = -(width1 + this._previewElWidth + 20);
 			this._scale = scale;
-			previewEl.style.marginBottom = `${-height1 * (1-scale)}px`;
-			previewEl.style.transform = `scale(${scale})`;
+
+			magicInput.style.display = 'none';
+
+			if(isMobile) {
+				previewEl.style.removeProperty('margin-bottom');
+				previewEl.style.removeProperty('transform');
+			} else {
+				previewEl.style.marginBottom = `${-height1 * (1-scale)}px`;
+				previewEl.style.transform = `scale(${scale})`;
+			}
+
 			wrapper.style.height = gridEl.height;
 			clueDisplayer.style.width = width2 + 'px';
 			this.rootEl.classList.add('collapsable-clues');
 			if (cluesEl.className.indexOf('magnify') === -1) cluesEl.classList.add('magnify');
 			cluesEl.style.opacity = '';
-			this._doFancyBehaviour = window.getComputedStyle(previewEl).display !== 'none';
+			this._doFancyBehaviour = window.getComputedStyle(previewEl).display !== 'none' && !isMobile;
+
 			if (this._doFancyBehaviour) {
 				cluesEl.style.marginLeft = gridWrapper.style.marginLeft = `${this._previewElWidth}px`;
 			} else {
 				cluesEl.style.marginLeft = gridWrapper.style.marginLeft = '';
 			}
+
+
+			//update grid size to fill 100% on mobile view
+			const fullWidth = Math.min(window.innerHeight, window.innerWidth);
+			document.getElementById('main-container').width = fullWidth + 'px !important';
+			const gridTDs = gridEl.querySelectorAll('td');
+			const gridSize = gridEl.querySelectorAll('tr').length;
+			const newTdWidth = parseInt(fullWidth / (gridSize + 1) );
+			const inputEl = document.querySelector('.o-crossword-magic-input');
+
+			if(isMobile) {
+				for (let i = 0; i < gridTDs.length; i++) {
+					let td = gridTDs[i];
+					td.style.width = newTdWidth + "px";
+					td.style.height = newTdWidth + "px";
+					td.style.maxWidth = "initial";
+					td.style.minWidth = "initial";
+				}
+				previewEl.style.width = fullWidth + "px";
+				previewEl.style.maxWidth = "initial";
+				clueDisplayer.style.width = (newTdWidth * (gridSize) +1) + "px";
+				clueDisplayer.style.marginLeft = "auto";
+				clueDisplayer.style.marginRight = "auto";
+				gridEl.style.marginLeft = "auto";
+				gridEl.style.marginRight = "auto";
+				inputEl.style.width = newTdWidth + "px";
+				inputEl.style.height = newTdWidth + "px";
+				inputEl.style.maxWidth = "initial";
+			} else {
+				for (let i = 0; i < gridTDs.length; i++) {
+					let td = gridTDs[i];
+					td.style.removeProperty('width');
+					td.style.removeProperty('height');
+					td.style.removeProperty('max-width');
+					td.style.removeProperty('min-width');
+				}
+				previewEl.style.removeProperty('width');
+				previewEl.style.removeProperty('max-width');
+				// clueDisplayer.style.removeProperty('width');
+				inputEl.style.removeProperty('width');
+				inputEl.style.removeProperty('height');
+				inputEl.style.removeProperty('max-width');
+			}
+			//END update grid size to fill 100% on mobile view
+
 		}.bind(this);
 
 		this.onResize = debounce(onResize, 100);
@@ -345,91 +409,6 @@ OCrossword.prototype.assemble = function assemble() {
 				cluesEl.style.transform = `translateX(${this._cluesPanHoriz}px)`;
 			}
 		}.bind(this));
-
-		const onPanVert = function onPanVert(e) {
-			if(!this._doFancyBehaviour) return;
-			getRelativeCenter(e, previewEl);
-			if (e.isFirst || (e.type.indexOf('start') !== -1 && (e.additionalEvent === 'panup' || e.additionalEvent === 'pandown'))){
-				if (e.relativeCenter.x < this._previewElWidth) {
-					if (cluesEl.className.indexOf('magnify-drag') === -1) cluesEl.classList.add('magnify-drag');
-				}
-			}
-			if (cluesEl.className.indexOf('magnify-drag') !== -1) {
-
-				if (cluesEl.className.indexOf('magnify') === -1) cluesEl.classList.add('magnify');
-				if (cluesEl.className.indexOf('expanded') !== -1) cluesEl.classList.remove('expanded');
-				if (cluesEl.scrollTop) cluesEl.scrollTop = 0;
-				this._cluesPanHorizTarget = this._cluesPanHorizStart;
-				this._isGrabbed = true;
-
-				const hoverEl = document.elementsFromPoint(e.center.x, e.center.y).filter(el => !!el.dataset.oCrosswordNumber)[0];
-				if (hoverEl) {
-					const number = hoverEl.dataset.oCrosswordNumber;
-					const direction = hoverEl.dataset.oCrosswordDirection;
-					setClue(number, direction);
-					highlightGridByCluesEl(hoverEl);
-				}
-
-				e.preventDefault();
-				const proportion = (e.relativeCenter.y/this._height);
-				const offset = this._cluesElHeight * proportion;
-
-				for (const li of cluesUlEls) {
-					li.style.transform = `translateY(${-offset}px)`;
-				}
-
-				cluesEl.style.transform = `translateY(${e.relativeCenter.y}px) translateY(-50%)`;
-			}
-		}.bind(this);
-
-		const onPanHoriz = function onPanHoriz(e) {
-			if(!this._doFancyBehaviour) return;
-			getRelativeCenter(e, previewEl);
-			if (
-				cluesEl.contains(e.target) ||
-				(e.relativeCenter.x < this._previewElWidth || this._isGrabbed) &&
-				Math.abs(e.deltaX) > 20
-			) {
-				this._isGrabbed = true;
-				e.preventDefault();
-				if (cluesEl.className.indexOf('magnify-drag') !== -1) cluesEl.classList.remove('magnify-drag');
-				if (cluesEl.className.indexOf('magnify') !== -1) cluesEl.classList.remove('magnify');
-				if (cluesEl.className.indexOf('expanded') === -1) {
-					cluesEl.classList.add('expanded');
-					this._cluesElWidth = cluesEl.clientWidth;
-				}
-				for (const li of cluesUlEls) {
-					li.style.transform = '';
-				}
-				let offset = this._cluesPanHoriz + e.deltaX;
-				if (offset + this._cluesElWidth - 5 < e.relativeCenter.x) {
-					this._cluesPanHoriz += 8;
-					offset = this._cluesPanHoriz + e.deltaX;
-				}
-				cluesEl.style.transform = `translateX(${offset}px)`;
-			}
-		}.bind(this);
-
-		const onPanEnd = function onPanEnd(e) {
-			if(!this._doFancyBehaviour) return;
-			if ( this._isGrabbed && cluesEl.className.indexOf('expanded') !== -1 ) {
-				this._cluesPanHoriz = e.deltaX + this._cluesPanHoriz;
-				this._isGrabbed = false;
-				if (this._cluesPanHoriz > -this._previewElWidth/2) {
-					this._cluesPanHorizTarget = 0;
-				} else {
-					this._cluesPanHorizTarget = this._cluesPanHorizStart;
-				}
-			} else if (
-				this._isGrabbed && cluesEl.className.indexOf('magnify') !== -1
-			) {
-				this._isGrabbed = false;
-				cluesEl.classList.remove('magnify-drag');
-				cluesEl.classList.add('magnify');
-				cluesEl.classList.remove('expanded');
-			}
-		}.bind(this);
-
 
 		function highlightGridByCluesEl(el) {
 			while(el.parentNode) {
@@ -480,6 +459,8 @@ OCrossword.prototype.assemble = function assemble() {
 				const clues = gridMap.get(cell);
 				if (!clues) return;
 
+				// cell.scrollIntoView(); //TODO: this works OK-ish for vertical oriented phones, could be explored
+
 				// iterate through list of answers associated with that cell
 				let index = clues.indexOf(currentlySelectedGridItem);
 
@@ -512,53 +493,24 @@ OCrossword.prototype.assemble = function assemble() {
 				));
 			}
 			if(!this._doFancyBehaviour) return;
-			const previewHit = previewEl.contains(e.target);
-			if (previewHit || cluesEl.contains(e.target)) {
-				getRelativeCenter(e, previewEl);
-				if (cluesEl.className.indexOf('magnify-drag') !== -1) cluesEl.classList.remove('magnify-drag');
-				if (cluesEl.className.indexOf('magnify') !== -1) cluesEl.classList.remove('magnify');
-				if (cluesEl.className.indexOf('expanded') === -1) cluesEl.classList.add('expanded');
-				for (const li of cluesUlEls) {
-					li.style.transform = '';
-				}
-
-				// if the preview is clicked on open it and bring to that point
-				// if the box is clicked on highlight that row and close it
-				if (previewHit) {
-					cluesEl.scrollTop = e.relativeCenter.y / this._scale;
-					this._cluesPanHorizTarget = 0;
-				} else {
-					this._cluesPanHorizTarget = this._cluesPanHorizTarget === 0 ? this._cluesPanHorizStart : 0;
-					highlightGridByCluesEl(e.target);
-				}
-			}
 		}.bind(this);
 
 		this.hammerMC = new Hammer.Manager(this.rootEl, {
 			recognizers: [
-				[Hammer.Tap],
-				[Hammer.Pan, { direction: Hammer.DIRECTION_ALL }],
-				[Hammer.Press, { time: 150 }],
-				[Hammer.Swipe, { direction: Hammer.DIRECTION_ALL }]
+				[Hammer.Tap]
 			]
 		});
 
 		this.addEventListener(cluesEl, 'mousemove', e => highlightGridByCluesEl(e.target));
 
-		this.hammerMC.on('panup pandown swipeup swipedown panstart press', onPanVert);
-		this.hammerMC.on('panleft panright', onPanHoriz);
-		this.hammerMC.on('panend pressup pancancel', onPanEnd);
 		this.hammerMC.on('tap', onTap);
-		this.hammerMC.on('hammer.input', function (e) {
-			if (!cluesEl.contains(e.target) && !gridWrapper.contains(e.target)) {
-				e.preventDefault();
-			}
-		});
-
-		this.addEventListener(this.rootEl, 'click', onPanEnd);
 
 		onResize();
 		this.addEventListener(window, 'resize', this.onResize);
+	}
+
+	if(isiOS()) {
+		document.getElementsByTagName('body')[0].className += " iOS";
 	}
 };
 
@@ -581,3 +533,8 @@ OCrossword.prototype.destroy = function destroy() {
 };
 
 module.exports = OCrossword;
+
+function isiOS() {
+	var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+	return iOS;
+}
