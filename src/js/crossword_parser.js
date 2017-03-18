@@ -232,11 +232,11 @@
     var knownIds = {};
     crossword.knownIds = knownIds;
     var maxId = 0;
-    var answers = {
+
+    crossword.answers = {
       across : [],
       down   : []
     };
-    crossword.answers = answers;
 
     for(let grouping of ['across', 'down']){
       let prev = groupingPrev[grouping];
@@ -287,6 +287,18 @@
           // check answer within bounds
           // and unpack the answerCSV
 
+          // convert "ANSWER,PARTS-INTO,NUMBERS" into number csv e.g. "6,5-4,6" (etc)
+          if ( /^[A-Z,\-]+$/.test(clue.answerCSV) ) {
+            clue.numericCSV = clue.answerCSV.replace(/[A-Z]+/g, match => {return match.length.toString() } );
+          } else {
+            clue.numericCSV = clue.answerCSV;
+          }
+
+          // and if the answer is solely Xs, replace that with the number csv
+          if ( /^[X,\-]+$/.test(clue.answerCSV) ) {
+            clue.answerCSV = clue.numericCSV;
+          }
+
           let answerPieces = clue.answerCSV.split(/[,-]/);
           let words = answerPieces.map(p => {
             if (/^[0-9]+$/.test(p)) {
@@ -308,7 +320,7 @@
             clueError("answer too long for crossword");
             break;
           }
-          answers[grouping].push(wordsString);
+          crossword.answers[grouping].push(wordsString);
 
           clue.wordsLengths = words.map(function(w){
             return w.length;
@@ -494,12 +506,22 @@
       crossword[grouping].forEach( function(clue) {
         let item = [
           parseInt(clue.id),
-          clue.body,
+          clue.body + ' (' + clue.numericCSV + ')',
           clue.wordsLengths,
         ];
         spec.clues[grouping].push(item);
       });
     });
+
+    {
+      // if the answers are just placeholders (lots of Xs)
+      // assume they are not to be displayed,
+      // so delete them from the spec
+      let concatAllAnswerWordsStrings = spec.answers.across.join('') + spec.answers.down.join('');
+      if ( /^X+$/.test(concatAllAnswerWordsStrings) ) {
+        delete spec['answers'];
+      }
+    }
 
     return spec;
   }
