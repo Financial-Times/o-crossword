@@ -564,12 +564,13 @@
     if (crossword.errors.length > 0) {
       specTextWithoutAnswers = crossword.errors.join("\n");
     } else {
-      let spec = generateSpec(crossword);
-      crossword.spec = spec;
+      let specWithAnswers = generateSpec(crossword);
+      crossword.spec = specWithAnswers;
+      specTextWithAnswers = JSON.stringify(specWithAnswers);
 
-      specTextWithAnswers = JSON.stringify(spec);
-      delete spec['answers'];
-      specTextWithoutAnswers = JSON.stringify(spec);
+      let specWithoutAnswers = generateSpec(crossword);
+      delete specWithoutAnswers['answers'];
+      specTextWithoutAnswers = JSON.stringify(specWithoutAnswers);
     }
     crossword.specTextWithAnswers    = specTextWithAnswers;
     crossword.specTextWithoutAnswers = specTextWithoutAnswers;
