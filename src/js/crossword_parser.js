@@ -165,6 +165,7 @@
        across : [],
          down : [],
        errors : [],
+       originalDSL : text,
     };
     var cluesGrouping;
     var lines = text.split(/\r|\n/);
@@ -188,7 +189,7 @@
       else if (match = /^pubdate:?\s+(\d{4}\/\d\d\/\d\d)$/i.exec(line) ) { crossword.pubdate    = match[1]; }
       else if (match = /^(?:size|dimensions):?\s+(15x15|17x17)$/i.exec(line) ) { crossword.dimensions = match[1]; }
       else if (match = /^(across|down):?$/i                .exec(line) ) { cluesGrouping        = match[1]; }
-      else if (match = /^(?:\s*-\s)?\[(\d+),(\d+)\]\s+(\d+)\.\s+(.+)\s+\(([A-Z,-]+|[0-9,-])\)$/.exec(line) ) {
+      else if (match = /^(?:\s*-\s)?\[(\d+),(\d+)\]\s+(\d+)\.\s+(.+)\s+\(([A-Z,-]+|[0-9,-]+)\)$/.exec(line) ) {
         if (! /(across|down)/.test(cluesGrouping)) {
           crossword.errors.push("ERROR: clue specified but no 'across' or 'down' grouping specified");
           break;
@@ -527,7 +528,7 @@
   }
 
   // given a crossword obj, generate the DSL for it
-  function generateDSL( crossword ){
+  function generateDSL( crossword, withAnswers=true ){
     var lines = [];
     var nonClueFields = [
       'version', 'name', 'author', 'editor', 'copyright', 'publisher', 'pubdate',
@@ -546,7 +547,7 @@
           `[${clue.coordinates.join(',')}]`,
           `${clue.id}.`,
           clue.body,
-          `(${clue.answerCSV})`
+          `(${(withAnswers)? clue.answerCSV : clue.numericCSV})`
         ];
         lines.push(pieces.join(' '));
       });
@@ -568,29 +569,13 @@
     return dsl;
   }
 
-  // given some text, decide what format it is and parse it accordingly,
+  // given some text, decide what format it is (currently, only the DSL)
+  // and parse it accordingly,
   // generating the grid text and output format if there are no errors,
   // returning the crossword object with all the bits (or the errors).
   function parseWhateverItIs(text) {
-    var crossword;
 
-    // a bit ugly, but if the text is probably JSON (i.e. starts with a '{'),
-    // assume it is the JSON text of the spec, and parse it accordingly,
-    // otherwise assume it is DSL
-
-    if (text.startsWith('{')) {
-      let parsedJson = parseJsonIntoDSL( text );
-      if (parsedJson['errors'].length > 0) {
-        crossword = {
-          errors : parsedJson['errors']
-        };
-      } else {
-        crossword = parseDSL(parsedJson.dslText);
-        crossword['generatedDSL'] = parsedJson.dslText;
-      }
-    } else {
-      crossword = parseDSL(text);
-    }
+    let crossword = parseDSL(text);
 
     // only attempt to validate the crossword if no errors found so far
     if (crossword.errors.length == 0) {
@@ -620,9 +605,11 @@
     crossword.gridText = generateGridText( crossword );
 
     if (crossword.errors.length == 0) {
-      crossword.DSLGeneratedFromDSL = generateDSL( crossword );
-
-      console.log('crossword.DSLGeneratedFromDSL:', crossword.DSLGeneratedFromDSL);
+      let withAnswers = true;
+      crossword.DSLGeneratedFromDSLWithAnswers = generateDSL( crossword, withAnswers );
+      console.log('crossword.DSLGeneratedFromDSLWithAnswers:', crossword.DSLGeneratedFromDSLWithAnswers);
+      crossword.DSLGeneratedFromDSLWithoutAnswers = generateDSL( crossword, ! withAnswers );
+      console.log('crossword.DSLGeneratedFromDSLWithoutAnswers:', crossword.DSLGeneratedFromDSLWithoutAnswers);
     }
 
     return crossword;
