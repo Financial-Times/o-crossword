@@ -1,5 +1,4 @@
-<div style="width: 100%;" id="main-container">
-	<div class="o-crossword" data-o-component="o-crossword" data-o-crossword-data="---
+---
 version: standard v1
 name: anon 1
 author: PETO
@@ -35,7 +34,7 @@ down:
 - [13,1] 7. Russian town having roots around Volga, originally (XXXXXX)
 - [15,1] 8. Field study in Dutch city (XXXXXX)
 - [8,5] 12. Bleepers haven't started ringing out in another royal burgh (XXXXXXX)
-- [6,7] 15. Another noted salmon river in west Ayrshire (XXX)
+- [6,7] 15. Another noted salmon riover in west Ayrshire (XXX)
 - [10,7] 16. Quartet regularly at Wensleydale river (XXX)
 - [11,8] 18. Oil painting of first and last halves of islands and Basque city (XXXXXXXX)
 - [13,8] 19. Marks on top-class trademark raised around new country (XXXXXXXX)
@@ -47,8 +46,4 @@ down:
 #
 # [coordinates of clue in grid]: [across,down]. [1,1] = top left, [17,17]=bottom right.
 # (WORDS,IN,ANSWER): capitalised, and separated by commas or hyphens.
----">
-		<table class="o-crossword-table"></table>
-    <ul class="o-crossword-clues"></ul>
-	</div>
-</div>
+---

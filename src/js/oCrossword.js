@@ -6,6 +6,7 @@
  */
 
 const debounce = require('o-viewport/src/utils').debounce;
+const crosswordParser = require('./crossword_parser');
 
 function prevAll(node) {
 	const nodes = Array.from(node.parentNode.children);
@@ -126,13 +127,21 @@ function OCrossword(rootEl) {
 
 	if (this.rootEl !== undefined) {
 		if (this.rootEl.dataset.oCrosswordData) {
+			/* get and parse the crossword data */
 			if (this.rootEl.dataset.oCrosswordData.startsWith('http')) {
 				return fetch(this.rootEl.dataset.oCrosswordData)
-				.then(res	=> res.json())
+				.then(res	=> res.text())
+				.then(text => crosswordParser(text) )
+				.then( specText => {
+					console.log('OCrossword: crosswordParser output=', specText);
+					return specText;
+				} )
+				.then(specText => JSON.parse(specText) )
 				.then(json => buildGrid(rootEl, json))
 				.then(()	 => this.assemble());
 			} else { // assume this is json text
-				return new Promise((resolve) => resolve( JSON.parse(this.rootEl.dataset.oCrosswordData) ) )
+				return new Promise((resolve) => resolve( crosswordParser(this.rootEl.dataset.oCrosswordData) ) )
+				.then(specText => JSON.parse(specText) )
 				.then(json => buildGrid(rootEl, json))
 				.then(()	 => this.assemble() );
 			}
