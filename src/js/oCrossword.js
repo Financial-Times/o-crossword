@@ -132,18 +132,24 @@ function OCrossword(rootEl) {
 				return fetch(this.rootEl.dataset.oCrosswordData)
 				.then(res	=> res.text())
 				.then(text => crosswordParser(text) )
-				.then( specText => {
-					console.log('OCrossword: crosswordParser output=', specText);
-					return specText;
-				} )
 				.then(specText => JSON.parse(specText) )
 				.then(json => buildGrid(rootEl, json))
 				.then(()	 => this.assemble());
 			} else { // assume this is json text
 				return new Promise((resolve) => resolve( crosswordParser(this.rootEl.dataset.oCrosswordData) ) )
 				.then(specText => JSON.parse(specText) )
+				.then( json => {
+					if (json.errors){
+						console.log("Found Errors after invoking crosswordParser: ", JSON.stringify(json.errors) );
+						return Promise.reject("Failed to parse crossword data, so cannot generate crossword display");
+					} else {
+						return json;
+					}
+				})
 				.then(json => buildGrid(rootEl, json))
-				.then(()	 => this.assemble() );
+				.then(()	 => this.assemble() )
+				.catch( reason => console.log("Error caught in OCrossword: ", reason ) )
+				;
 			}
 		}
 	}

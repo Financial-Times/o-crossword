@@ -616,8 +616,20 @@
   }
 
   function parseWhateverItIsIntoSpecText(text) {
+    // returns spec or errors as JSON
     var crossword = parseWhateverItIs(text);
-    var jsonText = JSON.stringify(crossword.spec);
+
+    var responseObj;
+    if (crossword.errors.length == 0) {
+      responseObj = crossword.spec;
+    } else {
+      responseObj = {
+        errors: crossword.errors
+      }
+    }
+
+    var jsonText = JSON.stringify( responseObj );
+
     console.log("parseWhateverItIsIntoSpecText: crossword=", crossword, ", jsonText=", jsonText );
     return jsonText;
   }
