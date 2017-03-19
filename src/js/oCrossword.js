@@ -127,30 +127,35 @@ function OCrossword(rootEl) {
 
 	if (this.rootEl !== undefined) {
 		if (this.rootEl.dataset.oCrosswordData) {
-			/* get and parse the crossword data */
-			if (this.rootEl.dataset.oCrosswordData.startsWith('http')) {
-				return fetch(this.rootEl.dataset.oCrosswordData)
-				.then(res	=> res.text())
-				.then(text => crosswordParser(text) )
-				.then(specText => JSON.parse(specText) )
-				.then(json => buildGrid(rootEl, json))
-				.then(()	 => this.assemble());
-			} else { // assume this is json text
-				return new Promise((resolve) => resolve( crosswordParser(this.rootEl.dataset.oCrosswordData) ) )
-				.then(specText => JSON.parse(specText) )
-				.then( json => {
-					if (json.errors){
-						console.log("Found Errors after invoking crosswordParser: ", JSON.stringify(json.errors) );
-						return Promise.reject("Failed to parse crossword data, so cannot generate crossword display");
-					} else {
-						return json;
-					}
-				})
-				.then(json => buildGrid(rootEl, json))
-				.then(()	 => this.assemble() )
-				.catch( reason => console.log("Error caught in OCrossword: ", reason ) )
-				;
-			}
+			/*
+				get and parse the crossword data
+				- fetch data via url or get from attribute
+				- parse, generate data struct
+				- render
+			*/
+			let p = new Promise( (resolve) => {
+				if (this.rootEl.dataset.oCrosswordData.startsWith('http')) {
+					return fetch(this.rootEl.dataset.oCrosswordData)
+								 .then(res => res.text())
+								 ;
+				} else { // assume this is json text
+					resolve( this.rootEl.dataset.oCrosswordData );
+				}
+			})
+			.then(text => crosswordParser(text) )
+			.then(specText => JSON.parse(specText) )
+			.then( json => {
+				if (json.errors){
+					console.log(`Found Errors after invoking crosswordParser:\n${json.errors.join("\n")}` );
+					return Promise.reject("Failed to parse crossword data, so cannot generate crossword display");
+				} else {
+					return json;
+				}
+			})
+			.then(json => buildGrid(rootEl, json))
+			.then(()	 => this.assemble() )
+			.catch( reason => console.log("Error caught in OCrossword: ", reason ) )
+			;
 		}
 	}
 }
