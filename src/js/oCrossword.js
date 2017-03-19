@@ -365,7 +365,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 			//update grid size to fill 100% on mobile view
 			const fullWidth = Math.min(window.innerHeight, window.innerWidth);
-			document.getElementById('main-container').width = fullWidth + 'px !important';
+			this.rootEl.width = fullWidth + 'px !important';
 			const gridTDs = gridEl.querySelectorAll('td');
 			const gridSize = gridEl.querySelectorAll('tr').length;
 			const newTdWidth = parseInt(fullWidth / (gridSize + 1) );
