@@ -14,6 +14,35 @@ function prevAll(node) {
 	return nodes.slice(0, pos);
 };
 
+function writeErrorsAsClues(rootEl, json) {
+	const cluesEl = rootEl.querySelector('ul.o-crossword-clues');
+
+	const explain = document.createElement('li');
+	explain.textContent = "Sorry, we failed to understand the details of this crossword for the following reason(s):";
+
+	const errorsList = document.createElement('ul');
+	json.errors.forEach(e => {
+		const eLine = document.createElement('li');
+		eLine.textContent = e;
+		errorsList.appendChild(eLine);
+	});
+
+	const textLine = document.createElement('li');
+	textLine.textContent = "Based on the following spec:";
+
+	const textList = document.createElement('ul');
+	json.text.split("\n").forEach( line => {
+		const eLine = document.createElement('li');
+		eLine.textContent = line;
+		textList.appendChild(eLine);
+	});
+
+	cluesEl.appendChild(explain);
+	cluesEl.appendChild(errorsList);
+	cluesEl.appendChild(textLine);
+	cluesEl.appendChild(textList);
+}
+
 const Hammer = require('hammerjs');
 const HORIZ_PAN_SPRING = 0.2;
 
@@ -27,7 +56,7 @@ function buildGrid(
 	answers
 }) {
 	const gridEl = rootEl.querySelector('table');
-	const cluesEl = rootEl.querySelector('ul.o-crossword-clues')
+	const cluesEl = rootEl.querySelector('ul.o-crossword-clues');
 	const {cols, rows} = size;
 	for (let i=0; i<rows; i++) {
 		const tr = document.createElement('tr');
@@ -147,6 +176,7 @@ function OCrossword(rootEl) {
 			.then( json => {
 				if (json.errors){
 					console.log(`Found Errors after invoking crosswordParser:\n${json.errors.join("\n")}` );
+					writeErrorsAsClues(rootEl, json);
 					return Promise.reject("Failed to parse crossword data, so cannot generate crossword display");
 				} else {
 					return json;

@@ -624,7 +624,8 @@
       responseObj = crossword.spec;
     } else {
       responseObj = {
-        errors: crossword.errors
+        errors: crossword.errors,
+        text  : text
       }
     }
 
