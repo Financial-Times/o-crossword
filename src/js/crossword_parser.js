@@ -1,156 +1,3 @@
-  // Given the json text of a crossword spec, generate the equivalent DSL,
-  // bailing as soon as an error is found.
-  // Only enough error checking is done to ensure the DSL can be constructed,
-  // since it is assumed the DSL will itself be checked subsequently
-  // to see if it specifies a valid crossword.
-  function parseJsonIntoDSL(text) {
-    var dslLines = [];
-    var errors   = [];
-    var response = {
-      errors : errors,
-      dslText : "",
-    };
-    var json;
-
-    function addError(e){
-      errors.push( "ERROR: " + e );
-    }
-
-    function responseWithError(e) {
-      errors.unshift('Assuming this is a JSON doc...');
-      if (e) {
-        addError( e );
-      }
-      return response;
-    }
-
-    try {
-      json = JSON.parse(text);
-    }
-    catch(err) {
-      return responseWithError( err.message );
-    }
-
-    // check the simple, single-value fields
-    ['author','editor','publisher','copyright','date'].forEach( f => {
-      if (f in json) {
-        let name = f;
-        if (f === 'date') {
-          name = 'pubdate';
-        }
-        dslLines.push( name + ' ' + json[f] );
-      } else {
-        addError( `missing field: ${f}` );
-      }
-    });
-
-    // check for the complex fields
-    // except 'answers' (for now)
-    ['size','grid','gridnums','clues'].forEach( f => {
-      if (! (f in json) ) {
-        addError( `missing field: ${f}` );
-      }
-    });
-
-    if (errors.length > 0) {
-      return responseWithError();
-    }
-
-    if (json.size.rows && json.size.cols) {
-      dslLines.push(`size ${json.size.rows}x${json.size.cols}`);
-    } else {
-      return responseWithError('could not parse size rows and cols');
-    }
-
-    if (json.gridnums.length !== json.size.rows){
-      return responseWithError('gridnums does not match size.rows');
-    }
-
-    let idCoordinates = {};
-
-    for( let [r, row] of json.gridnums.entries() ) {
-      if (row.length !== json.size.cols){
-        return responseWithError(`gridnums row ${r+1} does not match size.cols`);
-      }
-      for( let [c, cell] of row.entries() ) {
-        if(cell !== 0){
-          if (cell in idCoordinates) {
-            return responseWithError(`duplicate id in gridnums: [${r+1},${c+1}] ${cell}`);
-          }
-          idCoordinates[cell] = [c,r];
-        }
-      }
-    }
-
-    let answers;
-
-    if (json.answers) {
-      for( let grouping of ['across', 'down'] ) {
-        if(! json.answers[grouping]){
-          return responseWithError(`could not find answers.${grouping}`);
-        }
-      }
-
-      answers = json.answers;
-    }
-
-    for( let grouping of ['across', 'down'] ) {
-      if(! json.clues[grouping]){
-        return responseWithError(`could not find clues.${grouping}`);
-      }
-      if(answers && (json.clues[grouping].length !== answers[grouping].length)) {
-        return responseWithError(`mismatch between answers and clues in grouping ${grouping}`);
-      }
-
-      dslLines.push(grouping);
-
-      for( let [i, c] of json.clues[grouping].entries()) {
-        let id = c[0];
-        if (! (id in idCoordinates)) {
-          return responseWithError(`no gridnums value for clue ${id} ${grouping}`);
-        }
-
-        // there was a bug in the spec which seems to have resulted in some
-        // instances containing a mix of integers and strings here,
-        // so stripping out non integers
-        let wordSizes = c[2].filter(Number.isInteger);
-
-        // if we only have the answer sizes, mock up a string consisting entirely of Xs
-        let answerCombined;
-        if (answers) {
-          answerCombined = answers[grouping][i];
-        } else {
-          answerCombined = wordSizes.map(s => 'X'.repeat(s) ).join('');
-        }
-
-        // then split the text into the correctly-sized words.
-        let letters = answerCombined.split('');
-        let words = wordSizes.map(s => letters.splice(0, s).join(''));
-        let wordsCSV = words.join(',');
-
-        let body = c[1];
-
-        let clue = [
-          `[${idCoordinates[id][0]+1},${idCoordinates[id][1]+1}]`,
-          `${id}.`,
-          body,
-          `(${wordsCSV})`
-        ].join(' ');
-
-        dslLines.push(clue);
-      }
-    }
-
-    if( errors.length > 0 ) {
-      addError("having attempted to catch all the errors, should not reach this point with any remaining errors");
-      return responseWithError();
-    }
-
-    response['dslText'] = dslLines.join("\n");
-
-    return response;
-  }
-
   // given the DSL, ensure we have all the relevant pieces,
   // and assume there will be subsequent checking to ensure they are valid
   function parseDSL(text){
@@ -178,10 +25,11 @@
       // strip out trailing and leading spaces
       line = line.trim();
 
-      if     ( line === ""   ) { /* ignore blank lines */        }
-      else if( line === "---") { /* ignore front matter lines */ }
+      if     ( line === ""   )                                           { /* ignore blank lines */         }
+      else if( line === "---")                                           { /* ignore front matter lines */  }
+      else if (match = /^(layout|tag|tags|permalink):\s/   .exec(line) ) { /* ignore front matter fields */ }
       else if (match = /^version:?\s+(.+)$/i               .exec(line) ) { crossword.version    = match[1]; }
-      else if (match = /^name:?\s+(.+)$/i                 .exec(line) ) { crossword.name      = match[1]; }
+      else if (match = /^name:?\s+(.+)$/i                  .exec(line) ) { crossword.name       = match[1]; }
       else if (match = /^author:?\s+(.+)$/i                .exec(line) ) { crossword.author     = match[1]; }
       else if (match = /^editor:?\s+(.+)$/i                .exec(line) ) { crossword.editor     = match[1]; }
       else if (match = /^copyright:?\s+(.+)$/i             .exec(line) ) { crossword.copyright  = match[1]; }
@@ -189,7 +37,7 @@
       else if (match = /^pubdate:?\s+(\d{4}\/\d\d\/\d\d)$/i.exec(line) ) { crossword.pubdate    = match[1]; }
       else if (match = /^(?:size|dimensions):?\s+(15x15|17x17)$/i.exec(line) ) { crossword.dimensions = match[1]; }
       else if (match = /^(across|down):?$/i                .exec(line) ) { cluesGrouping        = match[1]; }
-      else if (match = /^(?:\s*-\s)?\[(\d+),(\d+)\]\s+(\d+)\.\s+(.+)\s+\(([A-Z,-]+|[0-9,-]+)\)$/.exec(line) ) {
+      else if (match = /^-\s\((\d+),(\d+)\)\s+(\d+)\.\s+(.+)\s+\(([A-Z,-]+|[0-9,-]+)\)$/.exec(line) ) {
         if (! /(across|down)/.test(cluesGrouping)) {
           crossword.errors.push("ERROR: clue specified but no 'across' or 'down' grouping specified");
           break;
@@ -198,7 +46,7 @@
             coordinates : [ parseInt(match[1]), parseInt(match[2]) ],
                      id : parseInt(match[3]),
                    body : match[4],
-              answerCSV : match[5], // could be either "A,LIST-OF,WORDS" or "1,4-2,5"
+              answerCSV : match[5], // could be in the form of either "A,LIST-OF,WORDS" or "1,4-2,5"
                original : line,
           };
           crossword[cluesGrouping].push(clue);
@@ -239,8 +87,14 @@
       down   : []
     };
 
+    // insist on having at least one clue !
+    if ( (crossword['across'].length + crossword['down'].length) == 0) {
+      crossword.errors.push("Error: no valid clues specified");
+    }
+
     for(let grouping of ['across', 'down']){
       let prev = groupingPrev[grouping];
+
       for(let clue of crossword[grouping]){
         function clueError(msg){
           crossword.errors.push("Error: " + msg + " in " + grouping + " clue=" + clue.original);
@@ -327,16 +181,6 @@
             return w.length;
           });
         }
-
-        // let answerPieces = clue.answerCSV.split(/([A-Z]+|[,-])/);
-        // let answerSpecPieces = answerPieces.map(function(p){
-        //   if (/[A-Z]+/.exec(p)) {
-        //     return p.length;
-        //   } else {
-        //     return p;
-        //   }
-        // });
-        // clue.answerSpec = answerSpecPieces.join('');
 
         // check answer + offset within bounds
         if(    (grouping==='across' && (clue.wordsString.length + x - 1 > maxCoord))
@@ -544,7 +388,7 @@
       crossword[grouping].forEach( clue => {
         var pieces = [
           '-',
-          `[${clue.coordinates.join(',')}]`,
+          `(${clue.coordinates.join(',')})`,
           `${clue.id}.`,
           clue.body,
           `(${(withAnswers)? clue.answerCSV : clue.numericCSV})`
@@ -555,8 +399,14 @@
 
     var footerComments = [
       '',
-      '[coordinates of clue in grid]: [across,down]. [1,1] = top left, [17,17]=bottom right.',
-      '(WORDS,IN,ANSWER): capitalised, and separated by commas or hyphens.'
+      "Notes on the text format...",
+      "Can't use square brackets or speech marks.",
+      "A clue has the form",
+      "- (COORDINATES) ID. Clue text (ANSWER)",
+      "Coordinates of clue in grid are (across,down), so (1,1) = top left, (17,17) = bottom right.",
+      "ID is a number, followed by a full stop.",
+      "(WORDS,IN,ANSWER): capitalised, and separated by commas or hyphens, or (numbers) separated by commas or hyphens.",
+      "ANSWERS with all words of XXXXXX are converted to numbers.",
     ];
     lines = lines.concat( footerComments.map(c => { return `# ${c}`; } ) );
 
@@ -580,9 +430,9 @@
     // only attempt to validate the crossword if no errors found so far
     if (crossword.errors.length == 0) {
       crossword = validateAndEmbellishCrossword(crossword);
-      console.log("validated crossword=", crossword);
+      console.log("parseWhateverItIs: validated crossword");
     } else {
-      console.log("could not validate crossword=", crossword);
+      console.log("parseWhateverItIs: did not validate crossword=", crossword);
     }
 
     // generate the spec, and specTexts with and without answers
@@ -605,11 +455,12 @@
     crossword.gridText = generateGridText( crossword );
 
     if (crossword.errors.length == 0) {
+      console.log('parseWhateverItIs: no errors so generated DSLs');
       let withAnswers = true;
       crossword.DSLGeneratedFromDSLWithAnswers = generateDSL( crossword, withAnswers );
-      console.log('crossword.DSLGeneratedFromDSLWithAnswers:', crossword.DSLGeneratedFromDSLWithAnswers);
       crossword.DSLGeneratedFromDSLWithoutAnswers = generateDSL( crossword, ! withAnswers );
-      console.log('crossword.DSLGeneratedFromDSLWithoutAnswers:', crossword.DSLGeneratedFromDSLWithoutAnswers);
+    } else {
+      console.log( "parseWhateverItIs: errors found:\n", crossword.errors.join("\n") );
     }
 
     return crossword;
@@ -621,17 +472,18 @@
 
     var responseObj;
     if (crossword.errors.length == 0) {
+      console.log("parseWhateverItIsIntoSpecText: no errors found");
       responseObj = crossword.spec;
     } else {
       responseObj = {
         errors: crossword.errors,
         text  : text
       }
+      console.log("parseWhateverItIsIntoSpecText: errors found:\n", crossword.errors.join("\n"), "\ntext=\n", text);
     }
 
     var jsonText = JSON.stringify( responseObj );
 
-    console.log("parseWhateverItIsIntoSpecText: crossword=", crossword, ", jsonText=", jsonText );
     return jsonText;
   }
 
