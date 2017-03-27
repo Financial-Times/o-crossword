@@ -1,5 +1,5 @@
 {
-	"title": "Financial Times, Thu, Mar 2, 2016",
+	"name": "Financial Times, Thu, Mar 2, 2016",
 	"author": "PETO",
 	"editor": "Colin Inman",
 	"copyright": "2016, Financial Times",
@@ -74,13 +74,13 @@
 			[12, "Bleepers haven't started ringing out in another royal burgh", [7]],
 			[15, "Another noted salmon riover in west Ayrshire", [3]],
 			[16, "Quartet regularly at Wensleydale river", [3]],
-			[18, "Oil painting of first and last halves of islands and Basque city", [9]],
+			[18, "Oil painting of first and last halves of islands and Basque city", [8]],
 			[19, "Marks on top-class trademark raised around new country", [8]],
 			[20, "Chap left to abandon one capital", [8]],
 			[22, "Book sliced in half Greater Manchester", [6]],
 			[23, "Department one has to go round in France", [6]],
 			[24, "British current holders of Rome's art in wine-making region", [6]],
-			[25, "7's river set around riover in Ukraine", [7]]
+			[25, "7's river set around river in Ukraine", [6]]
 		]
 	},
 	"notepad": "",

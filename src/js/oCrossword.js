@@ -6,12 +6,42 @@
  */
 
 const debounce = require('o-viewport/src/utils').debounce;
+const crosswordParser = require('./crossword_parser');
 
 function prevAll(node) {
 	const nodes = Array.from(node.parentNode.children);
 	const pos = nodes.indexOf(node);
 	return nodes.slice(0, pos);
 };
+
+function writeErrorsAsClues(rootEl, json) {
+	const cluesEl = rootEl.querySelector('ul.o-crossword-clues');
+
+	const explain = document.createElement('li');
+	explain.textContent = "Sorry, we failed to understand the details of this crossword for the following reason(s):";
+
+	const errorsList = document.createElement('ul');
+	json.errors.forEach(e => {
+		const eLine = document.createElement('li');
+		eLine.textContent = e;
+		errorsList.appendChild(eLine);
+	});
+
+	const textLine = document.createElement('li');
+	textLine.textContent = "Based on the following spec:";
+
+	const textList = document.createElement('ul');
+	json.text.split("\n").forEach( line => {
+		const eLine = document.createElement('li');
+		eLine.textContent = line;
+		textList.appendChild(eLine);
+	});
+
+	cluesEl.appendChild(explain);
+	cluesEl.appendChild(errorsList);
+	cluesEl.appendChild(textLine);
+	cluesEl.appendChild(textList);
+}
 
 const Hammer = require('hammerjs');
 const HORIZ_PAN_SPRING = 0.2;
@@ -26,7 +56,7 @@ function buildGrid(
 	answers
 }) {
 	const gridEl = rootEl.querySelector('table');
-	const cluesEl = rootEl.querySelector('ul.o-crossword-clues')
+	const cluesEl = rootEl.querySelector('ul.o-crossword-clues');
 	const {cols, rows} = size;
 	for (let i=0; i<rows; i++) {
 		const tr = document.createElement('tr');
@@ -63,7 +93,7 @@ function buildGrid(
 			const tempLi = document.createElement('li');
 			const tempSpan = document.createElement('span');
 			const answerLength = across[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
-			tempSpan.textContent = across[0] + '. ' + across[1] + ` (${across[2].filter(isFinite).join(', ')})`;
+			tempSpan.textContent = across[0] + '. ' + across[1];
 			tempLi.dataset.oCrosswordNumber = across[0];
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'across';
@@ -75,7 +105,7 @@ function buildGrid(
 			const tempLi = document.createElement('li');
 			const tempSpan = document.createElement('span');
 			const answerLength = down[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
-			tempSpan.textContent = down[0] + '. ' + down[1] + ` (${down[2].filter(isFinite).join(', ')})`;
+			tempSpan.textContent = down[0] + '. ' + down[1];
 			tempLi.dataset.oCrosswordNumber = down[0];
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'down';
@@ -130,16 +160,36 @@ function OCrossword(rootEl) {
 
 	if (this.rootEl !== undefined) {
 		if (this.rootEl.dataset.oCrosswordData) {
-			if (this.rootEl.dataset.oCrosswordData.startsWith('http')) {
-				return fetch(this.rootEl.dataset.oCrosswordData)
-				.then(res	=> res.json())
-				.then(json => buildGrid(rootEl, json))
-				.then(()	 => this.assemble());
-			} else { // assume this is json text
-				return new Promise((resolve) => resolve( JSON.parse(this.rootEl.dataset.oCrosswordData) ) )
-				.then(json => buildGrid(rootEl, json))
-				.then(()	 => this.assemble() );
-			}
+			/*
+				get and parse the crossword data
+				- fetch data via url or get from attribute
+				- parse, generate data struct
+				- render
+			*/
+			let p = new Promise( (resolve) => {
+				if (this.rootEl.dataset.oCrosswordData.startsWith('http')) {
+					return fetch(this.rootEl.dataset.oCrosswordData)
+								 .then(res => res.text())
+								 ;
+				} else { // assume this is json text
+					resolve( this.rootEl.dataset.oCrosswordData );
+				}
+			})
+			.then(text => crosswordParser(text) )
+			.then(specText => JSON.parse(specText) )
+			.then( json => {
+				if (json.errors){
+					console.log(`Found Errors after invoking crosswordParser:\n${json.errors.join("\n")}` );
+					writeErrorsAsClues(rootEl, json);
+					return Promise.reject("Failed to parse crossword data, so cannot generate crossword display");
+				} else {
+					return json;
+				}
+			})
+			.then(json => buildGrid(rootEl, json))
+			.then(()	 => this.assemble() )
+			.catch( reason => console.log("Error caught in OCrossword: ", reason ) )
+			;
 		}
 	}
 }
@@ -414,7 +464,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 			//update grid size to fill 100% on mobile view
 			const fullWidth = Math.min(window.innerHeight, window.innerWidth);
-			document.getElementById('main-container').width = fullWidth + 'px !important';
+			this.rootEl.width = fullWidth + 'px !important';
 			const gridTDs = gridEl.querySelectorAll('td');
 			const gridSize = gridEl.querySelectorAll('tr').length;
 			const newTdWidth = parseInt(fullWidth / (gridSize + 1) );
