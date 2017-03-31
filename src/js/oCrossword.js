@@ -142,6 +142,10 @@ function getRelativeCenter(e, el) {
 	};
 }
 
+function isMobileDevice() {
+	return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+}
+
 function OCrossword(rootEl) {
 	if (!rootEl) {
 		rootEl = document.body;
@@ -258,6 +262,46 @@ OCrossword.prototype.assemble = function assemble() {
 		wrapper.appendChild(previewEl);
 		wrapper.appendChild(cluesEl);
 
+		const keyboard = document.createElement('div');
+		keyboard.classList.add('o-crossword-keyboard');
+		this.rootEl.appendChild(keyboard);
+
+		const kb_html =
+			'<div class="keyboard-row keyboard-row-first">' +
+				'<div class="keyboard-letter">Q</div>' +
+				'<div class="keyboard-letter">W</div>' +
+				'<div class="keyboard-letter">E</div>' +
+				'<div class="keyboard-letter">R</div>' +
+				'<div class="keyboard-letter">T</div>' +
+				'<div class="keyboard-letter">Y</div>' +
+				'<div class="keyboard-letter">U</div>' +
+				'<div class="keyboard-letter">I</div>' +
+				'<div class="keyboard-letter">O</div>' +
+				'<div class="keyboard-letter">P</div>' +
+			'</div>' +
+			'<div class="keyboard-row keyboard-row-second">' +
+				'<div class="keyboard-letter">A</div>' +
+				'<div class="keyboard-letter">S</div>' +
+				'<div class="keyboard-letter">D</div>' +
+				'<div class="keyboard-letter">F</div>' +
+				'<div class="keyboard-letter">G</div>' +
+				'<div class="keyboard-letter">H</div>' +
+				'<div class="keyboard-letter">J</div>' +
+				'<div class="keyboard-letter">K</div>' +
+				'<div class="keyboard-letter">L</div>' +
+			'</div>' +
+			'<div class="keyboard-row keyboard-row-third">' +
+				'<div class="keyboard-letter">Z</div>' +
+				'<div class="keyboard-letter">X</div>' +
+				'<div class="keyboard-letter">C</div>' +
+				'<div class="keyboard-letter">V</div>' +
+				'<div class="keyboard-letter">B</div>' +
+				'<div class="keyboard-letter">N</div>' +
+				'<div class="keyboard-letter">M</div>' +
+			'</div>';
+		keyboard.innerHTML = kb_html;
+
+
 		const magicInput = document.createElement('input');
 		gridScaleWrapper.appendChild(magicInput);
 		magicInput.classList.add('o-crossword-magic-input');
@@ -266,10 +310,19 @@ OCrossword.prototype.assemble = function assemble() {
 		magicInput.type = 'text';
 		magicInput.style.display = 'none';
 
+		this.addEventListener(magicInput, 'focus', function (e) {
+			if(isMobileDevice()) {
+				console.log(currentlySelectedGridItem);
+				keyboard.style.display = "block";
+				this.blur();
+			}
+		});
+
 		this.addEventListener(magicInput, 'keyup', function (e) {
 			if (e.keyCode === 13) {
 				e.preventDefault();
 				magicInputNextEls = null;
+				keyboard.style.display = "none";
 				return progress();
 			}
 			if (
@@ -286,12 +339,14 @@ OCrossword.prototype.assemble = function assemble() {
 				e.keyCode === 38
 			) {
 				e.preventDefault();
+				keyboard.style.display = "none";
 				return progress(-1);
 			}
 			if (
 				e.keyCode === 8
 			) {
 				e.preventDefault();
+				keyboard.style.display = "none";
 				return magicInput.value = '';
 			}
 			progress();
@@ -353,6 +408,9 @@ OCrossword.prototype.assemble = function assemble() {
 		}
 
 		const onResize = function onResize() {
+			if (isMobileDevice()) {
+
+			}
 			var isMobile = false;
 			if (window.innerWidth <= 739) {
 				isMobile = true;
@@ -494,9 +552,12 @@ OCrossword.prototype.assemble = function assemble() {
 		}
 
 		const onTap = function onTap(e) {
+			console.log('tapped');
+
 			if (e.target === magicInput) {
 				e.target = magicInputTargetEl;
 			}
+
 			if (gridEl.contains(e.target)) {
 				let cell = e.target;
 				while(cell.parentNode) {
@@ -583,6 +644,8 @@ OCrossword.prototype.destroy = function destroy() {
 };
 
 module.exports = OCrossword;
+
+window.ocro = OCrossword;
 
 function isiOS() {
 	var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
