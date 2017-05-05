@@ -266,62 +266,69 @@ OCrossword.prototype.assemble = function assemble() {
 		magicInput.type = 'text';
 		magicInput.style.display = 'none';
 
-		this.addEventListener(magicInput, 'keyup', function (e) {
-			if (e.keyCode === 13) {
-				e.preventDefault();
+		this.addEventListener(magicInput, 'keydown', function (e) {
+			e.preventDefault();
+
+			if (e.keyCode === 13) { //enter
 				magicInputNextEls = null;
 				return progress();
 			}
 			if (
-				e.keyCode === 9 ||
-				e.keyCode === 40 ||
-				e.keyCode === 39 ||
-				e.keyCode === 32
+				e.keyCode === 9 || //tab
+				e.keyCode === 40 ||//down
+				e.keyCode === 39 ||//right
+				e.keyCode === 32 //space
 			) {
-				e.preventDefault();
 				return progress();
 			}
 			if (
-				e.keyCode === 37 ||
-				e.keyCode === 38
+				e.keyCode === 37 || //left
+				e.keyCode === 38 //up
 			) {
-				e.preventDefault();
 				return progress(-1);
 			}
 			if (
-				e.keyCode === 8
+				e.keyCode === 8 //backspace
 			) {
-				e.preventDefault();
-				return magicInput.value = '';
+				magicInput.value = '';
+				return progress(-1);
 			}
+
+			magicInput.value = String.fromCharCode(e.keyCode);
+			
 			progress();
 		});
+
+		//on keyup rem receiving-input class
 
 		const progress = debounce(function progress(direction) {
 			direction = direction === -1 ? -1 : 1;
 			const oldMagicInputEl = magicInputTargetEl;
+
 			if (
 				magicInputTargetEl &&
 				magicInput.value.match(/^[^\s]/)
 			) {
 				magicInputTargetEl.textContent = magicInput.value[0];
 			}
+
 			magicInputTargetEl = null;
+
 			if (magicInputNextEls) {
 				const index = magicInputNextEls.indexOf(oldMagicInputEl);
 				if (magicInputNextEls[index + direction]) {
 					return takeInput(magicInputNextEls[index + direction], magicInputNextEls);
 				}
 			}
-			magicInputTargetEl = null;
+
 			magicInputNextEls = null;
 			magicInput.value = '';
 			magicInput.blur();
+			magicInput.style.display = 'none';
 		}, 16);
 		this.addEventListener(magicInput, 'focus', magicInput.select());
 
 		function takeInput(el, nextEls) {
-
 			if (
 				magicInputTargetEl &&
 				magicInput.value.match(/^[^\s]/)
