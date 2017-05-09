@@ -266,6 +266,14 @@ OCrossword.prototype.assemble = function assemble() {
 		magicInput.type = 'text';
 		magicInput.style.display = 'none';
 
+		let blockHighlight = false;
+
+		this.hammerMC = new Hammer.Manager(this.rootEl, {
+			recognizers: [
+				[Hammer.Tap]
+			]
+		});
+
 		this.addEventListener(magicInput, 'keydown', function (e) {
 			e.preventDefault();
 
@@ -299,8 +307,6 @@ OCrossword.prototype.assemble = function assemble() {
 			progress();
 		});
 
-		//on keyup rem receiving-input class
-
 		const progress = debounce(function progress(direction) {
 			direction = direction === -1 ? -1 : 1;
 			const oldMagicInputEl = magicInputTargetEl;
@@ -321,10 +327,10 @@ OCrossword.prototype.assemble = function assemble() {
 				}
 			}
 
+			unsetClue(magicInputNextEls.length, direction);
 			magicInputNextEls = null;
 			magicInput.value = '';
-			magicInput.blur();
-			magicInput.style.display = 'none';
+			blockHighlight = false;
 		}, 16);
 		this.addEventListener(magicInput, 'focus', magicInput.select());
 
@@ -468,6 +474,8 @@ OCrossword.prototype.assemble = function assemble() {
 		}.bind(this));
 
 		function highlightGridByCluesEl(el) {
+			if(blockHighlight) return;
+
 			while(el.parentNode) {
 				if (el.dataset.oCrosswordNumber) {
 					highlightGridByNumber(Number(el.dataset.oCrosswordNumber), el.dataset.oCrosswordDirection, el.dataset.oCrosswordAnswerLength);
@@ -500,12 +508,88 @@ OCrossword.prototype.assemble = function assemble() {
 			gridElsToHighlight.forEach(el => el.dataset.oCrosswordHighlighted = direction);
 		}
 
-		const onTap = function onTap(e) {
-			if (e.target === magicInput) {
-				e.target = magicInputTargetEl;
+		function unsetClue(number, direction) {
+			const el = cluesEl.querySelector(`li[data-o-crossword-number="${number}"][data-o-crossword-direction="${direction}"]`);
+			const els = Array.from(gridEl.querySelectorAll('td[data-o-crossword-highlighted]'));
+			
+			for (const o of els) {
+				delete o.dataset.oCrosswordHighlighted;
 			}
-			if (gridEl.contains(e.target)) {
-				let cell = e.target;
+
+			if (el) {
+				clueDisplayer.textContent = '';
+				const els = Array.from(cluesEl.getElementsByClassName('has-hover'));
+				els.forEach(el => el.classList.remove('has-hover'));
+				el.classList.remove('has-hover');
+			}
+
+			magicInput.blur();
+			magicInput.style.display = 'none';
+		}
+
+		let previousClueSelection = null;
+
+		function isEquivalent(a, b) {
+		    var aProps = Object.getOwnPropertyNames(a);
+		    var bProps = Object.getOwnPropertyNames(b);
+
+		    if (aProps.length != bProps.length) {
+		        return false;
+		    }
+
+		    for (var i = 0; i < aProps.length; i++) {
+		        var propName = aProps[i];
+		        if (a[propName] !== b[propName]) {
+		            return false;
+		        }
+		    }
+
+		    return true;
+		}
+
+		function toggleClueSelection(clue) {
+			if(previousClueSelection !== null && isEquivalent(previousClueSelection, clue)) {
+				unsetClue(clue.number, clue.direction);
+				blockHighlight = false;
+				previousClueSelection = null;
+				return false;
+			}
+
+			blockHighlight = true;
+			previousClueSelection = clue;
+
+			return true;
+		}
+
+		const onTap = function onTap(e) {
+			let target;
+			let clueDetails;
+			blockHighlight = false;
+
+			if(e.target.nodeName === 'TD' || e.target.nodeName === 'INPUT') {
+				target = e.target;
+				blockHighlight = true;
+			} else {
+				const defEl = (e.target.nodeName === 'SPAN')?e.target.parentElement:e.target;
+
+				const num = defEl.getAttribute('data-o-crossword-number');
+				clueDetails = {};
+				clueDetails.number = num;
+				clueDetails.direction = defEl.getAttribute('data-o-crossword-direction');
+				clueDetails.answerLength = defEl.getAttribute('data-o-crossword-answer-length');
+
+				if(!toggleClueSelection(clueDetails)) return;
+				
+				const el = gridEl.querySelector(`td[data-o-crossword-number="${num}"]`);
+				target = el;
+			}
+
+			if (target === magicInput) {
+				target = magicInputTargetEl;
+			}
+
+			if (gridEl.contains(target)) {
+				let cell = target;
 				while(cell.parentNode) {
 					if (cell.tagName === 'TD') {
 						break;
@@ -524,17 +608,24 @@ OCrossword.prototype.assemble = function assemble() {
 				// if a new item is selected find what ever matches the current selection
 				if (index === -1 && currentlySelectedGridItem) {
 					const oldClue = currentlySelectedGridItem;
+
 					currentlySelectedGridItem = clues.find(item => (
 						item.direction === oldClue.direction &&
 						item.number === oldClue.number &&
 						item.answerLength === oldClue.answerLength
 					));
 				}
-				if (index !== -1 || !currentlySelectedGridItem) {
 
+				if (index !== -1 || !currentlySelectedGridItem) {
 					// the same cell has been clicked on again so
 					if (index + 1 === clues.length) index = -1;
 					currentlySelectedGridItem = clues[index + 1];
+				}
+
+				if(clueDetails !== undefined) {
+					currentlySelectedGridItem.number = clueDetails.number;
+					currentlySelectedGridItem.direction = clueDetails.direction;
+					currentlySelectedGridItem.answerLength = clueDetails.answerLength;
 				}
 
 				highlightGridByNumber(
@@ -551,12 +642,6 @@ OCrossword.prototype.assemble = function assemble() {
 			}
 			if(!this._doFancyBehaviour) return;
 		}.bind(this);
-
-		this.hammerMC = new Hammer.Manager(this.rootEl, {
-			recognizers: [
-				[Hammer.Tap]
-			]
-		});
 
 		this.addEventListener(cluesEl, 'mousemove', e => highlightGridByCluesEl(e.target));
 
