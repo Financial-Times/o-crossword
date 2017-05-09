@@ -168,9 +168,9 @@
 				padding-bottom: 0.5em;
 				margin-left: 1em;
 				cursor: pointer;
-				
+
 				.has-hover {
-					color: grey;
+					@include oColorsFor(o-crossword-clue-highlight, text);
 				}
 			}
 		}
