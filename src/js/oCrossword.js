@@ -304,6 +304,13 @@ OCrossword.prototype.assemble = function assemble() {
 				return progress(-1);
 			}
 
+			if( e.keyCode === 16 || //shift
+				e.keyCode === 20 //caps lock
+			) {
+				magicInput.value = '';
+				return;
+			}
+
 			if(!isAndroid())	magicInput.value = String.fromCharCode(e.keyCode);
 			
 			progress();

@@ -125,6 +125,7 @@
 
 			&[data-o-crossword-number]:before {
 				content: attr(data-o-crossword-number);
+				display: inline;
 				font-size: 0.5em;
 				position: absolute;
 				top: 0;
