@@ -327,10 +327,9 @@ OCrossword.prototype.assemble = function assemble() {
 				}
 			}
 
+			unsetClue(magicInputNextEls.length, direction);
 			magicInputNextEls = null;
 			magicInput.value = '';
-			magicInput.blur();
-			magicInput.style.display = 'none';
 			blockHighlight = false;
 		}, 16);
 		this.addEventListener(magicInput, 'focus', magicInput.select());
@@ -509,14 +508,23 @@ OCrossword.prototype.assemble = function assemble() {
 			gridElsToHighlight.forEach(el => el.dataset.oCrosswordHighlighted = direction);
 		}
 
-		function unsetClue(number, direction, length) {
+		function unsetClue(number, direction) {
 			const el = cluesEl.querySelector(`li[data-o-crossword-number="${number}"][data-o-crossword-direction="${direction}"]`);
+			const els = Array.from(gridEl.querySelectorAll('td[data-o-crossword-highlighted]'));
+			
+			for (const o of els) {
+				delete o.dataset.oCrosswordHighlighted;
+			}
+
 			if (el) {
 				clueDisplayer.textContent = '';
 				const els = Array.from(cluesEl.getElementsByClassName('has-hover'));
-				els.filter(el2 => el2 !== el).forEach(el => el.classList.remove('has-hover'));
+				els.forEach(el => el.classList.remove('has-hover'));
 				el.classList.remove('has-hover');
 			}
+
+			magicInput.blur();
+			magicInput.style.display = 'none';
 		}
 
 		let previousClueSelection = null;
@@ -541,19 +549,17 @@ OCrossword.prototype.assemble = function assemble() {
 
 		function toggleClueSelection(clue) {
 			if(previousClueSelection !== null && isEquivalent(previousClueSelection, clue)) {
-				// unsetClue(clue.number, clue.direction, clue.answerLength);
-				//TODO: rem highlight!
+				unsetClue(clue.number, clue.direction);
 				blockHighlight = false;
 				previousClueSelection = null;
-				return;
+				return false;
 			}
 
 			blockHighlight = true;
 			previousClueSelection = clue;
-		}
 
-		//TODO: disable block highlight on grid click/different clue.
-		//TODO: handle click on li instead of span.
+			return true;
+		}
 
 		const onTap = function onTap(e) {
 			let target;
@@ -571,7 +577,7 @@ OCrossword.prototype.assemble = function assemble() {
 				clueDetails.direction = defEl.getAttribute('data-o-crossword-direction');
 				clueDetails.answerLength = defEl.getAttribute('data-o-crossword-answer-length');
 
-				toggleClueSelection(clueDetails);
+				if(!toggleClueSelection(clueDetails)) return;
 				
 				const el = gridEl.querySelector(`td[data-o-crossword-number="${num}"]`);
 				target = el;
@@ -597,7 +603,6 @@ OCrossword.prototype.assemble = function assemble() {
 
 				// iterate through list of answers associated with that cell
 				let index = clues.indexOf(currentlySelectedGridItem);
-				console.log('index::', index);
 
 				// if a new item is selected find what ever matches the current selection
 				if (index === -1 && currentlySelectedGridItem) {
