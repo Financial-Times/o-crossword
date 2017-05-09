@@ -275,7 +275,9 @@ OCrossword.prototype.assemble = function assemble() {
 		});
 
 		this.addEventListener(magicInput, 'keydown', function (e) {
-			e.preventDefault();
+			if(!isAndroid()) {
+				e.preventDefault();
+			}
 
 			if (e.keyCode === 13) { //enter
 				magicInputNextEls = null;
@@ -302,7 +304,7 @@ OCrossword.prototype.assemble = function assemble() {
 				return progress(-1);
 			}
 
-			magicInput.value = String.fromCharCode(e.keyCode);
+			if(!isAndroid())	magicInput.value = String.fromCharCode(e.keyCode);
 			
 			progress();
 		});
@@ -367,6 +369,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 		const onResize = function onResize() {
 			var isMobile = false;
+			
 			if (window.innerWidth <= 739) {
 				isMobile = true;
 			} else if (window.innerWidth > window.innerHeight && window.innerHeight <=739 ) { //rotated phones and small devices, but not iOS
@@ -462,7 +465,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 		}.bind(this);
 
-		this.onResize = debounce(onResize, 100);
+		if(!isAndroid())	this.onResize = debounce(onResize, 100);
 
 		this._raf = requestAnimationFrame(function animate() {
 			this._raf = requestAnimationFrame(animate.bind(this));
@@ -679,4 +682,9 @@ module.exports = OCrossword;
 function isiOS() {
 	var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 	return iOS;
+}
+
+function isAndroid() {
+	var android = navigator.userAgent.toLowerCase().indexOf("android") > -1;
+	return android;
 }
