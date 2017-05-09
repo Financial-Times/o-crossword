@@ -568,6 +568,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 			if(e.target.nodeName === 'TD' || e.target.nodeName === 'INPUT') {
 				target = e.target;
+				blockHighlight = true;
 			} else {
 				const defEl = (e.target.nodeName === 'SPAN')?e.target.parentElement:e.target;
 
