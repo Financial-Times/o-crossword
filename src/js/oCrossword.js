@@ -305,7 +305,8 @@ OCrossword.prototype.assemble = function assemble() {
 			}
 
 			if( e.keyCode === 16 || //shift
-				e.keyCode === 20 //caps lock
+				e.keyCode === 20 || //caps lock
+				e.keyCode === 91 	//Command
 			) {
 				magicInput.value = '';
 				return;

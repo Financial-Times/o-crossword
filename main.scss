@@ -9,6 +9,7 @@ $o-crossword-is-silent: true !default;
 @import "src/scss/mixins";
 @import "src/scss/base";
 @import "src/scss/orientation";
+@import "src/scss/print";
 
 @if ($o-crossword-is-silent == false) {
 	@include oCrosswordAll;
