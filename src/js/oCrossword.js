@@ -275,7 +275,7 @@ OCrossword.prototype.assemble = function assemble() {
 		});
 
 		this.addEventListener(magicInput, 'keydown', function (e) {
-			if(!isAndroid()) {
+			if (!isAndroid()) {
 				e.preventDefault();
 			}
 
@@ -311,7 +311,9 @@ OCrossword.prototype.assemble = function assemble() {
 				return;
 			}
 
-			if(!isAndroid())	magicInput.value = String.fromCharCode(e.keyCode);
+			if(!isAndroid()) {
+				magicInput.value = String.fromCharCode(e.keyCode);
+			}
 			
 			progress();
 		});
@@ -472,7 +474,9 @@ OCrossword.prototype.assemble = function assemble() {
 
 		}.bind(this);
 
-		if(!isAndroid())	this.onResize = debounce(onResize, 100);
+		if(!isAndroid()) {
+			this.onResize = debounce(onResize, 100);
+		}
 
 		this._raf = requestAnimationFrame(function animate() {
 			this._raf = requestAnimationFrame(animate.bind(this));
@@ -484,7 +488,9 @@ OCrossword.prototype.assemble = function assemble() {
 		}.bind(this));
 
 		function highlightGridByCluesEl(el) {
-			if(blockHighlight) return;
+			if (blockHighlight) {
+				return;
+			}
 
 			while(el.parentNode) {
 				if (el.dataset.oCrosswordNumber) {
@@ -558,7 +564,7 @@ OCrossword.prototype.assemble = function assemble() {
 		}
 
 		function toggleClueSelection(clue) {
-			if(previousClueSelection !== null && isEquivalent(previousClueSelection, clue)) {
+			if (previousClueSelection !== null && isEquivalent(previousClueSelection, clue)) {
 				unsetClue(clue.number, clue.direction);
 				blockHighlight = false;
 				previousClueSelection = null;
@@ -576,7 +582,7 @@ OCrossword.prototype.assemble = function assemble() {
 			let clueDetails;
 			blockHighlight = false;
 
-			if(e.target.nodeName === 'TD' || e.target.nodeName === 'INPUT') {
+			if (e.target.nodeName === 'TD' || e.target.nodeName === 'INPUT') {
 				target = e.target;
 				blockHighlight = true;
 			} else {
@@ -588,7 +594,9 @@ OCrossword.prototype.assemble = function assemble() {
 				clueDetails.direction = defEl.getAttribute('data-o-crossword-direction');
 				clueDetails.answerLength = defEl.getAttribute('data-o-crossword-answer-length');
 
-				if(!toggleClueSelection(clueDetails)) return;
+				if (!toggleClueSelection(clueDetails)) {
+					return;
+				}
 				
 				const el = gridEl.querySelector(`td[data-o-crossword-number="${num}"]`);
 				target = el;
@@ -608,7 +616,9 @@ OCrossword.prototype.assemble = function assemble() {
 					}
 				}
 				const clues = gridMap.get(cell);
-				if (!clues) return;
+				if (!clues) {
+					return;
+				}
 
 				// cell.scrollIntoView(); //TODO: this works OK-ish for vertical oriented phones, could be explored
 
@@ -632,7 +642,7 @@ OCrossword.prototype.assemble = function assemble() {
 					currentlySelectedGridItem = clues[index + 1];
 				}
 
-				if(clueDetails !== undefined) {
+				if (clueDetails !== undefined) {
 					currentlySelectedGridItem.number = clueDetails.number;
 					currentlySelectedGridItem.direction = clueDetails.direction;
 					currentlySelectedGridItem.answerLength = clueDetails.answerLength;
@@ -650,7 +660,10 @@ OCrossword.prototype.assemble = function assemble() {
 					currentlySelectedGridItem.answerLength
 				));
 			}
-			if(!this._doFancyBehaviour) return;
+
+			if (!this._doFancyBehaviour) {
+				return;
+			}
 		}.bind(this);
 
 		this.addEventListener(cluesEl, 'mousemove', e => highlightGridByCluesEl(e.target));
@@ -667,7 +680,10 @@ OCrossword.prototype.assemble = function assemble() {
 };
 
 OCrossword.prototype.addEventListener = function(el, type, callback) {
-	if (this.listeners === undefined) this.listeners = [];
+	if (this.listeners === undefined) {
+		this.listeners = [];
+	}
+
 	this.listeners.push({el, type, callback});
 	el.addEventListener(type, callback);
 };
@@ -680,8 +696,13 @@ OCrossword.prototype.removeAllEventListeners = function() {
 
 OCrossword.prototype.destroy = function destroy() {
 	this.removeAllEventListeners();
-	if (this.hammerMC) this.hammerMC.destroy();
-	if (this._raf) cancelAnimationFrame(this._raf);
+	if (this.hammerMC) {
+		this.hammerMC.destroy();
+	}
+
+	if (this._raf) {
+		cancelAnimationFrame(this._raf);
+	}
 };
 
 module.exports = OCrossword;
