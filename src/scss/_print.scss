@@ -15,6 +15,11 @@
 		}
 	}
 
+	.o-crossword table td {
+		width: 25px!important;
+		height: 25px!important;
+	}
+
 	.o-crossword table td[data-o-crossword-highlighted="across"],
 	.o-crossword table td[data-o-crossword-highlighted="down"] {
 		background-color: transparent!important;
