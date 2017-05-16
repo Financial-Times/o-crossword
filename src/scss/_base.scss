@@ -14,6 +14,7 @@
 	line-height: 1.5em;
 	line-height: 2ch;
 	text-align: center;
+	box-sizing: border-box;
 }
 
 /// Base crosswords styles - add to <crossword>
@@ -72,6 +73,7 @@
 			background: rgba(0,0,0,0.2);
 			font-size: inherit;
     		text-transform: inherit;
+    		max-width: none!important;
 		}
 	}
 

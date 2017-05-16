@@ -424,6 +424,7 @@ OCrossword.prototype.assemble = function assemble() {
 					td.style.maxWidth = "initial";
 					td.style.minWidth = "initial";
 				}
+
 				inputEl.style.width = Math.min(newTdWidth, cellSizeMax) + "px";
 				inputEl.style.height = Math.min(newTdWidth, cellSizeMax) + "px";
 				inputEl.style.maxWidth = "initial";
@@ -435,9 +436,10 @@ OCrossword.prototype.assemble = function assemble() {
 					td.style.removeProperty('max-width');
 					td.style.removeProperty('min-width');
 				}
-				inputEl.style.removeProperty('width');
-				inputEl.style.removeProperty('height');
-				inputEl.style.removeProperty('max-width');
+
+				let desktopSize = gridTDs[0].getBoundingClientRect().width;
+				inputEl.style.width = desktopSize + "px";
+				inputEl.style.height = desktopSize + "px";
 			}
 
 			d2 = gridEl.getBoundingClientRect();
