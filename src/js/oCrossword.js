@@ -50,6 +50,7 @@ function buildGrid(
 	rootEl,
 {
 	size,
+	name,
 	gridnums,
 	grid,
 	clues,
@@ -72,6 +73,8 @@ function buildGrid(
 		}
 		gridEl.appendChild(tr);
 	}
+
+	rootEl.parentElement.setAttribute('data-o-crossword-title', name);
 
 	if (clues) {
 		const acrossEl = document.createElement('ul');

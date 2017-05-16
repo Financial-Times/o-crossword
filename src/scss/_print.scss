@@ -12,6 +12,14 @@
 			page-break-after:avoid;
 			position: relative;
 			width: 100%;
+
+			&:before {
+				content: attr(data-o-crossword-title);
+				display: block;
+				text-align: center;
+				margin: .5cm 0 0;
+				text-transform: capitalize;
+			}
 		}
 	}
 
@@ -20,7 +28,7 @@
 	}
 
 	.o-crossword table {
-		margin: 2cm auto 0;
+		margin: 0 auto;
 	}
 
 	.o-crossword table td {
@@ -46,6 +54,10 @@
 	.o-crossword table td[data-o-crossword-number]:before {
 		font-size: 8px!important;
 		background: transparent!important;
+	}
+
+	.o-crossword .o-crossword-grid-wrapper {
+		margin: 1.2cm auto 0;
 	}
 
 	.o-crossword .o-crossword-grid-wrapper .o-crossword-magic-input {
