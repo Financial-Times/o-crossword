@@ -113,27 +113,29 @@
 			@include oColorsFor(o-crossword-border, border);
 			@include oCrosswordType;
 			position: relative;
+			overflow: hidden;
 
 			&.empty {
 				@include oColorsFor(o-crossword-empty, background);
-				overflow: hidden;
 
 				.empty-fallback {
 					position: absolute;
 					display: block;
-					width: 100%;
-					height: 100%;
-					top: 0px;
-					left: 0px;
+
+					/*Needs to be oversized to deal with Firefox*/
+					width: 110%;
+					height: 110%;
+					top: -2px;
+					left: -2px;
 				}
 			}
 
 			&[data-o-crossword-highlighted="across"] {
-				@include oColorsFor(o-crossword-hidden-across, background);
+				background-color:rgba(158, 47, 80,.5);
 			}
 
 			&[data-o-crossword-highlighted="down"] {
-				@include oColorsFor(o-crossword-hidden-down, background);
+				background-color:rgba(158, 47, 80,.5);
 			}
 
 			text-align: center;
@@ -204,6 +206,22 @@
 			line-height: 1.3em;
 			font-size: 1.2em;
 			padding-bottom: 0.5em;
+		}
+
+		@include oGridRespondTo(M) {
+			position: relative;
+			opacity: 1;
+			height: auto;
+			margin-left: 1em !important;
+			box-shadow: none;
+			border: none;
+			transition: none;
+			pointer-events: all;
+			transform: none !important;
+
+			ul {
+				transform: none !important;
+			}
 		}
 	}
 }
