@@ -59,6 +59,8 @@ function buildGrid(
 	const gridEl = rootEl.querySelector('table');
 	const cluesEl = rootEl.querySelector('ul.o-crossword-clues');
 	const {cols, rows} = size;
+	const emptyCell = rootEl.querySelector('.empty-fallback');
+
 	for (let i=0; i<rows; i++) {
 		const tr = document.createElement('tr');
 		for (let j=0; j<cols; j++) {
@@ -69,6 +71,9 @@ function buildGrid(
 			}
 			if (grid[i][j] === '.') {
 				td.classList.add('empty');
+				const emptyMarker = emptyCell.cloneNode(true);
+				emptyMarker.classList.remove('hidden');
+				td.appendChild(emptyMarker);
 			}
 		}
 		gridEl.appendChild(tr);

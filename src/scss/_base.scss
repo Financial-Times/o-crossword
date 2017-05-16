@@ -36,6 +36,10 @@
 		box-sizing: border-box;
 	}
 
+	.hidden {
+		display: none;
+	}
+
 	.o-crossword-grid-wrapper {
 		flex-shrink: 0;
 		overflow: auto;
@@ -108,9 +112,20 @@
 			padding: 0;
 			@include oColorsFor(o-crossword-border, border);
 			@include oCrosswordType;
+			position: relative;
 
 			&.empty {
 				@include oColorsFor(o-crossword-empty, background);
+				overflow: hidden;
+
+				.empty-fallback {
+					position: absolute;
+					display: block;
+					width: 110%;
+					height: 110%;
+					top: -2px;
+					left: -2px;
+				}
 			}
 
 			&[data-o-crossword-highlighted="across"] {
@@ -190,104 +205,6 @@
 			font-size: 1.2em;
 			padding-bottom: 0.5em;
 		}
-
-		// &.preview {
-		// 	transform-origin: 0 0;
-		// 	cursor: default;
-		// 	display: none;
-		// 	pointer-events: all;
-
-		// 	.o-crossword-clues-down {
-		// 		span {
-		// 			@include oColorsFor(o-crossword-hidden-down, text);
-		// 			//@include oColorsFor(o-crossword-hidden-down, background);
-		// 		}
-
-		// 		&:before {
-		// 			@include oColorsFor(o-crossword-hidden-down, text);
-		// 			//@include oColorsFor(o-crossword-hidden-down, background);
-		// 		}
-		// 	}
-
-		// 	.o-crossword-clues-across {
-		// 		span {
-		// 			@include oColorsFor(o-crossword-hidden-across, text);
-		// 			//@include oColorsFor(o-crossword-hidden-across, background);
-		// 		}
-
-		// 		&:before {
-		// 			@include oColorsFor(o-crossword-hidden-across, text);
-		// 			//@include oColorsFor(o-crossword-hidden-across, background);
-		// 		}
-		// 	}
-		// }
 	}
-
-	// &.collapsable-clues .o-crossword-clues {
-	// 	// position: absolute;
-	// 	width: 100%;
-	// 	&.magnify, &.magnify-drag {
-	// 		background-color: oColorsGetColorFor(o-crossword page, background);
-	// 		border: 1px solid grey;
-	// 		height: 8em;
-	// 		padding-top: 3em;
-	// 		@include oGridRespondTo(M) {
-	// 			padding-top: 0;
-	// 		}
-	// 		overflow: hidden;
-	// 		margin: 0 1em;
-	// 		box-shadow: 0 0 1em black;
-	// 		pointer-events: none;
-	// 		opacity: 0;
-	// 		transition: opacity 0.15s ease;
-
-	// 		&.magnify-drag {
-	// 			opacity: 1;
-	// 		}
-	// 	}
-	// 	&.expanded {
-	// 		overflow-y: auto;
-	// 		-webkit-overflow-scrolling: touch;
-	// 		height: 100%;
-	// 		max-height: 100%;
-	// 		background: white;
-	// 		box-shadow: 0 0 1em black;
-	// 		overflow-x: hidden;
-	// 		padding-right: 1em;
-	// 		pointer-events: all;
-	// 	}
-	// 	// &.preview {
-	// 		display: block;
-	// 		position: relative;
-	// 	// }
-	// }
-
-	// &:not([data-o-crossword-force-compact]) {
-	// 	&.collapsable-clues .o-crossword-clues {
-	// 		@include oGridRespondTo(M) {
-	// 			position: relative;
-
-	// 			&.magnify {
-	// 				opacity: 1;
-	// 				height: auto;
-	// 				margin-left: 1em !important;
-	// 				box-shadow: none;
-	// 				border: none;
-	// 				transition: none;
-	// 				pointer-events: all;
-	// 				transform: none !important;
-
-	// 				ul {
-	// 					transform: none !important;
-	// 				}
-	// 			}
-
-	// 			// &.preview {
-	// 			// 	display: none;
-	// 			// 	position: relative;
-	// 			// }
-	// 		}
-	// 	}
-	// }
 }
 
