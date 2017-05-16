@@ -316,6 +316,12 @@ OCrossword.prototype.assemble = function assemble() {
 				return;
 			}
 
+			if( e.keyCode === 229) {
+				//fix safari press down
+				magicInput.value = '';
+				return;
+			}
+
 			if(!isAndroid()) {
 				magicInput.value = String.fromCharCode(e.keyCode);
 			}
