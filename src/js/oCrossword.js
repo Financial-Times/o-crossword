@@ -236,9 +236,6 @@ OCrossword.prototype.assemble = function assemble() {
 	if (cluesEl) {
 		const cluesUlEls = Array.from(cluesEl.querySelectorAll('ul'));
 
-		const previewEl = cluesEl.cloneNode(true);
-		previewEl.classList.add('preview');
-
 		const gridWrapper = document.createElement('div');
 		gridWrapper.classList.add('o-crossword-grid-wrapper');
 		this.rootEl.insertBefore(gridWrapper, gridEl);
@@ -255,7 +252,6 @@ OCrossword.prototype.assemble = function assemble() {
 		const wrapper = document.createElement('div');
 		wrapper.classList.add('o-crossword-clues-wrapper');
 		this.rootEl.insertBefore(wrapper, cluesEl);
-		wrapper.appendChild(previewEl);
 		wrapper.appendChild(cluesEl);
 
 		const magicInput = document.createElement('input');
@@ -379,6 +375,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 		const onResize = function onResize() {
 			var isMobile = false;
+			const cellSizeMax = 40;
 			
 			if (window.innerWidth <= 739) {
 				isMobile = true;
@@ -386,49 +383,22 @@ OCrossword.prototype.assemble = function assemble() {
 				isMobile = true;
 			}
 
-			cluesEl.classList.remove('magnify');
-			this.rootEl.classList.remove('collapsable-clues');
-			cluesEl.style.opacity = '0';
 			const d1 = cluesEl.getBoundingClientRect();
-			const d2 = gridEl.getBoundingClientRect();
-			const d3 = gridWrapper.getBoundingClientRect();
-			const width1 = d2.width;
+			let d2 = gridEl.getBoundingClientRect();
+			const width1 = d1.width;
 			const height1 = d1.height;
-			const width2 = d2.width;
+			let width2 = d2.width;
 			const height2 = d2.height;
 
 			let scale = height2/height1;
 			if (scale > 0.2) scale = 0.2;
 
 			this._cluesElHeight = height1;
-			this._previewElWidth = width1 * scale;
+			this._cluesElWidth = width1 * scale;
 			this._height = height1 * scale;
-			this._cluesPanHorizTarget = this._cluesPanHoriz = this._cluesPanHorizStart = -(width1 + this._previewElWidth + 20);
 			this._scale = scale;
 
 			magicInput.style.display = 'none';
-
-			if(isMobile) {
-				previewEl.style.removeProperty('margin-bottom');
-				previewEl.style.removeProperty('transform');
-			} else {
-				previewEl.style.marginBottom = `${-height1 * (1-scale)}px`;
-				previewEl.style.transform = `scale(${scale})`;
-			}
-
-			wrapper.style.height = gridEl.height;
-			clueDisplayer.style.width = width2 + 'px';
-			this.rootEl.classList.add('collapsable-clues');
-			if (cluesEl.className.indexOf('magnify') === -1) cluesEl.classList.add('magnify');
-			cluesEl.style.opacity = '';
-			this._doFancyBehaviour = window.getComputedStyle(previewEl).display !== 'none' && !isMobile;
-
-			if (this._doFancyBehaviour) {
-				cluesEl.style.marginLeft = gridWrapper.style.marginLeft = `${this._previewElWidth}px`;
-			} else {
-				cluesEl.style.marginLeft = gridWrapper.style.marginLeft = '';
-			}
-
 
 			//update grid size to fill 100% on mobile view
 			const fullWidth = Math.min(window.innerHeight, window.innerWidth);
@@ -441,20 +411,13 @@ OCrossword.prototype.assemble = function assemble() {
 			if(isMobile) {
 				for (let i = 0; i < gridTDs.length; i++) {
 					let td = gridTDs[i];
-					td.style.width = newTdWidth + "px";
-					td.style.height = newTdWidth + "px";
+					td.style.width = Math.min(newTdWidth, cellSizeMax) + "px";
+					td.style.height = Math.min(newTdWidth, cellSizeMax) + "px";
 					td.style.maxWidth = "initial";
 					td.style.minWidth = "initial";
 				}
-				previewEl.style.width = fullWidth + "px";
-				previewEl.style.maxWidth = "initial";
-				clueDisplayer.style.width = (newTdWidth * (gridSize) +1) + "px";
-				clueDisplayer.style.marginLeft = "auto";
-				clueDisplayer.style.marginRight = "auto";
-				gridEl.style.marginLeft = "auto";
-				gridEl.style.marginRight = "auto";
-				inputEl.style.width = newTdWidth + "px";
-				inputEl.style.height = newTdWidth + "px";
+				inputEl.style.width = Math.min(newTdWidth, cellSizeMax) + "px";
+				inputEl.style.height = Math.min(newTdWidth, cellSizeMax) + "px";
 				inputEl.style.maxWidth = "initial";
 			} else {
 				for (let i = 0; i < gridTDs.length; i++) {
@@ -464,29 +427,19 @@ OCrossword.prototype.assemble = function assemble() {
 					td.style.removeProperty('max-width');
 					td.style.removeProperty('min-width');
 				}
-				previewEl.style.removeProperty('width');
-				previewEl.style.removeProperty('max-width');
-				// clueDisplayer.style.removeProperty('width');
 				inputEl.style.removeProperty('width');
 				inputEl.style.removeProperty('height');
 				inputEl.style.removeProperty('max-width');
 			}
-			//END update grid size to fill 100% on mobile view
+
+			d2 = gridEl.getBoundingClientRect();
+			clueDisplayer.style.width = d2.width + 'px';
 
 		}.bind(this);
 
 		if(!isAndroid()) {
 			this.onResize = debounce(onResize, 100);
 		}
-
-		this._raf = requestAnimationFrame(function animate() {
-			this._raf = requestAnimationFrame(animate.bind(this));
-			if(!this._doFancyBehaviour) return;
-			if (cluesEl.className.indexOf('expanded') !== -1 && !this._isGrabbed) {
-				this._cluesPanHoriz = Math.round(this._cluesPanHoriz + (this._cluesPanHorizTarget - this._cluesPanHoriz) * HORIZ_PAN_SPRING);
-				cluesEl.style.transform = `translateX(${this._cluesPanHoriz}px)`;
-			}
-		}.bind(this));
 
 		function highlightGridByCluesEl(el) {
 			if (blockHighlight) {
@@ -660,10 +613,6 @@ OCrossword.prototype.assemble = function assemble() {
 					currentlySelectedGridItem.direction,
 					currentlySelectedGridItem.answerLength
 				));
-			}
-
-			if (!this._doFancyBehaviour) {
-				return;
 			}
 		}.bind(this);
 
