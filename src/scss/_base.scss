@@ -24,7 +24,7 @@
 	background-color: oColorsGetColorFor(o-crossword page, background);
 	@include oTypographySans(s);
 	position: relative;
-	display: inline-block;
+	display: block;
 	max-width: 100%;
 	margin: auto;
 	padding: 1em 0;
@@ -53,6 +53,7 @@
 			box-sizing: border-box;
 			@include oColorsFor(o-crossword-border, border);
 			text-transform: none;
+			margin: 0 auto;
 		}
 
 		.o-crossword-magic-input {
@@ -100,6 +101,7 @@
 		border-collapse: collapse;
 		border-spacing: 0;
 		font-size: 1.5rem;
+		margin: 0 auto;
 
 		td {
 			border: 1px solid;
