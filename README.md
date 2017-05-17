@@ -23,6 +23,10 @@ An experimental Origami component to implement a responsive crossword.
 
 * src/js/oCrossword.js
 
+## Print view
+Portrait mode has been favoured, and made to work across Chrome, Safari, and Firefox (Internet Explorer still needs to be tested), which means landscape mode doesn't fit the page as nicely as it could. Note: control over page margins isn't possible in Safari.
+
+
 # Old notes
 
 ## Features it could do with:
