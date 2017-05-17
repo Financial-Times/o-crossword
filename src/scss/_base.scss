@@ -33,6 +33,30 @@
 	overflow-x: hidden;
 	overflow-y: visible;
 
+	@include oGridRespondTo(M) {
+		display: flex;
+
+		.o-crossword-clues-wrapper {
+			flex-grow: 1;
+			display: flex;
+		}
+
+		ul, li {
+			flex-basis: 18em;
+			flex-grow: 1;
+		}
+
+		ul {
+			display: flex;
+			flex-grow: 1;
+			flex-flow: wrap;
+
+			.o-crossword-clues-across, .o-crossword-clues-down {
+				display: block;
+			}
+		}
+	}
+
 	* {
 		box-sizing: border-box;
 	}
@@ -74,32 +98,6 @@
 			font-size: inherit;
     		text-transform: inherit;
     		max-width: none!important;
-		}
-	}
-
-	&:not([data-o-crossword-force-compact]) {
-		@include oGridRespondTo(M) {
-			display: flex;
-
-			.o-crossword-clues-wrapper {
-				flex-grow: 1;
-				display: flex;
-			}
-
-			ul, li {
-				flex-basis: 18em;
-				flex-grow: 1;
-			}
-
-			ul {
-				display: flex;
-				flex-grow: 1;
-				flex-flow: wrap;
-
-				.o-crossword-clues-across, .o-crossword-clues-down {
-					display: block;
-				}
-			}
 		}
 	}
 
@@ -162,15 +160,11 @@
 		pointer-events: none;
 		z-index: 2;
 		width: 20em;
-	}
 
-	&:not([data-o-crossword-force-compact]) {
-		.o-crossword-clues-wrapper {
-			@include oGridRespondTo(M) {
-				position: relative;
-				float: left;
-				width: auto;
-			}
+		@include oGridRespondTo(M) {
+			position: relative;
+			float: left;
+			width: auto;
 		}
 	}
 
