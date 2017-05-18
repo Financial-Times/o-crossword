@@ -1,19 +1,33 @@
 @media screen and (max-width: $break-phone) {
-  .o-crossword table, .o-crossword .o-crossword-grid-wrapper .o-crossword-magic-input {
-    font-size: 1.2rem;
-  }
+    .o-crossword table, .o-crossword .o-crossword-grid-wrapper .o-crossword-magic-input {
+        font-size: 1.2rem;
+    }
 
-  .o-crossword .o-crossword-clues-wrapper {
-    display: block;
-    width: auto;
-    overflow: auto;
-  }
+    .o-crossword table td {
+        line-height: 1;
+    }
 
-  .o-crossword-clue-displayer {
-    height: 3em;
-  }
+    .o-crossword .o-crossword-clues-wrapper {
+        display: block;
+        width: auto;
+        overflow: auto;
+    }
 
-  .o-crossword .o-crossword-clues li, .o-crossword .o-crossword-clues ul li {
-    line-height: 1.1em;
-  }
+    .o-crossword .o-crossword-grid-wrapper .o-crossword-clue-displayer {
+        height: 3.6em;
+        font-size: .85rem;
+        padding: 0 0.5em;
+
+        span {
+            padding: 0 10%;
+        }
+    }
+
+    .o-crossword .o-crossword-grid-wrapper .o-crossword-clue-navigation {
+        display: initial;
+    }
+
+    .o-crossword .o-crossword-clues li, .o-crossword .o-crossword-clues ul li {
+        line-height: 1.1em;
+    }
 }

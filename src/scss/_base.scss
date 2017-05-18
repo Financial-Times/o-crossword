@@ -83,7 +83,15 @@
 			@include oColorsFor(o-crossword-border, border);
 			text-transform: none;
 			margin: 0 auto;
-			position: relative
+			position: relative;
+			display: table;
+
+			span {
+				display: table-cell;
+				vertical-align: middle;
+				padding: 0;
+				width: 100%;
+			}
 		}
 
 		.o-crossword-clue-navigation {
@@ -92,15 +100,33 @@
 			left: 0;
 			width: 100%;
 			height: 100%;
+			display: none;
 
 			a {
+				background: transparent;
 				display: inline-block;
-				background: rgba(0,0,0,.2);
 				height: 100%;
 				width: 50%;
+				font-size: 0;
+				vertical-align: middle;
+
+				&:before {
+					content: '';
+					display: block;
+					width: 30px;
+					height: 30px;
+					background-image: url('https://www.ft.com/__origami/service/image/v2/images/raw/fticon-v1:arrow-left?source=o-crossword');
+					background-repeat: no-repeat;
+					background-size: cover;
+					margin-top: 8px;
+				}
 
 				&.o-crossword-clue-nav-next {
-					text-align: right;
+					&:before {
+						background-image: url('https://www.ft.com/__origami/service/image/v2/images/raw/fticon-v1:arrow-right?source=o-crossword');
+						float: right;
+					}
+
 				}
 			}
 		}
