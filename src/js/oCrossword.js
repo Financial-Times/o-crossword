@@ -386,7 +386,6 @@ OCrossword.prototype.assemble = function assemble() {
 		this.addEventListener(magicInput, 'focus', magicInput.select());
 
 		function takeInput(el, nextEls) {
-			console.log(el);
 			if (
 				magicInputTargetEl &&
 				magicInput.value.match(/^[^\s]/)
@@ -413,13 +412,11 @@ OCrossword.prototype.assemble = function assemble() {
 			magicInputNextEls = nextEls;
 			magicInput.style.left = magicInputTargetEl.offsetLeft + 'px';
 			magicInput.style.top = magicInputTargetEl.offsetTop + 'px';
-			magicInput.focus();
-			magicInput.select();
 
-			setTimeout(function(){
+			debounce(function(){
 				magicInput.focus();
-			}.bind(this), 300);
-
+				magicInput.select();
+			}, 100);
 		}
 
 		const onResize = function onResize() {
