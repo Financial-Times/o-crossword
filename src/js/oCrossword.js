@@ -406,7 +406,7 @@ OCrossword.prototype.assemble = function assemble() {
 			magicInput.style.top = magicInputTargetEl.offsetTop + 'px';
 			magicInput.focus();
 			magicInput.select();
-			
+
 			debounce(function(){
 				magicInput.focus();
 				magicInput.select();
@@ -581,6 +581,7 @@ OCrossword.prototype.assemble = function assemble() {
 		const onTap = function onTap(e) {
 			let target;
 			let clueDetails;
+			let isNavigation = false;
 			blockHighlight = false;
 
 			if (e.target.nodeName === 'TD' || e.target.nodeName === 'INPUT') {
@@ -591,6 +592,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 				if(e.target.nodeName === 'A') {
 					defEl = navigateClues(e);
+					isNavigation = true;
 				} else {
 					defEl = (e.target.nodeName === 'SPAN')?e.target.parentElement:e.target;
 				}
@@ -660,12 +662,15 @@ OCrossword.prototype.assemble = function assemble() {
 					currentlySelectedGridItem.direction,
 					currentlySelectedGridItem.answerLength
 				);
-				takeInput(cell, getGridCellsByNumber(
-					gridEl,
-					currentlySelectedGridItem.number,
-					currentlySelectedGridItem.direction,
-					currentlySelectedGridItem.answerLength
-				));
+
+				if(!isNavigation) {
+					takeInput(cell, getGridCellsByNumber(
+						gridEl,
+						currentlySelectedGridItem.number,
+						currentlySelectedGridItem.direction,
+						currentlySelectedGridItem.answerLength
+					));
+				}
 			}
 		}.bind(this);
 
