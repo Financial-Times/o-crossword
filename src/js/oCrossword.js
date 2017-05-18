@@ -283,7 +283,6 @@ OCrossword.prototype.assemble = function assemble() {
 
 		clueDisplayer.appendChild(clueNavigation);
 
-
 		const wrapper = document.createElement('div');
 		wrapper.classList.add('o-crossword-clues-wrapper');
 		this.rootEl.insertBefore(wrapper, cluesEl);
@@ -298,12 +297,6 @@ OCrossword.prototype.assemble = function assemble() {
 		magicInput.style.display = 'none';
 
 		let blockHighlight = false;
-
-		/*this.hammerMC = new Hammer.Manager(this.rootEl, {
-			recognizers: [
-				[Hammer.Tap]
-			]
-		});*/
 
 		this.addEventListener(magicInput, 'keydown', function (e) {
 			if (!isAndroid()) {
@@ -696,7 +689,6 @@ OCrossword.prototype.assemble = function assemble() {
 
 		this.addEventListener(cluesEl, 'mousemove', e => highlightGridByCluesEl(e.target));
 
-		// this.hammerMC.on('tap', onTap);
 		this.rootEl.addEventListener('click', onTap, false);
 
 		onResize();
@@ -725,9 +717,6 @@ OCrossword.prototype.removeAllEventListeners = function() {
 
 OCrossword.prototype.destroy = function destroy() {
 	this.removeAllEventListeners();
-	/*if (this.hammerMC) {
-		this.hammerMC.destroy();
-	}*/
 
 	if (this._raf) {
 		cancelAnimationFrame(this._raf);
