@@ -415,6 +415,11 @@ OCrossword.prototype.assemble = function assemble() {
 			magicInput.style.top = magicInputTargetEl.offsetTop + 'px';
 			magicInput.focus();
 			magicInput.select();
+
+			setTimeout(function(){
+				magicInput.focus();
+			}.bind(this), 300);
+
 		}
 
 		const onResize = function onResize() {
