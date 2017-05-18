@@ -245,7 +245,7 @@ OCrossword.prototype.assemble = function assemble() {
 		});
 	}
 	if (cluesEl) {
-		let currentClue = 0;
+		let currentClue = -1;
 
 		const cluesUlEls = Array.from(cluesEl.querySelectorAll('ul'));
 
@@ -404,14 +404,16 @@ OCrossword.prototype.assemble = function assemble() {
 			magicInputNextEls = nextEls;
 			magicInput.style.left = magicInputTargetEl.offsetLeft + 'px';
 			magicInput.style.top = magicInputTargetEl.offsetTop + 'px';
-
+			magicInput.focus();
+			magicInput.select();
+			
 			debounce(function(){
 				magicInput.focus();
 				magicInput.select();
 			}, 100);
 		}
 
-		const onResize = function onResize() {
+		const onResize = function onResize(init) {
 			var isMobile = false;
 			const cellSizeMax = 40;
 			
@@ -419,6 +421,10 @@ OCrossword.prototype.assemble = function assemble() {
 				isMobile = true;
 			} else if (window.innerWidth > window.innerHeight && window.innerHeight <=739 ) { //rotated phones and small devices, but not iOS
 				isMobile = true;
+			}
+
+			if(isMobile && !!init) {
+				clueNavigationNext.click();
 			}
 
 			const d1 = cluesEl.getBoundingClientRect();
@@ -688,7 +694,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 		this.rootEl.addEventListener('click', onTap, false);
 
-		onResize();
+		onResize(true);
 		this.addEventListener(window, 'resize', this.onResize);
 	}
 
