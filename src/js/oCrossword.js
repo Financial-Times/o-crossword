@@ -101,27 +101,49 @@ function buildGrid(
 		clues.across.forEach(function acrossForEach(across, index) {
 			const tempLi = document.createElement('li');
 			const tempSpan = document.createElement('span');
+			const tempPartial = document.createElement('div');
+			tempPartial.classList.add('o-crossword-user-answer');
+
 			const answerLength = across[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
 			tempSpan.textContent = across[0] + '. ' + across[1];
 			tempLi.dataset.oCrosswordNumber = across[0];
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'across';
 			tempLi.dataset.oCrosswordClueId = index;
+
+			for(var i = 0; i < answerLength; ++i) {
+				let tempInput = document.createElement('input');
+				tempInput.setAttribute('maxlength', 1);
+				tempPartial.appendChild(tempInput);
+			}
+
 			acrossEl.appendChild(tempLi);
 			tempLi.appendChild(tempSpan);
+			tempLi.appendChild(tempPartial);
 		});
 
 		clues.down.forEach(function acrossForEach(down, index) {
 			const tempLi = document.createElement('li');
 			const tempSpan = document.createElement('span');
+			const tempPartial = document.createElement('div');
+			tempPartial.classList.add('o-crossword-user-answer');
+
 			const answerLength = down[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
 			tempSpan.textContent = down[0] + '. ' + down[1];
 			tempLi.dataset.oCrosswordNumber = down[0];
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'down';
 			tempLi.dataset.oCrosswordClueId = clues.across.length + index;
+
+			for(var i = 0; i < answerLength; ++i) {
+				let tempInput = document.createElement('input');
+				tempInput.setAttribute('maxlength', 1);
+				tempPartial.appendChild(tempInput);
+			}
+
 			downEl.appendChild(tempLi);
 			tempLi.appendChild(tempSpan);
+			tempLi.appendChild(tempPartial);
 		});
 	}
 
