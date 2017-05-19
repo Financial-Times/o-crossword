@@ -43,8 +43,6 @@ function writeErrorsAsClues(rootEl, json) {
 	cluesEl.appendChild(textList);
 }
 
-const HORIZ_PAN_SPRING = 0.2;
-
 function buildGrid(
 	rootEl,
 {
@@ -114,6 +112,7 @@ function buildGrid(
 			for(var i = 0; i < answerLength; ++i) {
 				let tempInput = document.createElement('input');
 				tempInput.setAttribute('maxlength', 1);
+				tempInput.setAttribute('data-link-identifier', 'A' + across[0] + '-' + i);
 				tempPartial.appendChild(tempInput);
 			}
 
@@ -138,6 +137,7 @@ function buildGrid(
 			for(var i = 0; i < answerLength; ++i) {
 				let tempInput = document.createElement('input');
 				tempInput.setAttribute('maxlength', 1);
+				tempInput.setAttribute('data-link-identifier', 'D' + down[0] + '-' + i);
 				tempPartial.appendChild(tempInput);
 			}
 
@@ -249,6 +249,16 @@ function getGridCellsByNumber(gridEl, number, direction, length) {
 	return out;
 }
 
+function getLetterIndex(gridEl, cell, number, direction) {
+	let el = gridEl.querySelector(`td[data-o-crossword-number="${number}"]`);
+
+	if(direction === 'across') {
+		return cell.cellIndex - el.cellIndex;
+	} else {
+		return cell.parentNode.rowIndex - el.parentNode.rowIndex;
+	}
+}
+
 OCrossword.prototype.assemble = function assemble() {
 	const gridEl = this.rootEl.querySelector('table');
 	const cluesEl = this.rootEl.querySelector('ul.o-crossword-clues');
@@ -261,11 +271,13 @@ OCrossword.prototype.assemble = function assemble() {
 			arr.push({
 				number: el.dataset.oCrosswordNumber,
 				direction: el.dataset.oCrosswordDirection,
-				answerLength: el.dataset.oCrosswordAnswerLength
+				answerLength: el.dataset.oCrosswordAnswerLength,
+				answerPos: getLetterIndex(gridEl, cell, el.dataset.oCrosswordNumber, el.dataset.oCrosswordDirection)
 			});
 			gridMap.set(cell, arr);
 		});
 	}
+
 	if (cluesEl) {
 		let currentClue = -1;
 
@@ -386,6 +398,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 			if (magicInputNextEls) {
 				const index = magicInputNextEls.indexOf(oldMagicInputEl);
+				syncPartialClue(magicInput.value, magicInputNextEls, index);
 				if (magicInputNextEls[index + direction]) {
 					return takeInput(magicInputNextEls[index + direction], magicInputNextEls);
 				}
@@ -564,6 +577,20 @@ OCrossword.prototype.assemble = function assemble() {
 
 			magicInput.blur();
 			magicInput.style.display = 'none';
+		}
+
+		function syncPartialClue(letter, src, index) {
+			const gridItems = gridMap.get(src[index]);
+			let targets = [];
+
+			for(let i = 0; i < gridItems.length; ++i) {
+				let linkName = gridItems[i].direction[0].toUpperCase() + gridItems[i].number + '-' + gridItems[i].answerPos;
+				targets.push(cluesEl.querySelector('input[data-link-identifier="'+linkName+'"]'));
+			}
+
+			targets.forEach((target) => {
+				target.value = letter;
+			});
 		}
 
 		let previousClueSelection = null;
