@@ -388,8 +388,11 @@ OCrossword.prototype.assemble = function assemble() {
 				e.preventDefault();
 			}
 
+			magicInput.value ='';
+			magicInput.style.display = 'none';
+
 			if (e.keyCode === 13) { //enter
-				magicInputNextEls = null;
+				e.target.blur();
 				return;
 				// return progress();
 			}
@@ -412,7 +415,7 @@ OCrossword.prototype.assemble = function assemble() {
 			if (
 				e.keyCode === 8 //backspace
 			) {
-				magicInput.value = '';
+				e.target.value = '';
 				return;
 				// return progress(-1);
 			}
@@ -442,7 +445,6 @@ OCrossword.prototype.assemble = function assemble() {
 				let defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
 				defSync.value = e.target.value;
 			}
-
 
 			nextInput(e.target);
 		});

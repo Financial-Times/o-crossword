@@ -143,6 +143,8 @@
 			font-size: inherit;
     		text-transform: inherit;
     		max-width: none!important;
+    		border-radius: 0;
+    		padding: 0;
 		}
 	}
 
@@ -246,6 +248,8 @@
 				font-family: monospace;
 				font-size: 1.5rem;
 				text-align: center;
+				border-radius: 0;
+				padding: 0;
 
 				&:focus {
 					outline: none;
