@@ -383,6 +383,130 @@ OCrossword.prototype.assemble = function assemble() {
 			progress();
 		});
 
+		this.addEventListener(cluesEl, 'keydown', function(e){
+			if (!isAndroid()) {
+				e.preventDefault();
+			}
+
+			if (e.keyCode === 13) { //enter
+				magicInputNextEls = null;
+				return;
+				// return progress();
+			}
+			if (
+				e.keyCode === 9 || //tab
+				e.keyCode === 40 ||//down
+				e.keyCode === 39 ||//right
+				e.keyCode === 32 //space
+			) {
+				return;
+				// return progress();
+			}
+			if (
+				e.keyCode === 37 || //left
+				e.keyCode === 38 //up
+			) {
+				return;
+				// return progress(-1);
+			}
+			if (
+				e.keyCode === 8 //backspace
+			) {
+				magicInput.value = '';
+				return;
+				// return progress(-1);
+			}
+
+			if( e.keyCode === 16 || //shift
+				e.keyCode === 20 || //caps lock
+				e.keyCode === 91 	//Command
+			) {
+				e.target.value = '';
+				return;
+			}
+
+			if(!isAndroid()) {
+				e.target.value = String.fromCharCode(e.keyCode);
+
+				if( e.keyCode === 229) {
+					//fix safari press down
+					e.target.value = '';
+					return;
+				}
+			}
+
+			let gridSync = getCellFromClue(e.target);
+			gridSync.grid.textContent = e.target.value;
+			
+			if(gridSync.defSync) {
+				let defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
+				defSync.value = e.target.value;
+			}
+
+
+			nextInput(e.target);
+		});
+
+		function nextInput(source) {
+			let inputID = source.getAttribute('data-link-identifier');
+			let inputGroup = document.querySelectorAll('input[data-link-identifier^="' + inputID.split('-')[0] +'-"]');
+			let currentInput = inputID.split('-')[1];
+			let newInput = ++currentInput;
+
+			if(newInput < inputGroup.length) {
+				let next = cluesEl.querySelector('input[data-link-identifier="' + inputID.split('-')[0] +'-'+ newInput+'"]');
+				next.focus();
+				next.select();
+			} else {
+				source.blur();
+			}
+		}
+
+		function getCellFromClue(clue) {
+			let inputIdentifier = clue.getAttribute('data-link-identifier');
+			let defDirection = (inputIdentifier.slice(0,1) === 'A')?'across':'down';
+			let defNum = inputIdentifier.slice(1,inputIdentifier.length).split('-')[0];
+			let defIndex = parseInt(inputIdentifier.split('-')[1]);
+			
+			let cells = gridEl.querySelectorAll('td:not(.empty)');
+			let selectedCell = {};
+
+			cells.forEach(cell => {
+				let cellData = gridMap.get(cell);
+				for(let i = 0; i < cellData.length; ++i) {
+					if(
+						cellData[i].direction === defDirection &&
+						parseInt(cellData[i].number) === parseInt(defNum) &&
+						parseInt(cellData[i].answerPos) === parseInt(defIndex)
+					) {
+						selectedCell.grid = cell;
+						if(cellData.length > 1) {
+							selectedCell.defSync = true;
+
+							selectedCell.defSyncInput = constructInputIdentifier(cellData, defDirection);
+						}
+					}
+				}
+			});
+
+			return selectedCell;
+		}
+
+		function constructInputIdentifier(data, direction) {
+			let identifier;
+
+			for(let i = 0; i < data.length; ++i) {
+				if(data[i].direction !== direction) {
+					identifier = data[i].direction.slice(0,1).toUpperCase();
+					identifier += data[i].number;
+					identifier += '-';
+					identifier += data[i].answerPos;
+				}
+			}
+
+			return identifier;
+		}
+
 		const progress = debounce(function progress(direction) {
 			direction = direction === -1 ? -1 : 1;
 			const oldMagicInputEl = magicInputTargetEl;
