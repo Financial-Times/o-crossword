@@ -397,7 +397,6 @@ OCrossword.prototype.assemble = function assemble() {
 			if (e.keyCode === 13) { //enter
 				e.target.blur();
 				return;
-				// return progress();
 			}
 			if (
 				e.keyCode === 9 || //tab
@@ -406,20 +405,17 @@ OCrossword.prototype.assemble = function assemble() {
 				e.keyCode === 32 //space
 			) {
 				return nextInput(e.target, 1);
-				// return progress();
 			}
 			if (
 				e.keyCode === 37 || //left
 				e.keyCode === 38 //up
 			) {
 				return nextInput(e.target, -1);
-				// return progress(-1);
 			}
 			if (
 				e.keyCode === 8 //backspace
 			) {
 				e.target.value = '';
-
 				gridSync.grid.textContent = e.target.value;
 				
 				if(gridSync.defSync) {
@@ -427,7 +423,6 @@ OCrossword.prototype.assemble = function assemble() {
 					defSync.value = e.target.value;
 				}
 				return nextInput(e.target, -1);
-				// return progress(-1);
 			}
 
 			if( e.keyCode === 16 || //shift
@@ -448,14 +443,16 @@ OCrossword.prototype.assemble = function assemble() {
 				}
 			}
 
-			gridSync.grid.textContent = e.target.value;
+			setTimeout(function(){ //debounce not working on Android
+				gridSync.grid.textContent = e.target.value;
 				
-			if(gridSync.defSync) {
-				let defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
-				defSync.value = e.target.value;
-			}
+				if(gridSync.defSync) {
+					let defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
+					defSync.value = e.target.value;
+				}
 
-			nextInput(e.target, 1);
+				nextInput(e.target, 1);
+			}, 10);
 		});
 
 		function nextInput(source, direction) {
