@@ -332,6 +332,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 		let blockHighlight = false;
 
+
 		this.addEventListener(magicInput, 'keydown', function (e) {
 			if (!isAndroid()) {
 				e.preventDefault();
@@ -443,7 +444,7 @@ OCrossword.prototype.assemble = function assemble() {
 				}
 			}
 
-			setTimeout(function(){ //debounce not working on Android
+			setTimeout(function(){
 				gridSync.grid.textContent = e.target.value;
 				
 				if(gridSync.defSync) {
@@ -479,7 +480,7 @@ OCrossword.prototype.assemble = function assemble() {
 			let cells = gridEl.querySelectorAll('td:not(.empty)');
 			let selectedCell = {};
 
-			cells.forEach(cell => {
+			Array.from(cells).forEach(cell => {
 				let cellData = gridMap.get(cell);
 				for(let i = 0; i < cellData.length; ++i) {
 					if(
@@ -574,7 +575,7 @@ OCrossword.prototype.assemble = function assemble() {
 			magicInput.focus();
 			magicInput.select();
 
-			debounce(function(){
+			setTimeout(function(){
 				magicInput.focus();
 				magicInput.select();
 			}, 100);
