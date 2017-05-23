@@ -390,6 +390,9 @@ OCrossword.prototype.assemble = function assemble() {
 
 			magicInput.value ='';
 			magicInput.style.display = 'none';
+			
+			let gridSync = getCellFromClue(e.target);
+			
 
 			if (e.keyCode === 13) { //enter
 				e.target.blur();
@@ -402,21 +405,28 @@ OCrossword.prototype.assemble = function assemble() {
 				e.keyCode === 39 ||//right
 				e.keyCode === 32 //space
 			) {
-				return;
+				return nextInput(e.target, 1);
 				// return progress();
 			}
 			if (
 				e.keyCode === 37 || //left
 				e.keyCode === 38 //up
 			) {
-				return;
+				return nextInput(e.target, -1);
 				// return progress(-1);
 			}
 			if (
 				e.keyCode === 8 //backspace
 			) {
 				e.target.value = '';
-				return;
+
+				gridSync.grid.textContent = e.target.value;
+				
+				if(gridSync.defSync) {
+					let defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
+					defSync.value = e.target.value;
+				}
+				return nextInput(e.target, -1);
 				// return progress(-1);
 			}
 
@@ -438,24 +448,23 @@ OCrossword.prototype.assemble = function assemble() {
 				}
 			}
 
-			let gridSync = getCellFromClue(e.target);
 			gridSync.grid.textContent = e.target.value;
-			
+				
 			if(gridSync.defSync) {
 				let defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
 				defSync.value = e.target.value;
 			}
 
-			nextInput(e.target);
+			nextInput(e.target, 1);
 		});
 
-		function nextInput(source) {
+		function nextInput(source, direction) {
 			let inputID = source.getAttribute('data-link-identifier');
 			let inputGroup = document.querySelectorAll('input[data-link-identifier^="' + inputID.split('-')[0] +'-"]');
 			let currentInput = inputID.split('-')[1];
-			let newInput = ++currentInput;
+			let newInput = (direction === 1)?++currentInput:--currentInput;
 
-			if(newInput < inputGroup.length) {
+			if(newInput >= 0 && newInput < inputGroup.length) {
 				let next = cluesEl.querySelector('input[data-link-identifier="' + inputID.split('-')[0] +'-'+ newInput+'"]');
 				next.focus();
 				next.select();
