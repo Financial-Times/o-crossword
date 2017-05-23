@@ -331,7 +331,7 @@ OCrossword.prototype.assemble = function assemble() {
 		magicInput.style.display = 'none';
 
 		let blockHighlight = false;
-
+		let previousClueSelection = null;
 
 		this.addEventListener(magicInput, 'keydown', function (e) {
 			if (!isAndroid()) {
@@ -388,9 +388,6 @@ OCrossword.prototype.assemble = function assemble() {
 			if (!isAndroid()) {
 				e.preventDefault();
 			}
-
-			magicInput.value ='';
-			magicInput.style.display = 'none';
 			
 			let gridSync = getCellFromClue(e.target);
 			
@@ -416,14 +413,19 @@ OCrossword.prototype.assemble = function assemble() {
 			if (
 				e.keyCode === 8 //backspace
 			) {
-				e.target.value = '';
-				gridSync.grid.textContent = e.target.value;
+				setTimeout(function(){
+					e.target.value = '';
+					gridSync.grid.textContent = e.target.value;
+					
+					if(gridSync.defSync) {
+						let defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
+						defSync.value = e.target.value;
+					}
+
+					nextInput(e.target, -1);
+				}, 5);
 				
-				if(gridSync.defSync) {
-					let defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
-					defSync.value = e.target.value;
-				}
-				return nextInput(e.target, -1);
+				return;
 			}
 
 			if( e.keyCode === 16 || //shift
@@ -453,7 +455,7 @@ OCrossword.prototype.assemble = function assemble() {
 				}
 
 				nextInput(e.target, 1);
-			}, 10);
+			}, 5);
 		});
 
 		function nextInput(source, direction) {
@@ -468,6 +470,8 @@ OCrossword.prototype.assemble = function assemble() {
 				next.select();
 			} else {
 				source.blur();
+				let def = source.parentElement.parentElement;
+				def.click();
 			}
 		}
 
@@ -545,6 +549,27 @@ OCrossword.prototype.assemble = function assemble() {
 
 		this.addEventListener(magicInput, 'focus', magicInput.select());
 
+		const clueInputs = cluesEl.querySelectorAll('input');
+		this.addEventListener(clueInputs, 'focus', function(e){
+			magicInput.value ='';
+			magicInput.style.display = 'none';
+
+			let def = e.target.parentElement.parentElement;
+			let targetClue = {
+				'number': def.getAttribute('data-o-crossword-number'),
+				'direction': def.getAttribute('data-o-crossword-direction'),
+				'answerLength': def.getAttribute('data-o-crossword-answer-length')
+
+			};
+
+			previousClueSelection = targetClue;
+
+			if(!def.classList.contains('has-hover')) {
+				highlightGridByNumber(targetClue.number, targetClue.direction, targetClue.answerLength);
+			}
+
+		});
+
 		function takeInput(el, nextEls) {
 			if (
 				magicInputTargetEl &&
@@ -578,7 +603,7 @@ OCrossword.prototype.assemble = function assemble() {
 			setTimeout(function(){
 				magicInput.focus();
 				magicInput.select();
-			}, 100);
+			}, 5);
 		}
 
 		const onResize = function onResize(init) {
@@ -726,8 +751,6 @@ OCrossword.prototype.assemble = function assemble() {
 			});
 		}
 
-		let previousClueSelection = null;
-
 		function isEquivalent(a, b) {
 		    var aProps = Object.getOwnPropertyNames(a);
 		    var bProps = Object.getOwnPropertyNames(b);
@@ -779,9 +802,8 @@ OCrossword.prototype.assemble = function assemble() {
 					defEl = (e.target.nodeName === 'SPAN')?e.target.parentElement:e.target;
 				}
 
-				const num = defEl.getAttribute('data-o-crossword-number');
 				clueDetails = {};
-				clueDetails.number = num;
+				clueDetails.number = defEl.getAttribute('data-o-crossword-number');;
 				clueDetails.direction = defEl.getAttribute('data-o-crossword-direction');
 				clueDetails.answerLength = defEl.getAttribute('data-o-crossword-answer-length');
 
@@ -789,7 +811,7 @@ OCrossword.prototype.assemble = function assemble() {
 					return;
 				}
 				
-				const el = gridEl.querySelector(`td[data-o-crossword-number="${num}"]`);
+				const el = gridEl.querySelector(`td[data-o-crossword-number="${clueDetails.number}"]`);
 				target = el;
 			}
 
@@ -896,7 +918,14 @@ OCrossword.prototype.addEventListener = function(el, type, callback) {
 	}
 
 	this.listeners.push({el, type, callback});
-	el.addEventListener(type, callback);
+
+	if(Object.prototype.toString.call(el) === '[object NodeList]') {
+		Array.from(el).forEach(function(element) {
+			element.addEventListener(type, callback);
+		});
+	} else {
+		el.addEventListener(type, callback);
+	}
 };
 
 OCrossword.prototype.removeAllEventListeners = function() {
