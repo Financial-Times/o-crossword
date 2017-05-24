@@ -256,6 +256,11 @@
 					border-bottom: 2px solid rgb(158, 47, 80);
 				}
 			}
+
+			.separator {
+				display: inline-block;
+				padding: 0 5px;
+			}
 		}
 
 		.o-crossword-clues-down:before {
