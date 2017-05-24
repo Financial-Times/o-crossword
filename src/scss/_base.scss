@@ -230,7 +230,7 @@
 				margin-left: 1em;
 				cursor: pointer;
 
-				.has-hover {
+				.has-hover > span{
 					@include oColorsFor(o-crossword-clue-highlight, text);
 				}
 			}
