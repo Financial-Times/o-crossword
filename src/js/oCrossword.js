@@ -60,6 +60,7 @@ function buildGrid(
 
 	for (let i=0; i<rows; i++) {
 		const tr = document.createElement('tr');
+		tr.setAttribute('data-tr-index', i);
 		for (let j=0; j<cols; j++) {
 			const td = document.createElement('td');
 			tr.appendChild(td);
@@ -255,7 +256,7 @@ function getLetterIndex(gridEl, cell, number, direction) {
 	if(direction === 'across') {
 		return cell.cellIndex - el.cellIndex;
 	} else {
-		return cell.parentNode.rowIndex - el.parentNode.rowIndex;
+		return parseInt(cell.parentNode.getAttribute('data-tr-index')) - parseInt(el.parentNode.getAttribute('data-tr-index'));
 	}
 }
 
@@ -385,8 +386,11 @@ OCrossword.prototype.assemble = function assemble() {
 		});
 
 		this.addEventListener(cluesEl, 'keydown', function(e){
+			let timer = 5;
+
 			if (!isAndroid()) {
 				e.preventDefault();
+				timer = 0;
 			}
 			
 			let gridSync = getCellFromClue(e.target);
@@ -423,7 +427,7 @@ OCrossword.prototype.assemble = function assemble() {
 					}
 
 					nextInput(e.target, -1);
-				}, 5);
+				}, timer);
 				
 				return;
 			}
@@ -455,7 +459,7 @@ OCrossword.prototype.assemble = function assemble() {
 				}
 
 				nextInput(e.target, 1);
-			}, 5);
+			}, timer);
 		});
 
 		function nextInput(source, direction) {
@@ -597,13 +601,13 @@ OCrossword.prototype.assemble = function assemble() {
 			magicInputNextEls = nextEls;
 			magicInput.style.left = magicInputTargetEl.offsetLeft + 'px';
 			magicInput.style.top = magicInputTargetEl.offsetTop + 'px';
-			magicInput.focus();
-			magicInput.select();
+
+			let timer = (isAndroid())?5:0;
 
 			setTimeout(function(){
 				magicInput.focus();
 				magicInput.select();
-			}, 5);
+			}, timer);
 		}
 
 		const onResize = function onResize(init) {
@@ -745,8 +749,8 @@ OCrossword.prototype.assemble = function assemble() {
 				let linkName = gridItems[i].direction[0].toUpperCase() + gridItems[i].number + '-' + gridItems[i].answerPos;
 				targets.push(cluesEl.querySelector('input[data-link-identifier="'+linkName+'"]'));
 			}
-
-			targets.forEach((target) => {
+			
+			Array.from(targets).forEach((target) => {
 				target.value = letter;
 			});
 		}
