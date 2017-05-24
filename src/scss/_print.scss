@@ -1,14 +1,13 @@
 @media print {
 	@page {
-		margin: 1cm 0.5cm 2cm 0.5cm;
+		margin: 1cm 0.5cm 1cm 0.5cm;
 	}
 	body {
 		-webkit-print-color-adjust: exact;
-		// height: 100%;
+		height: 100%;
 
 		& >div {
 			height: auto;
-			// overflow: hidden;
 			page-break-after:avoid;
 			position: relative;
 			width: 100%;
@@ -40,7 +39,7 @@
 	}
 
 	.o-crossword-clue-displayer {
-		display: none;
+		display: none!important;
 	}
 
 	.o-crossword table td[data-o-crossword-number]:before {
@@ -81,6 +80,11 @@
 	.o-crossword .o-crossword-clues ul li span {
 		line-height: 1.4!important;
 		font-size: 14px!important;
+	}
+
+	.o-crossword .o-crossword-clues ul li .o-crossword-user-answer,
+	.o-crossword .o-crossword-clues ul .o-crossword-user-answer {
+		display: none!important;
 	}
 
 	.o-crossword:not([data-o-crossword-force-compact]) {

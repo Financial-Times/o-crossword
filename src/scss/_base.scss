@@ -143,6 +143,8 @@
 			font-size: inherit;
     		text-transform: inherit;
     		max-width: none!important;
+    		border-radius: 0;
+    		padding: 0;
 		}
 	}
 
@@ -230,6 +232,28 @@
 
 				.has-hover {
 					@include oColorsFor(o-crossword-clue-highlight, text);
+				}
+			}
+		}
+
+		.o-crossword-user-answer {
+			input {
+				border:0;
+				display: inline-block;
+				border-bottom: 1px solid #000;
+				margin-right: 2px;
+				width: 25px;
+				height: 25px;
+				text-transform: uppercase;
+				font-family: monospace;
+				font-size: 1.5rem;
+				text-align: center;
+				border-radius: 0;
+				padding: 0;
+
+				&:focus {
+					outline: none;
+					border-bottom: 2px solid rgb(158, 47, 80);
 				}
 			}
 		}
