@@ -114,6 +114,28 @@ function buildGrid(
 				let tempInput = document.createElement('input');
 				tempInput.setAttribute('maxlength', 1);
 				tempInput.setAttribute('data-link-identifier', 'A' + across[0] + '-' + i);
+				let count = 0;
+				
+				if(across[3].length > 1) {	
+					for(var j = 0; j < across[3].length; ++j) {
+						if(j%2 === 1) {
+							count += parseInt(across[3][j-1]);
+							let separator = document.createElement('span');
+							separator.classList.add('separator');
+
+							if(across[3][j] === '-') {
+								separator.innerHTML = '&mdash;';
+							} else {
+								separator.innerHTML = '&nbsp;';
+							}
+
+							if(i === count) {
+								tempPartial.appendChild(separator);
+							}
+						}
+					}
+				}
+
 				tempPartial.appendChild(tempInput);
 			}
 
@@ -139,6 +161,29 @@ function buildGrid(
 				let tempInput = document.createElement('input');
 				tempInput.setAttribute('maxlength', 1);
 				tempInput.setAttribute('data-link-identifier', 'D' + down[0] + '-' + i);
+
+				let count = 0;
+
+				if(down[3].length > 1) {	
+					for(var j = 0; j < down[3].length; ++j) {
+						if(j%2 === 1) {
+							count += parseInt(down[3][j-1]);
+							let separator = document.createElement('span');
+							separator.classList.add('separator');
+
+							if(down[3][j] === '-') {
+								separator.innerHTML = '&mdash;';
+							} else {
+								separator.innerHTML = '&nbsp;';
+							}
+
+							if(i === count) {
+								tempPartial.appendChild(separator);
+							}
+						}
+					}
+				}
+
 				tempPartial.appendChild(tempInput);
 			}
 
@@ -703,7 +748,7 @@ OCrossword.prototype.assemble = function assemble() {
 		function setClue(number, direction) {
 			const el = cluesEl.querySelector(`li[data-o-crossword-number="${number}"][data-o-crossword-direction="${direction}"]`);
 			if (el) {
-				clueDisplayerText.textContent = el.textContent;
+				clueDisplayerText.textContent = el.querySelector('span').textContent;
 				const els = Array.from(cluesEl.getElementsByClassName('has-hover'));
 				els.filter(el2 => el2 !== el).forEach(el => el.classList.remove('has-hover'));
 				el.classList.add('has-hover');

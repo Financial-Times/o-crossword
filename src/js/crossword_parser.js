@@ -169,6 +169,7 @@
               return p;
             }
           });
+
           let wordsString = words.join('');
           clue.wordsString = wordsString;
           if (wordsString.length > maxCoord) {
@@ -353,6 +354,7 @@
           parseInt(clue.id),
           clue.body + ' (' + clue.numericCSV + ')',
           clue.wordsLengths,
+          clue.numericCSV
         ];
         spec.clues[grouping].push(item);
       });

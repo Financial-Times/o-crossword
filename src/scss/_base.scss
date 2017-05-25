@@ -230,7 +230,7 @@
 				margin-left: 1em;
 				cursor: pointer;
 
-				.has-hover {
+				.has-hover > span{
 					@include oColorsFor(o-crossword-clue-highlight, text);
 				}
 			}
@@ -255,6 +255,11 @@
 					outline: none;
 					border-bottom: 2px solid rgb(158, 47, 80);
 				}
+			}
+
+			.separator {
+				display: inline-block;
+				padding: 0 5px;
 			}
 		}
 
