@@ -119,7 +119,7 @@ function buildGrid(
 				}
 
 				let count = 0;
-				
+
 				if(across[3].length > 1) {	
 					for(var j = 0; j < across[3].length; ++j) {
 						if(j%2 === 1) {
@@ -129,11 +129,11 @@ function buildGrid(
 
 							if(across[3][j] === '-') {
 								separator.innerHTML = '&mdash;';
-							} else {
+							} else if(across[3][j] === ',') {
 								separator.innerHTML = '&nbsp;';
 							}
-
-							if(i === count) {
+							
+							if(i === count && separator.innerHTML !== '') {
 								tempPartial.appendChild(separator);
 							}
 						}
@@ -181,11 +181,11 @@ function buildGrid(
 
 							if(down[3][j] === '-') {
 								separator.innerHTML = '&mdash;';
-							} else {
+							} else if(down[3][j] === ',') {
 								separator.innerHTML = '&nbsp;';
 							}
 
-							if(i === count) {
+							if(i === count && separator.innerHTML !== '') {
 								tempPartial.appendChild(separator);
 							}
 						}
