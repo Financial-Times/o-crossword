@@ -426,7 +426,6 @@ OCrossword.prototype.assemble = function assemble() {
 				e.keyCode === 20 || //caps lock
 				e.keyCode === 91 	//Command
 			) {
-				magicInput.value = '';
 				return;
 			}
 
@@ -502,7 +501,6 @@ OCrossword.prototype.assemble = function assemble() {
 				e.keyCode === 20 || //caps lock
 				e.keyCode === 91 	//Command
 			) {
-				e.target.value = '';
 				return;
 			}
 
