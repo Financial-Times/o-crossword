@@ -16,6 +16,7 @@
     };
     var cluesGrouping;
     var lines = text.split(/\r|\n/);
+
     for(let line of lines){
       let match;
       // strip out comments
@@ -426,7 +427,6 @@
   // generating the grid text and output format if there are no errors,
   // returning the crossword object with all the bits (or the errors).
   function parseWhateverItIs(text) {
-
     let crossword = parseDSL(text);
 
     // only attempt to validate the crossword if no errors found so far
