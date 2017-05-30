@@ -244,13 +244,12 @@ function OCrossword(rootEl) {
 			let p = new Promise( (resolve) => {
 				if (this.rootEl.dataset.oCrosswordData.startsWith('http')) {
 					return fetch(this.rootEl.dataset.oCrosswordData)
-								 .then(res => res.text())
-								 ;
-				} else { // assume this is json text
+						.then(res => resolve(res.text()));
+				} else { // assume this is yaml text
 					resolve( this.rootEl.dataset.oCrosswordData );
 				}
 			})
-			.then(text => crosswordParser(text) )
+			.then(text => crosswordParser(text))
 			.then(specText => JSON.parse(specText) )
 			.then( json => {
 				if (json.errors){
