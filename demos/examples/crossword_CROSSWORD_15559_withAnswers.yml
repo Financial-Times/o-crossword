@@ -1,0 +1,49 @@
+---
+version: standard v1
+name: CROSSWORD 15,559
+author: BRADMAN
+editor: Colin Inman
+copyright: 2017, Financial Times
+publisher: Financial Times
+pubdate: 2017/05/26
+size: 15x15
+across:
+- (1,1) 1. A POW cell is unlikely to provide a bit of bed linen (10)
+- (12,1) 6. When suffering setback wimps fret (4)
+- (1,3) 9. A very small worker cultivated land endlessly, setting the trend (5-5)
+- (12,3) 10. A new cricket side will get together in a while (4)
+- (4,5) 12. Study of a heavenly body, dancing angel so hyper (12)
+- (1,7) 15. Initially those reinforcements helped and worked hard (9)
+- (11,7) 17. Long after sunbathing one may see this dance (5)
+- (1,9) 18. Mostly hard work when one is in group of entertainers (5)
+- (7,9) 19. Get rid of factory producing explosive devices (9)
+- (1,11) 20. Characters held by copper are seen to be so careful (6-6)
+- (1,13) 24. Rebel army facing question in country (4)
+- (6,13) 25. What could make cot go slimy? One looks at mouldy stuff (10)
+- (1,15) 26. Place where a lady powders her nose, we hear? (4)
+- (6,15) 27. Get hard with son terribly self-willed (10)
+down:
+- (1,1) 1. Design of apparatus inadequate (4)
+- (3,1) 2. No problem for Mr Sprat, being thin (4)
+- (5,1) 3. Another Polly working, employed by the company (2,3,7)
+- (7,1) 4. Longing to be less than totally cowardly (5)
+- (9,1) 5. Dish desired after battle – soldiers tucked in (4,5)
+- (13,1) 7. Kitchen gadgets in store moved outside enclosure (3,7)
+- (15,1) 8. What offers a domestic structure for children playing (5,5)
+- (11,4) 11. Girl and boy taken in by illegal seller? It’s sure to get heard about (5,4,3)
+- (1,6) 13. Goods in front of cash-receiver not shifting at all (5-5)
+- (3,6) 14. Call UFO image phony – not fine one, a sort of optical trick? (10)
+- (7,7) 16. A way of being silly with feet all over the place (9)
+- (9,11) 21. Jack sits in car in a body of water (5)
+- (13,12) 22. Artist makes marks with topless pen (4)
+- (15,12) 23. Caveman a disgrace ousting mother (4)
+#
+# Notes on the text format...
+# Can't use square brackets or speech marks.
+# A clue has the form
+# - (COORDINATES) ID. Clue text (ANSWER)
+# Coordinates of clue in grid are (across,down), so (1,1) = top left, (17,17) = bottom right.
+# ID is a number, followed by a full stop.
+# (WORDS,IN,ANSWER): capitalised, and separated by commas or hyphens, or (numbers) separated by commas or hyphens.
+# ANSWERS with all words of XXXXXX are converted to numbers.
+---
