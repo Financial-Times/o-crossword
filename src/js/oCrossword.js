@@ -390,6 +390,10 @@ OCrossword.prototype.assemble = function assemble() {
 				e.preventDefault();
 			}
 
+			if(e.shiftKey && e.keyCode === 9) {
+				return progress(-1);
+			}
+
 			if (e.keyCode === 13) { //enter
 				magicInputNextEls = null;
 				return progress();
@@ -446,11 +450,15 @@ OCrossword.prototype.assemble = function assemble() {
 			
 			let gridSync = getCellFromClue(e.target);
 			
+			if(e.shiftKey && e.keyCode === 9) {
+				return nextInput(e.target, -1);
+			}
 
 			if (e.keyCode === 13) { //enter
 				e.target.blur();
 				return;
 			}
+			
 			if (
 				e.keyCode === 9 || //tab
 				e.keyCode === 40 ||//down
