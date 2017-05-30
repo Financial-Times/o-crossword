@@ -1,0 +1,49 @@
+---
+version: standard v1
+name: CROSSWORD 15,559
+author: BRADMAN
+editor: Colin Inman
+copyright: 2017, Financial Times
+publisher: Financial Times
+pubdate: 2017/05/26
+size: 15x15
+across:
+- (1,1) 1. A POW cell is unlikely to provide a bit of bed linen (PILLOWCASE)
+- (12,1) 6. When suffering setback wimps fret (STEW)
+- (1,3) 9. A very small worker cultivated land endlessly, setting the trend (AVANT-GARDE)
+- (12,3) 10. A new cricket side will get together in a while (ANON)
+- (4,5) 12. Study of a heavenly body, dancing angel so hyper (SELENOGRAPHY)
+- (1,7) 15. Initially those reinforcements helped and worked hard (TRAVAILED)
+- (11,7) 17. Long after sunbathing one may see this dance (TANGO)
+- (1,9) 18. Mostly hard work when one is in group of entertainers (CHOIR)
+- (7,9) 19. Get rid of factory producing explosive devices (FIREWORKS)
+- (1,11) 20. Characters held by copper are seen to be so careful (SOFTLY-SOFTLY)
+- (1,13) 24. Rebel army facing question in country (IRAQ)
+- (6,13) 25. What could make cot go slimy? One looks at mouldy stuff (MYCOLOGIST)
+- (1,15) 26. Place where a lady powders her nose, we hear? (LIEU)
+- (6,15) 27. Get hard with son terribly self-willed (HEADSTRONG)
+down:
+- (1,1) 1. Design of apparatus inadequate (PLAN)
+- (3,1) 2. No problem for Mr Sprat, being thin (LEAN)
+- (5,1) 3. Another Polly working, employed by the company (ON,THE,PAYROLL)
+- (7,1) 4. Longing to be less than totally cowardly (CRAVE)
+- (9,1) 5. Dish desired after battle – soldiers tucked in (SIDE,ORDER)
+- (13,1) 7. Kitchen gadgets in store moved outside enclosure (TIN,OPENERS)
+- (15,1) 8. What offers a domestic structure for children playing (WENDY,HOUSE)
+- (11,4) 11. Girl and boy taken in by illegal seller? It’s sure to get heard about (TRUTH,WILL,OUT)
+- (1,6) 13. Goods in front of cash-receiver not shifting at all (STOCK-STILL)
+- (3,6) 14. Call UFO image phony – not fine one, a sort of optical trick? (CAMOUFLAGE)
+- (7,7) 16. A way of being silly with feet all over the place (LIFESTYLE)
+- (9,11) 21. Jack sits in car in a body of water (FJORD)
+- (13,12) 22. Artist makes marks with topless pen (MIRO)
+- (15,12) 23. Caveman a disgrace ousting mother (STIG)
+#
+# Notes on the text format...
+# Can't use square brackets or speech marks.
+# A clue has the form
+# - (COORDINATES) ID. Clue text (ANSWER)
+# Coordinates of clue in grid are (across,down), so (1,1) = top left, (17,17) = bottom right.
+# ID is a number, followed by a full stop.
+# (WORDS,IN,ANSWER): capitalised, and separated by commas or hyphens, or (numbers) separated by commas or hyphens.
+# ANSWERS with all words of XXXXXX are converted to numbers.
+---

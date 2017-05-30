@@ -1,0 +1,55 @@
+---
+version: standard v1
+name: Polymath 917
+author: Aardvark
+editor: Colin Inman
+copyright: 2017, Financial Times
+publisher: Financial Times
+pubdate: 2017/05/13
+size: 17x17
+across:
+- (1,1) 1. Two rocks flanking the Strait of Gibraltar (PILLARS,OF,HERCULES)
+- (1,3) 10. Song from the musical West Side Story (MARIA)
+- (7,3) 11. Analgesic for mild pain (PARACETAMOL)
+- (1,5) 12. Specialist in the microscopic study of animal tissues (HISTOLOGIST)
+- (13,5) 13. Low-growing pine tree of North America (PINON)
+- (1,7) 14. Subsonic tactical missile travelling at low altitude (EXOCET)
+- (9,7) 15. Leading instructor in the Hindu faith (MAHARISHI)
+- (1,9) 18. Site of the original settlement of Salisbury (OLD,SARUM)
+- (10,9) 20. In heraldry, lying down with head raised (COUCHANT)
+- (1,11) 22. Writer of the comedy play The Alchemist (BEN,JONSON)
+- (12,11) 24. Number one single by the Brotherhood of Man (ANGELO)
+- (1,13) 27. Barb of a bird’s feather (RAMUS)
+- (7,13) 29. Rugby union club based at Old Deer Park, Richmond (LONDON,WELSH)
+- (1,15) 30. Structure in the cochlea containing auditory receptors (CORTIS,ORGAN)
+- (13,15) 31. Notched gourd used for percussion in Latin America (GUIRO)
+- (1,17) 32. 1983 film starring Shirley MacLaine (TERMS,OF,ENDEARMENT)
+down:
+- (1,1) 1. One of the Grey Sisters in Greek mythology (PEMPHREDO)
+- (3,1) 2. Photographer born Anthony Armstrong-Jones (1930-2017) (LORD,SNOWDON)
+- (5,1) 3. Large edible shellfish called the sea-ear (ABALONE)
+- (7,1) 4. Philosophical term for a wise person (SOPHOS)
+- (9,1) 5. Synthetic radioactive metallic element (FERMIUM)
+- (11,1) 6. Shield on which a coat of arms is represented (ESCUTCHEON)
+- (13,1) 7. Relating to reflections or mirrors (CATOPTRIC)
+- (15,1) 8. Cavity or passage in a tubular organ (LUMEN)
+- (17,1) 9. Thick muscles on the back of the neck (SPLENII)
+- (15,7) 16. England’s highest mountain (SCAFELL,PIKE)
+- (7,8) 17. City containing the Rheinturm telecom tower (DUSSELDORF)
+- (5,9) 19. The physical quality of a space for performing music (ACOUSTIC)
+- (17,9) 21. Pale fleshy plant of the broomrape family (TOOTHWORT)
+- (1,11) 22. Russian and Polish beetroot soup (BORSCHT)
+- (9,11) 23. Nine-sided geometrical figure (NONAGON)
+- (13,11) 25. Believer in alternative medicine, astrology, spiritualism etc (NEW,AGER)
+- (11,12) 26. In ballet, the extreme tip of the toe (POINTE)
+- (3,13) 28. Loch -----, the deepest freshwater body in British Isles (MORAR)
+#
+# Notes on the text format...
+# Can't use square brackets or speech marks.
+# A clue has the form
+# - (COORDINATES) ID. Clue text (ANSWER)
+# Coordinates of clue in grid are (across,down), so (1,1) = top left, (17,17) = bottom right.
+# ID is a number, followed by a full stop.
+# (WORDS,IN,ANSWER): capitalised, and separated by commas or hyphens, or (numbers) separated by commas or hyphens.
+# ANSWERS with all words of XXXXXX are converted to numbers.
+---
