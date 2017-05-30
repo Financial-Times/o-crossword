@@ -114,6 +114,10 @@ function buildGrid(
 				let tempInput = document.createElement('input');
 				tempInput.setAttribute('maxlength', 1);
 				tempInput.setAttribute('data-link-identifier', 'A' + across[0] + '-' + i);
+				if(answers) {
+					tempInput.value = answers.across[index][i];
+				}
+
 				let count = 0;
 				
 				if(across[3].length > 1) {	
@@ -161,6 +165,10 @@ function buildGrid(
 				let tempInput = document.createElement('input');
 				tempInput.setAttribute('maxlength', 1);
 				tempInput.setAttribute('data-link-identifier', 'D' + down[0] + '-' + i);
+
+				if(answers) {
+					tempInput.value = answers.down[index][i];
+				}
 
 				let count = 0;
 
@@ -232,7 +240,6 @@ function OCrossword(rootEl) {
 	} else {
 		this.rootEl = rootEl.querySelector('[data-o-component~="o-crossword"]');
 	}
-
 	if (this.rootEl !== undefined) {
 		if (this.rootEl.dataset.oCrosswordData) {
 			/*
@@ -244,13 +251,12 @@ function OCrossword(rootEl) {
 			let p = new Promise( (resolve) => {
 				if (this.rootEl.dataset.oCrosswordData.startsWith('http')) {
 					return fetch(this.rootEl.dataset.oCrosswordData)
-								 .then(res => res.text())
-								 ;
-				} else { // assume this is json text
+						.then(res => resolve(res.text()));
+				} else { // assume this is yaml text
 					resolve( this.rootEl.dataset.oCrosswordData );
 				}
 			})
-			.then(text => crosswordParser(text) )
+			.then(text => crosswordParser(text))
 			.then(specText => JSON.parse(specText) )
 			.then( json => {
 				if (json.errors){
