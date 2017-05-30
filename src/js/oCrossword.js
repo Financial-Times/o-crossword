@@ -375,6 +375,7 @@ OCrossword.prototype.assemble = function assemble() {
 		wrapper.appendChild(cluesEl);
 
 		const magicInput = document.createElement('input');
+		magicInput.setAttribute('pattern', '[a-zA-Z]');
 		gridScaleWrapper.appendChild(magicInput);
 		magicInput.classList.add('o-crossword-magic-input');
 		let magicInputTargetEl = null;
@@ -398,6 +399,7 @@ OCrossword.prototype.assemble = function assemble() {
 				magicInputNextEls = null;
 				return progress();
 			}
+
 			if (
 				e.keyCode === 9 || //tab
 				e.keyCode === 40 ||//down
@@ -412,6 +414,7 @@ OCrossword.prototype.assemble = function assemble() {
 			) {
 				return progress(-1);
 			}
+
 			if (
 				e.keyCode === 8 //backspace
 			) {
@@ -427,17 +430,21 @@ OCrossword.prototype.assemble = function assemble() {
 				return;
 			}
 
-			if(!isAndroid()) {
-				magicInput.value = String.fromCharCode(e.keyCode);
+			if(e.keyCode >= 65 && e.keyCode <= 90) {
+				if(!isAndroid()) {
+					magicInput.value = String.fromCharCode(e.keyCode);
 
-				if( e.keyCode === 229) {
-					//fix safari press down
-					magicInput.value = '';
-					return;
+					if( e.keyCode === 229) {
+						//fix safari press down
+						magicInput.value = '';
+						return;
+					}
 				}
+				
+				progress();
+			} else {
+				return;
 			}
-			
-			progress();
 		});
 
 		this.addEventListener(cluesEl, 'keydown', function(e){
@@ -458,7 +465,7 @@ OCrossword.prototype.assemble = function assemble() {
 				e.target.blur();
 				return;
 			}
-			
+
 			if (
 				e.keyCode === 9 || //tab
 				e.keyCode === 40 ||//down
@@ -499,26 +506,30 @@ OCrossword.prototype.assemble = function assemble() {
 				return;
 			}
 
-			if(!isAndroid()) {
-				e.target.value = String.fromCharCode(e.keyCode);
+			if(e.keyCode >= 65 && e.keyCode <= 90) {
+				if(!isAndroid()) {
+					e.target.value = String.fromCharCode(e.keyCode);
 
-				if( e.keyCode === 229) {
-					//fix safari press down
-					e.target.value = '';
-					return;
+					if( e.keyCode === 229) {
+						//fix safari press down
+						e.target.value = '';
+						return;
+					}
 				}
+
+				setTimeout(function(){
+					gridSync.grid.textContent = e.target.value;
+					
+					if(gridSync.defSync) {
+						let defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
+						defSync.value = e.target.value;
+					}
+
+					nextInput(e.target, 1);
+				}, timer);
+			} else {
+				return;
 			}
-
-			setTimeout(function(){
-				gridSync.grid.textContent = e.target.value;
-				
-				if(gridSync.defSync) {
-					let defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
-					defSync.value = e.target.value;
-				}
-
-				nextInput(e.target, 1);
-			}, timer);
 		});
 
 		function nextInput(source, direction) {
