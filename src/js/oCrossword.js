@@ -432,12 +432,6 @@ OCrossword.prototype.assemble = function assemble() {
 			if(e.keyCode >= 65 && e.keyCode <= 90) {
 				if(!isAndroid()) {
 					magicInput.value = String.fromCharCode(e.keyCode);
-
-					if( e.keyCode === 229) {
-						//fix safari press down
-						magicInput.value = '';
-						return;
-					}
 				}
 				
 				progress();
@@ -507,12 +501,6 @@ OCrossword.prototype.assemble = function assemble() {
 			if(e.keyCode >= 65 && e.keyCode <= 90) {
 				if(!isAndroid()) {
 					e.target.value = String.fromCharCode(e.keyCode);
-
-					if( e.keyCode === 229) {
-						//fix safari press down
-						e.target.value = '';
-						return;
-					}
 				}
 
 				setTimeout(function(){
