@@ -120,7 +120,7 @@ function buildGrid(
 
 				let count = 0;
 
-				if(across[3].length > 1) {	
+				if(across[3].length > 1) {
 					for(var j = 0; j < across[3].length; ++j) {
 						if(j%2 === 1) {
 							count += parseInt(across[3][j-1]);
@@ -132,7 +132,7 @@ function buildGrid(
 							} else if(across[3][j] === ',') {
 								separator.innerHTML = '&nbsp;';
 							}
-							
+
 							if(i === count && separator.innerHTML !== '') {
 								tempPartial.appendChild(separator);
 							}
@@ -172,7 +172,7 @@ function buildGrid(
 
 				let count = 0;
 
-				if(down[3].length > 1) {	
+				if(down[3].length > 1) {
 					for(var j = 0; j < down[3].length; ++j) {
 						if(j%2 === 1) {
 							count += parseInt(down[3][j-1]);
@@ -256,11 +256,11 @@ function OCrossword(rootEl) {
 					resolve( this.rootEl.dataset.oCrosswordData );
 				}
 			})
-			.then(text => crosswordParser(text))
+			.then(text => crosswordParser.intoSpecJson(text))
 			.then(specText => JSON.parse(specText) )
 			.then( json => {
 				if (json.errors){
-					console.log(`Found Errors after invoking crosswordParser:\n${json.errors.join("\n")}` );
+					console.log(`Found Errors after invoking crosswordParser.intoSpecJson:\n${json.errors.join("\n")}` );
 					writeErrorsAsClues(rootEl, json);
 					return Promise.reject("Failed to parse crossword data, so cannot generate crossword display");
 				} else {
@@ -432,7 +432,7 @@ OCrossword.prototype.assemble = function assemble() {
 					return;
 				}
 			}
-			
+
 			progress();
 		});
 
@@ -443,9 +443,9 @@ OCrossword.prototype.assemble = function assemble() {
 				e.preventDefault();
 				timer = 0;
 			}
-			
+
 			let gridSync = getCellFromClue(e.target);
-			
+
 
 			if (e.keyCode === 13) { //enter
 				e.target.blur();
@@ -471,7 +471,7 @@ OCrossword.prototype.assemble = function assemble() {
 				setTimeout(function(){
 					e.target.value = '';
 					gridSync.grid.textContent = e.target.value;
-					
+
 					if(gridSync.defSync) {
 						let defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
 						defSync.value = e.target.value;
@@ -479,7 +479,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 					nextInput(e.target, -1);
 				}, timer);
-				
+
 				return;
 			}
 
@@ -503,7 +503,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 			setTimeout(function(){
 				gridSync.grid.textContent = e.target.value;
-				
+
 				if(gridSync.defSync) {
 					let defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
 					defSync.value = e.target.value;
@@ -535,7 +535,7 @@ OCrossword.prototype.assemble = function assemble() {
 			let defDirection = (inputIdentifier.slice(0,1) === 'A')?'across':'down';
 			let defNum = inputIdentifier.slice(1,inputIdentifier.length).split('-')[0];
 			let defIndex = parseInt(inputIdentifier.split('-')[1]);
-			
+
 			let cells = gridEl.querySelectorAll('td:not(.empty)');
 			let selectedCell = {};
 
@@ -664,7 +664,7 @@ OCrossword.prototype.assemble = function assemble() {
 		const onResize = function onResize(init) {
 			var isMobile = false;
 			const cellSizeMax = 40;
-			
+
 			if (window.innerWidth <= 739) {
 				isMobile = true;
 			} else if (window.innerWidth > window.innerHeight && window.innerHeight <=739 ) { //rotated phones and small devices, but not iOS
@@ -776,7 +776,7 @@ OCrossword.prototype.assemble = function assemble() {
 		function unsetClue(number, direction) {
 			const el = cluesEl.querySelector(`li[data-o-crossword-number="${number}"][data-o-crossword-direction="${direction}"]`);
 			const els = Array.from(gridEl.querySelectorAll('td[data-o-crossword-highlighted]'));
-			
+
 			for (const o of els) {
 				delete o.dataset.oCrosswordHighlighted;
 			}
@@ -800,7 +800,7 @@ OCrossword.prototype.assemble = function assemble() {
 				let linkName = gridItems[i].direction[0].toUpperCase() + gridItems[i].number + '-' + gridItems[i].answerPos;
 				targets.push(cluesEl.querySelector('input[data-link-identifier="'+linkName+'"]'));
 			}
-			
+
 			Array.from(targets).forEach((target) => {
 				target.value = letter;
 			});
@@ -865,7 +865,7 @@ OCrossword.prototype.assemble = function assemble() {
 				if (!toggleClueSelection(clueDetails)) {
 					return;
 				}
-				
+
 				const el = gridEl.querySelector(`td[data-o-crossword-number="${clueDetails.number}"]`);
 				target = el;
 			}

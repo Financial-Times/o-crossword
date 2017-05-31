@@ -468,20 +468,20 @@
     return crossword;
   }
 
-  function parseWhateverItIsIntoSpecText(text) {
+  function parseWhateverItIsIntoSpecJson(text) {
     // returns spec or errors as JSON
     var crossword = parseWhateverItIs(text);
 
     var responseObj;
     if (crossword.errors.length == 0) {
-      console.log("parseWhateverItIsIntoSpecText: no errors found");
+      console.log("parseWhateverItIsIntoSpecJson: no errors found");
       responseObj = crossword.spec;
     } else {
       responseObj = {
         errors: crossword.errors,
         text  : text
       }
-      console.log("parseWhateverItIsIntoSpecText: errors found:\n", crossword.errors.join("\n"), "\ntext=\n", text);
+      console.log("parseWhateverItIsIntoSpecJson: errors found:\n", crossword.errors.join("\n"), "\ntext=\n", text);
     }
 
     var jsonText = JSON.stringify( responseObj );
@@ -489,4 +489,7 @@
     return jsonText;
   }
 
-  module.exports = parseWhateverItIsIntoSpecText;
+  module.exports = {
+    'whateverItIs' : parseWhateverItIs,
+    'intoSpecJson' : parseWhateverItIsIntoSpecJson
+  };
