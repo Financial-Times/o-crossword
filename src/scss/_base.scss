@@ -89,6 +89,10 @@
 				vertical-align: middle;
 				padding: 0;
 				width: 100%;
+
+				.sr-direction {
+					display: none;
+				}
 			}
 		}
 
@@ -232,6 +236,10 @@
 
 				.has-hover > span{
 					@include oColorsFor(o-crossword-clue-highlight, text);
+				}
+
+				.sr-direction {
+					display: none;
 				}
 			}
 		}

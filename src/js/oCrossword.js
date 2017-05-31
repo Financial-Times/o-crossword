@@ -103,10 +103,10 @@ function buildGrid(
 			const tempPartial = document.createElement('div');
 			tempLi.setAttribute('tabindex', '0');
 			tempPartial.classList.add('o-crossword-user-answer');
-			// tempPartial.classList.add('inactive');
 
 			const answerLength = across[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
-			tempSpan.textContent = across[0] + '. ' + across[1];
+			tempSpan.innerHTML = across[0] + '<span class="sr-direction" aria-hidden=false>across</span>' + '. ' + across[1];
+			console.log(tempSpan);
 			tempLi.dataset.oCrosswordNumber = across[0];
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'across';
@@ -159,7 +159,7 @@ function buildGrid(
 			tempPartial.classList.add('o-crossword-user-answer');
 
 			const answerLength = down[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
-			tempSpan.textContent = down[0] + '. ' + down[1];
+			tempSpan.innerHTML = down[0] + '<span class="sr-direction" aria-hidden=false>down</span>' + '. ' + down[1];
 			tempLi.dataset.oCrosswordNumber = down[0];
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'down';
@@ -801,7 +801,7 @@ OCrossword.prototype.assemble = function assemble() {
 		function setClue(number, direction) {
 			const el = cluesEl.querySelector(`li[data-o-crossword-number="${number}"][data-o-crossword-direction="${direction}"]`);
 			if (el) {
-				clueDisplayerText.textContent = el.querySelector('span').textContent;
+				clueDisplayerText.innerHTML = el.querySelector('span').innerHTML;
 				const els = Array.from(cluesEl.getElementsByClassName('has-hover'));
 				els.filter(el2 => el2 !== el).forEach(el => el.classList.remove('has-hover'));
 				el.classList.add('has-hover');
@@ -829,7 +829,7 @@ OCrossword.prototype.assemble = function assemble() {
 			}
 
 			if (el) {
-				clueDisplayerText.textContent = '';
+				clueDisplayerText.innerHTML = '';
 				const els = Array.from(cluesEl.getElementsByClassName('has-hover'));
 				els.forEach(el => el.classList.remove('has-hover'));
 				el.classList.remove('has-hover');
