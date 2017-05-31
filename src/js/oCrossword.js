@@ -102,7 +102,7 @@ function buildGrid(
 			const tempLi = document.createElement('li');
 			const tempSpan = document.createElement('span');
 			const tempPartial = document.createElement('div');
-			tempLi.setAttribute('tabindex', '0');
+			tempLi.setAttribute('tabindex', 0);
 			tempPartial.classList.add('o-crossword-user-answer');
 
 			const answerLength = across[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
@@ -116,7 +116,7 @@ function buildGrid(
 				let tempInput = document.createElement('input');
 				tempInput.setAttribute('maxlength', 1);
 				tempInput.setAttribute('data-link-identifier', 'A' + across[0] + '-' + i);
-				// tempInput.setAttribute('tabindex', -1);
+				tempInput.setAttribute('tabindex', -1);
 				if(answers) {
 					tempInput.value = answers.across[index][i];
 				}
@@ -155,7 +155,7 @@ function buildGrid(
 			const tempLi = document.createElement('li');
 			const tempSpan = document.createElement('span');
 			const tempPartial = document.createElement('div');
-			tempLi.setAttribute('tabindex', '0');
+			tempLi.setAttribute('tabindex', 0);
 			tempPartial.classList.add('o-crossword-user-answer');
 
 			const answerLength = down[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
@@ -436,8 +436,15 @@ OCrossword.prototype.assemble = function assemble() {
 			if(e.keyCode >= 65 && e.keyCode <= 90) {
 				if(!isAndroid()) {
 					magicInput.value = String.fromCharCode(e.keyCode);
+
+					let last = gridMap.get(magicInputTargetEl);
+					Array.from(last).forEach(cell => {
+						if(parseInt(cell.answerLength) - cell.answerPos === 1) {
+							e.target.select();
+						}
+					}); //a11y fix for screen reader
 				}
-				
+
 				progress();
 			} else {
 				return;
@@ -452,7 +459,6 @@ OCrossword.prototype.assemble = function assemble() {
 				timer = 100;
 			}
 			
-			//TODO: a11y tests
 			if(e.target.nodeName !== 'INPUT') {
 				if(e.keyCode === 9) {
 					if(e.shiftKey) {
@@ -482,7 +488,6 @@ OCrossword.prototype.assemble = function assemble() {
 
 				return;
 			}
-			//end TODO
 
 			let gridSync = getCellFromClue(e.target);
 			
@@ -703,7 +708,6 @@ OCrossword.prototype.assemble = function assemble() {
 
 			setTimeout(function(){
 				magicInput.focus();
-				magicInput.select();
 			}, timer);
 		}
 
