@@ -101,7 +101,9 @@ function buildGrid(
 			const tempLi = document.createElement('li');
 			const tempSpan = document.createElement('span');
 			const tempPartial = document.createElement('div');
+			tempLi.setAttribute('tabindex', '0');
 			tempPartial.classList.add('o-crossword-user-answer');
+			// tempPartial.classList.add('inactive');
 
 			const answerLength = across[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
 			tempSpan.textContent = across[0] + '. ' + across[1];
@@ -114,6 +116,7 @@ function buildGrid(
 				let tempInput = document.createElement('input');
 				tempInput.setAttribute('maxlength', 1);
 				tempInput.setAttribute('data-link-identifier', 'A' + across[0] + '-' + i);
+				// tempInput.setAttribute('tabindex', -1);
 				if(answers) {
 					tempInput.value = answers.across[index][i];
 				}
@@ -152,6 +155,7 @@ function buildGrid(
 			const tempLi = document.createElement('li');
 			const tempSpan = document.createElement('span');
 			const tempPartial = document.createElement('div');
+			tempLi.setAttribute('tabindex', '0');
 			tempPartial.classList.add('o-crossword-user-answer');
 
 			const answerLength = down[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
@@ -165,6 +169,7 @@ function buildGrid(
 				let tempInput = document.createElement('input');
 				tempInput.setAttribute('maxlength', 1);
 				tempInput.setAttribute('data-link-identifier', 'D' + down[0] + '-' + i);
+				tempInput.setAttribute('tabindex', -1);
 
 				if(answers) {
 					tempInput.value = answers.down[index][i];
@@ -332,6 +337,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 	if (cluesEl) {
 		let currentClue = -1;
+		const cluesTotal = parseInt(this.rootEl.parentElement.getAttribute('data-o-crossword-clue-length')) - 1;
 
 		const cluesUlEls = Array.from(cluesEl.querySelectorAll('ul'));
 
@@ -375,7 +381,6 @@ OCrossword.prototype.assemble = function assemble() {
 		wrapper.appendChild(cluesEl);
 
 		const magicInput = document.createElement('input');
-		magicInput.setAttribute('pattern', '[a-zA-Z]');
 		gridScaleWrapper.appendChild(magicInput);
 		magicInput.classList.add('o-crossword-magic-input');
 		let magicInputTargetEl = null;
@@ -448,6 +453,39 @@ OCrossword.prototype.assemble = function assemble() {
 				timer = 0;
 			}
 			
+			//TODO: a11y tests
+			if(e.target.nodeName !== 'INPUT') {
+				if(e.keyCode === 9) {
+					// e.target.parentNode.getAttribute
+					if(e.shiftKey) {
+						--currentClue;
+						if(currentClue < 0) {
+							currentClue = cluesTotal;
+						}
+					} else {
+						++currentClue;
+						if(currentClue > cluesTotal) {
+							currentClue = 0;
+						}
+					}
+
+					let nextFocus = cluesEl.querySelector('li[data-o-crossword-clue-id="'+ currentClue +'"]');
+					nextFocus.focus();
+				}
+
+				if(e.keyCode === 13) {
+					let inputs = e.target.querySelectorAll('input');
+					Array.from(inputs).forEach(input => {
+						input.setAttribute('tabindex', 1);
+					});
+
+					inputs[0].focus();
+				}
+
+				return;
+			}
+			//end TODO
+
 			let gridSync = getCellFromClue(e.target);
 			
 			if(e.shiftKey && e.keyCode === 9) {
@@ -531,6 +569,10 @@ OCrossword.prototype.assemble = function assemble() {
 			} else {
 				source.blur();
 				let def = source.parentElement.parentElement;
+				let inputs = cluesEl.querySelectorAll('input');
+				Array.from(inputs).forEach(input => {
+					input.setAttribute('tabindex', -1);
+				});
 				def.click();
 			}
 		}
@@ -941,7 +983,6 @@ OCrossword.prototype.assemble = function assemble() {
 		const navigateClues = function navigateClues (e) {
 			e.preventDefault();
 			const dir = (e.target === clueNavigationNext)?'forward':'backward';
-			const cluesTotal = parseInt(this.rootEl.parentElement.getAttribute('data-o-crossword-clue-length')) - 1;
 
 			if (dir === 'forward') {
 				++currentClue;
