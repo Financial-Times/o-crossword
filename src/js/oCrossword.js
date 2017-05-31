@@ -71,6 +71,7 @@ function buildGrid(
 				td.classList.add('empty');
 				const emptyMarker = emptyCell.cloneNode(true);
 				emptyMarker.classList.remove('hidden');
+				emptyMarker.setAttribute('aria-hidden', true);
 				td.appendChild(emptyMarker);
 			}
 		}
@@ -106,7 +107,6 @@ function buildGrid(
 
 			const answerLength = across[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
 			tempSpan.innerHTML = across[0] + '<span class="sr-direction" aria-hidden=false>across</span>' + '. ' + across[1];
-			console.log(tempSpan);
 			tempLi.dataset.oCrosswordNumber = across[0];
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'across';
@@ -359,7 +359,6 @@ OCrossword.prototype.assemble = function assemble() {
 
 		const clueNavigation = document.createElement('nav');
 		clueNavigation.classList.add('o-crossword-clue-navigation');
-		// clueNavigation.classList.add('hidden');
 
 		const clueNavigationPrev = document.createElement('a');
 		clueNavigationPrev.classList.add('o-crossword-clue-nav-prev');
@@ -450,13 +449,12 @@ OCrossword.prototype.assemble = function assemble() {
 
 			if (!isAndroid()) {
 				e.preventDefault();
-				timer = 0;
+				timer = 100;
 			}
 			
 			//TODO: a11y tests
 			if(e.target.nodeName !== 'INPUT') {
 				if(e.keyCode === 9) {
-					// e.target.parentNode.getAttribute
 					if(e.shiftKey) {
 						--currentClue;
 						if(currentClue < 0) {
@@ -539,6 +537,7 @@ OCrossword.prototype.assemble = function assemble() {
 			if(e.keyCode >= 65 && e.keyCode <= 90) {
 				if(!isAndroid()) {
 					e.target.value = String.fromCharCode(e.keyCode);
+					e.target.select(); //a11y: screen reader reads value properly
 				}
 
 				setTimeout(function(){
