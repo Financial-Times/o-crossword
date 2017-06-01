@@ -90,7 +90,9 @@
 				padding: 0;
 				width: 100%;
 
-				.sr-direction {
+				.sr-direction, 
+				.sr-instruction,
+				.sr-answer {
 					display: none;
 				}
 			}
@@ -238,7 +240,9 @@
 					@include oColorsFor(o-crossword-clue-highlight, text);
 				}
 
-				.sr-direction {
+				.sr-direction, 
+				.sr-instruction,
+				.sr-answer {
 					display: none;
 				}
 			}

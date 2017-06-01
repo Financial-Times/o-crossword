@@ -106,7 +106,7 @@ function buildGrid(
 			tempPartial.classList.add('o-crossword-user-answer');
 
 			const answerLength = across[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
-			tempSpan.innerHTML = across[0] + '<span class="sr-direction" aria-hidden=false>across</span>' + '. ' + across[1];
+			tempSpan.innerHTML = across[0] + '<span class="sr-direction" aria-hidden=false>across</span>' + '. ' + across[1] + ' <span class="sr-answer" aria-hidden=false></span> <span class="sr-instruction" aria-hidden=false>Press ENTER to add your answer</span>';
 			tempLi.dataset.oCrosswordNumber = across[0];
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'across';
@@ -159,7 +159,7 @@ function buildGrid(
 			tempPartial.classList.add('o-crossword-user-answer');
 
 			const answerLength = down[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
-			tempSpan.innerHTML = down[0] + '<span class="sr-direction" aria-hidden=false>down</span>' + '. ' + down[1];
+			tempSpan.innerHTML = down[0] + '<span class="sr-direction" aria-hidden=false>down</span>' + '. ' + down[1] + ' <span class="sr-answer" aria-hidden=false></span> <span class="sr-instruction" aria-hidden=false>Press ENTER to add your answer</span>';
 			tempLi.dataset.oCrosswordNumber = down[0];
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'down';
@@ -390,6 +390,22 @@ OCrossword.prototype.assemble = function assemble() {
 		let blockHighlight = false;
 		let previousClueSelection = null;
 
+		function constructInputIdentifier(data, direction) {
+			let identifier;
+
+			for(let i = 0; i < data.length; ++i) {
+				if(data[i].direction !== direction) {
+					identifier = data[i].direction.slice(0,1).toUpperCase();
+					identifier += data[i].number;
+					identifier += '-';
+					identifier += data[i].answerPos;
+				}
+			}
+
+			return identifier;
+		}
+
+
 		this.addEventListener(magicInput, 'keydown', function (e) {
 			if (!isAndroid()) {
 				e.preventDefault();
@@ -526,6 +542,8 @@ OCrossword.prototype.assemble = function assemble() {
 						defSync.value = e.target.value;
 					}
 
+					updateScreenReaderAnswer(e.target);
+
 					nextInput(e.target, -1);
 				}, timer);
 				
@@ -553,78 +571,14 @@ OCrossword.prototype.assemble = function assemble() {
 						defSync.value = e.target.value;
 					}
 
+					updateScreenReaderAnswer(e.target, gridSync);
+
 					nextInput(e.target, 1);
 				}, timer);
 			} else {
 				return;
 			}
 		});
-
-		function nextInput(source, direction) {
-			let inputID = source.getAttribute('data-link-identifier');
-			let inputGroup = document.querySelectorAll('input[data-link-identifier^="' + inputID.split('-')[0] +'-"]');
-			let currentInput = inputID.split('-')[1];
-			let newInput = (direction === 1)?++currentInput:--currentInput;
-
-			if(newInput >= 0 && newInput < inputGroup.length) {
-				let next = cluesEl.querySelector('input[data-link-identifier="' + inputID.split('-')[0] +'-'+ newInput+'"]');
-				next.focus();
-				next.select();
-			} else {
-				source.blur();
-				let def = source.parentElement.parentElement;
-				let inputs = cluesEl.querySelectorAll('input');
-				Array.from(inputs).forEach(input => {
-					input.setAttribute('tabindex', -1);
-				});
-				def.click();
-			}
-		}
-
-		function getCellFromClue(clue) {
-			let inputIdentifier = clue.getAttribute('data-link-identifier');
-			let defDirection = (inputIdentifier.slice(0,1) === 'A')?'across':'down';
-			let defNum = inputIdentifier.slice(1,inputIdentifier.length).split('-')[0];
-			let defIndex = parseInt(inputIdentifier.split('-')[1]);
-			
-			let cells = gridEl.querySelectorAll('td:not(.empty)');
-			let selectedCell = {};
-
-			Array.from(cells).forEach(cell => {
-				let cellData = gridMap.get(cell);
-				for(let i = 0; i < cellData.length; ++i) {
-					if(
-						cellData[i].direction === defDirection &&
-						parseInt(cellData[i].number) === parseInt(defNum) &&
-						parseInt(cellData[i].answerPos) === parseInt(defIndex)
-					) {
-						selectedCell.grid = cell;
-						if(cellData.length > 1) {
-							selectedCell.defSync = true;
-
-							selectedCell.defSyncInput = constructInputIdentifier(cellData, defDirection);
-						}
-					}
-				}
-			});
-
-			return selectedCell;
-		}
-
-		function constructInputIdentifier(data, direction) {
-			let identifier;
-
-			for(let i = 0; i < data.length; ++i) {
-				if(data[i].direction !== direction) {
-					identifier = data[i].direction.slice(0,1).toUpperCase();
-					identifier += data[i].number;
-					identifier += '-';
-					identifier += data[i].answerPos;
-				}
-			}
-
-			return identifier;
-		}
 
 		const progress = debounce(function progress(direction) {
 			direction = direction === -1 ? -1 : 1;
@@ -711,6 +665,172 @@ OCrossword.prototype.assemble = function assemble() {
 			}, timer);
 		}
 
+		function nextInput(source, direction) {
+			let inputID = source.getAttribute('data-link-identifier');
+			let inputGroup = document.querySelectorAll('input[data-link-identifier^="' + inputID.split('-')[0] +'-"]');
+			let currentInput = inputID.split('-')[1];
+			let newInput = (direction === 1)?++currentInput:--currentInput;
+
+			if(newInput >= 0 && newInput < inputGroup.length) {
+				let next = cluesEl.querySelector('input[data-link-identifier="' + inputID.split('-')[0] +'-'+ newInput+'"]');
+				next.focus();
+				next.select();
+			} else {
+				source.blur();
+				let def = source.parentElement.parentElement;
+				let inputs = cluesEl.querySelectorAll('input');
+				Array.from(inputs).forEach(input => {
+					input.setAttribute('tabindex', -1);
+				});
+				def.click();
+			}
+		}
+
+		function highlightGridByCluesEl(el) {
+			if (blockHighlight) {
+				return;
+			}
+
+			while(el.parentNode) {
+				if (el.dataset.oCrosswordNumber) {
+					highlightGridByNumber(Number(el.dataset.oCrosswordNumber), el.dataset.oCrosswordDirection, el.dataset.oCrosswordAnswerLength);
+					return;
+				} else {
+					el = el.parentNode;
+				}
+			}
+			return false;
+		}
+
+		function highlightGridByNumber(number, direction, length) {
+			magicInput.style.display = 'none';
+			setClue(number, direction);
+			const els = Array.from(gridEl.querySelectorAll('td[data-o-crossword-highlighted]'));
+			for (const o of els) {
+				delete o.dataset.oCrosswordHighlighted;
+			}
+			const gridElsToHighlight = getGridCellsByNumber(gridEl, number, direction, length);
+			gridElsToHighlight.forEach(el => el.dataset.oCrosswordHighlighted = direction);
+		}
+
+		function getCellFromClue(clue) {
+			let inputIdentifier = clue.getAttribute('data-link-identifier');
+			let defDirection = (inputIdentifier.slice(0,1) === 'A')?'across':'down';
+			let defNum = inputIdentifier.slice(1,inputIdentifier.length).split('-')[0];
+			let defIndex = parseInt(inputIdentifier.split('-')[1]);
+			
+			let cells = gridEl.querySelectorAll('td:not(.empty)');
+			let selectedCell = {};
+
+			Array.from(cells).forEach(cell => {
+				let cellData = gridMap.get(cell);
+				for(let i = 0; i < cellData.length; ++i) {
+					if(
+						cellData[i].direction === defDirection &&
+						parseInt(cellData[i].number) === parseInt(defNum) &&
+						parseInt(cellData[i].answerPos) === parseInt(defIndex)
+					) {
+						selectedCell.grid = cell;
+						if(cellData.length > 1) {
+							selectedCell.defSync = true;
+
+							selectedCell.defSyncInput = constructInputIdentifier(cellData, defDirection);
+						}
+					}
+				}
+			});
+
+			return selectedCell;
+		}
+
+		function setClue(number, direction) {
+			const el = cluesEl.querySelector(`li[data-o-crossword-number="${number}"][data-o-crossword-direction="${direction}"]`);
+			if (el) {
+				clueDisplayerText.innerHTML = el.querySelector('span').innerHTML;
+				const els = Array.from(cluesEl.getElementsByClassName('has-hover'));
+				els.filter(el2 => el2 !== el).forEach(el => el.classList.remove('has-hover'));
+				el.classList.add('has-hover');
+				currentClue = parseInt(el.getAttribute('data-o-crossword-clue-id'));
+			}
+		}
+
+		function unsetClue(number, direction) {
+			const el = cluesEl.querySelector(`li[data-o-crossword-number="${number}"][data-o-crossword-direction="${direction}"]`);
+			const els = Array.from(gridEl.querySelectorAll('td[data-o-crossword-highlighted]'));
+			
+			for (const o of els) {
+				delete o.dataset.oCrosswordHighlighted;
+			}
+
+			if (el) {
+				clueDisplayerText.innerHTML = '';
+				const els = Array.from(cluesEl.getElementsByClassName('has-hover'));
+				els.forEach(el => el.classList.remove('has-hover'));
+				el.classList.remove('has-hover');
+			}
+
+			magicInput.blur();
+			magicInput.style.display = 'none';
+		}
+
+		function toggleClueSelection(clue) {
+			if (previousClueSelection !== null && isEquivalent(previousClueSelection, clue)) {
+				unsetClue(clue.number, clue.direction);
+				blockHighlight = false;
+				previousClueSelection = null;
+				return false;
+			}
+
+			blockHighlight = true;
+			previousClueSelection = clue;
+
+			return true;
+		}
+
+		function updateScreenReaderAnswer(target, dataGrid) {
+			const targetData = target.parentNode.parentNode;
+			const answerLength = parseInt(targetData.getAttribute('data-o-crossword-answer-length'));
+			const inputs = targetData.querySelectorAll('input');
+			const screenReaderAnswer = targetData.querySelector('.sr-answer');
+			let answerValue = [];
+			let filledCount = 0;
+
+			Array.from(inputs).forEach(input => {
+				if(input.value !== '') {
+					++filledCount;
+					answerValue.push(input.value);
+				} else {
+					answerValue.push(" blank ");
+				}
+			});
+
+			if(filledCount > 0) {
+				screenReaderAnswer.textContent = 'Your Answer: ' + answerValue.join('') + '.';
+			} else {
+				screenReaderAnswer.textContent = '';
+			}
+
+			if(dataGrid && dataGrid.defSync) {
+				let syncTarget = cluesEl.querySelector('input[data-link-identifier=' + dataGrid.defSyncInput + ']');
+				updateScreenReaderAnswer(syncTarget);
+			}
+		}
+
+		function syncPartialClue(letter, src, index) {
+			const gridItems = gridMap.get(src[index]);
+			let targets = [];
+
+			for(let i = 0; i < gridItems.length; ++i) {
+				let linkName = gridItems[i].direction[0].toUpperCase() + gridItems[i].number + '-' + gridItems[i].answerPos;
+				targets.push(cluesEl.querySelector('input[data-link-identifier="'+linkName+'"]'));
+			}
+			
+			Array.from(targets).forEach((target) => {
+				target.value = letter;
+				updateScreenReaderAnswer(target);
+			});
+		}
+
 		const onResize = function onResize(init) {
 			var isMobile = false;
 			const cellSizeMax = 40;
@@ -783,109 +903,6 @@ OCrossword.prototype.assemble = function assemble() {
 
 		if(!isAndroid()) {
 			this.onResize = debounce(onResize, 100);
-		}
-
-		function highlightGridByCluesEl(el) {
-			if (blockHighlight) {
-				return;
-			}
-
-			while(el.parentNode) {
-				if (el.dataset.oCrosswordNumber) {
-					highlightGridByNumber(Number(el.dataset.oCrosswordNumber), el.dataset.oCrosswordDirection, el.dataset.oCrosswordAnswerLength);
-					return;
-				} else {
-					el = el.parentNode;
-				}
-			}
-			return false;
-		}
-
-		function setClue(number, direction) {
-			const el = cluesEl.querySelector(`li[data-o-crossword-number="${number}"][data-o-crossword-direction="${direction}"]`);
-			if (el) {
-				clueDisplayerText.innerHTML = el.querySelector('span').innerHTML;
-				const els = Array.from(cluesEl.getElementsByClassName('has-hover'));
-				els.filter(el2 => el2 !== el).forEach(el => el.classList.remove('has-hover'));
-				el.classList.add('has-hover');
-				currentClue = parseInt(el.getAttribute('data-o-crossword-clue-id'));
-			}
-		}
-
-		function highlightGridByNumber(number, direction, length) {
-			magicInput.style.display = 'none';
-			setClue(number, direction);
-			const els = Array.from(gridEl.querySelectorAll('td[data-o-crossword-highlighted]'));
-			for (const o of els) {
-				delete o.dataset.oCrosswordHighlighted;
-			}
-			const gridElsToHighlight = getGridCellsByNumber(gridEl, number, direction, length);
-			gridElsToHighlight.forEach(el => el.dataset.oCrosswordHighlighted = direction);
-		}
-
-		function unsetClue(number, direction) {
-			const el = cluesEl.querySelector(`li[data-o-crossword-number="${number}"][data-o-crossword-direction="${direction}"]`);
-			const els = Array.from(gridEl.querySelectorAll('td[data-o-crossword-highlighted]'));
-			
-			for (const o of els) {
-				delete o.dataset.oCrosswordHighlighted;
-			}
-
-			if (el) {
-				clueDisplayerText.innerHTML = '';
-				const els = Array.from(cluesEl.getElementsByClassName('has-hover'));
-				els.forEach(el => el.classList.remove('has-hover'));
-				el.classList.remove('has-hover');
-			}
-
-			magicInput.blur();
-			magicInput.style.display = 'none';
-		}
-
-		function syncPartialClue(letter, src, index) {
-			const gridItems = gridMap.get(src[index]);
-			let targets = [];
-
-			for(let i = 0; i < gridItems.length; ++i) {
-				let linkName = gridItems[i].direction[0].toUpperCase() + gridItems[i].number + '-' + gridItems[i].answerPos;
-				targets.push(cluesEl.querySelector('input[data-link-identifier="'+linkName+'"]'));
-			}
-			
-			Array.from(targets).forEach((target) => {
-				target.value = letter;
-			});
-		}
-
-		function isEquivalent(a, b) {
-		    var aProps = Object.getOwnPropertyNames(a);
-		    var bProps = Object.getOwnPropertyNames(b);
-
-		    if (aProps.length != bProps.length) {
-		        return false;
-		    }
-
-		    for (var i = 0; i < aProps.length; i++) {
-		        var propName = aProps[i];
-		        if (a[propName] !== b[propName]) {
-		            return false;
-		        }
-		    }
-
-		    return true;
-		}
-
-		function toggleClueSelection(clue) {
-			if (previousClueSelection !== null && isEquivalent(previousClueSelection, clue)) {
-				unsetClue(clue.number, clue.direction);
-				blockHighlight = false;
-				previousClueSelection = null;
-				return false;
-			}
-
-			blockHighlight = true;
-			previousClueSelection = clue;
-
-			return true;
 		}
 
 		const onTap = function onTap(e) {
@@ -1056,4 +1073,22 @@ function isiOS() {
 function isAndroid() {
 	var android = navigator.userAgent.toLowerCase().indexOf("android") > -1;
 	return android;
+}
+
+function isEquivalent(a, b) {
+    var aProps = Object.getOwnPropertyNames(a);
+    var bProps = Object.getOwnPropertyNames(b);
+
+    if (aProps.length != bProps.length) {
+        return false;
+    }
+
+    for (var i = 0; i < aProps.length; i++) {
+        var propName = aProps[i];
+        if (a[propName] !== b[propName]) {
+            return false;
+        }
+    }
+
+    return true;
 }
