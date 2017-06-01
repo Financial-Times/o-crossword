@@ -1,3 +1,16 @@
+// Using UMD (Universal Module Definition), see https://github.com/umdjs/umd, and Jake,
+// for a js file to be included as-is in Node code and in browser code.
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like environments that support module.exports,
+    // like Node.
+    module.exports = factory();
+  } else {
+    // Browser globals (root is window)
+    root.CrosswordDSL = factory();
+  }
+}(this, function () {
   // given the DSL, ensure we have all the relevant pieces,
   // and assume there will be subsequent checking to ensure they are valid
   function parseDSL(text){
@@ -468,20 +481,20 @@
     return crossword;
   }
 
-  function parseWhateverItIsIntoSpecText(text) {
+  function parseWhateverItIsIntoSpecJson(text) {
     // returns spec or errors as JSON
     var crossword = parseWhateverItIs(text);
 
     var responseObj;
     if (crossword.errors.length == 0) {
-      console.log("parseWhateverItIsIntoSpecText: no errors found");
+      console.log("parseWhateverItIsIntoSpecJson: no errors found");
       responseObj = crossword.spec;
     } else {
       responseObj = {
         errors: crossword.errors,
         text  : text
       }
-      console.log("parseWhateverItIsIntoSpecText: errors found:\n", crossword.errors.join("\n"), "\ntext=\n", text);
+      console.log("parseWhateverItIsIntoSpecJson: errors found:\n", crossword.errors.join("\n"), "\ntext=\n", text);
     }
 
     var jsonText = JSON.stringify( responseObj );
@@ -489,4 +502,8 @@
     return jsonText;
   }
 
-  module.exports = parseWhateverItIsIntoSpecText;
+  return {
+    'whateverItIs' : parseWhateverItIs,
+    'intoSpecJson' : parseWhateverItIsIntoSpecJson
+  };
+}));
