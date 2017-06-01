@@ -123,7 +123,7 @@ function buildGrid(
 
 				let count = 0;
 
-				if(across[3].length > 1) {	
+				if(across[3].length > 1) {
 					for(var j = 0; j < across[3].length; ++j) {
 						if(j%2 === 1) {
 							count += parseInt(across[3][j-1]);
@@ -177,7 +177,7 @@ function buildGrid(
 
 				let count = 0;
 
-				if(down[3].length > 1) {	
+				if(down[3].length > 1) {
 					for(var j = 0; j < down[3].length; ++j) {
 						if(j%2 === 1) {
 							count += parseInt(down[3][j-1]);
