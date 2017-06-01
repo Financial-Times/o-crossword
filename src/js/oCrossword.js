@@ -261,11 +261,11 @@ function OCrossword(rootEl) {
 					resolve( this.rootEl.dataset.oCrosswordData );
 				}
 			})
-			.then(text => crosswordParser(text))
+			.then(text => crosswordParser.intoSpecJson(text))
 			.then(specText => JSON.parse(specText) )
 			.then( json => {
 				if (json.errors){
-					console.log(`Found Errors after invoking crosswordParser:\n${json.errors.join("\n")}` );
+					console.log(`Found Errors after invoking crosswordParser.intoSpecJson:\n${json.errors.join("\n")}` );
 					writeErrorsAsClues(rootEl, json);
 					return Promise.reject("Failed to parse crossword data, so cannot generate crossword display");
 				} else {
