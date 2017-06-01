@@ -627,7 +627,6 @@ OCrossword.prototype.assemble = function assemble() {
 			if(!def.classList.contains('has-hover')) {
 				highlightGridByNumber(targetClue.number, targetClue.direction, targetClue.answerLength);
 			}
-
 		});
 
 		function takeInput(el, nextEls) {
@@ -800,12 +799,31 @@ OCrossword.prototype.assemble = function assemble() {
 					++filledCount;
 					answerValue.push(input.value);
 				} else {
-					answerValue.push(" blank ");
+					answerValue.push(".");
 				}
 			});
 
+			let combineCount = 0;
+			let combinedValue = [];
+
+			for(let i = 0; i < answerValue.length; ++i) {
+				if(answerValue[i] === '.') {
+					++combineCount;
+					if((i < answerValue.length - 1 && answerValue[i + 1] !== '.') || i === answerValue.length - 1) {
+						if(combineCount > 1) {
+							combinedValue.push(" " + combineCount + " blanks ");
+						} else {
+							combinedValue.push(" blank ");
+						}
+					}
+				} else {	
+					combineCount = 0;
+					combinedValue.push(answerValue[i]);
+				}
+			}
+
 			if(filledCount > 0) {
-				screenReaderAnswer.textContent = 'Your Answer: ' + answerValue.join('') + '.';
+				screenReaderAnswer.textContent = 'Your Answer: ' + combinedValue.join('') + '.';
 			} else {
 				screenReaderAnswer.textContent = '';
 			}
