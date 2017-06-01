@@ -472,7 +472,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 			if (!isAndroid()) {
 				e.preventDefault();
-				timer = 100;
+				timer = 0;
 			}
 			
 			if(e.target.nodeName !== 'INPUT') {
