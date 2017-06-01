@@ -389,6 +389,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 		let blockHighlight = false;
 		let previousClueSelection = null;
+		let isTab = false;
 
 		function constructInputIdentifier(data, direction) {
 			let identifier;
@@ -412,7 +413,8 @@ OCrossword.prototype.assemble = function assemble() {
 			}
 
 			if(e.shiftKey && e.keyCode === 9) {
-				return progress(-1);
+				isTab = true;
+				return clueNavigationPrev.click();
 			}
 
 			if (e.keyCode === 13) { //enter
@@ -420,8 +422,13 @@ OCrossword.prototype.assemble = function assemble() {
 				return progress();
 			}
 
+			if (e.keyCode === 9) { //tab
+				//TODO: get next clue;
+				isTab = true;
+				return clueNavigationNext.click();
+			}
+
 			if (
-				e.keyCode === 9 || //tab
 				e.keyCode === 40 ||//down
 				e.keyCode === 39 ||//right
 				e.keyCode === 32 //space
@@ -1007,13 +1014,15 @@ OCrossword.prototype.assemble = function assemble() {
 					currentlySelectedGridItem.answerLength
 				);
 
-				if(!isNavigation) {
+				if(!isNavigation || isTab) {
 					takeInput(cell, getGridCellsByNumber(
 						gridEl,
 						currentlySelectedGridItem.number,
 						currentlySelectedGridItem.direction,
 						currentlySelectedGridItem.answerLength
 					));
+
+					isTab = false;
 				}
 			}
 		}.bind(this);
