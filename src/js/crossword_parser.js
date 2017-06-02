@@ -51,7 +51,7 @@
       else if (match = /^pubdate:?\s+(\d{4}\/\d\d\/\d\d)$/i.exec(line) ) { crossword.pubdate    = match[1]; }
       else if (match = /^(?:size|dimensions):?\s+(15x15|17x17)$/i.exec(line) ) { crossword.dimensions = match[1]; }
       else if (match = /^(across|down):?$/i                .exec(line) ) { cluesGrouping        = match[1]; }
-      else if (match = /^-\s\((\d+),(\d+)\)\s+(\d+)\.\s+(.+)\s+\(([A-Z,-]+|[0-9,-]+)\)$/.exec(line) ) {
+      else if (match = /^-\s\((\d+),(\d+)\)\s+(\d+)\.\s+(.+)\s+\(([A-Z,\-*]+|[0-9,-]+)\)$/.exec(line) ) {
         if (! /(across|down)/.test(cluesGrouping)) {
           crossword.errors.push("ERROR: clue specified but no 'across' or 'down' grouping specified");
           break;
@@ -157,14 +157,14 @@
           // and unpack the answerCSV
 
           // convert "ANSWER,PARTS-INTO,NUMBERS" into number csv e.g. "6,5-4,6" (etc)
-          if ( /^[A-Z,\-]+$/.test(clue.answerCSV) ) {
-            clue.numericCSV = clue.answerCSV.replace(/[A-Z]+/g, match => {return match.length.toString() } );
+          if ( /^[A-Z,\-*]+$/.test(clue.answerCSV) ) {
+            clue.numericCSV = clue.answerCSV.replace(/[A-Z*]+/g, match => {return match.length.toString() } );
           } else {
             clue.numericCSV = clue.answerCSV;
           }
 
-          // and if the answer is solely Xs, replace that with the number csv
-          if ( /^[X,\-]+$/.test(clue.answerCSV) ) {
+          // and if the answer is solely *s, replace that with the number csv
+          if ( /^[*,\-]+$/.test(clue.answerCSV) ) {
             clue.answerCSV = clue.numericCSV;
           }
 
@@ -175,7 +175,7 @@
               if (pInt == 0) {
                 clueError("answer contains a word size of 0");
               }
-              return 'X'.repeat( pInt );
+              return '*'.repeat( pInt );
             } else {
               if (p.length == 0) {
                 clueError("answer contains an empty word");
@@ -239,7 +239,7 @@
     if (crossword.errors.length == 0) {
       for (var i = 2; i <= maxId; i++) {
         let prevClue = knownIds[i-1];
-        let clue 	 = knownIds[i];
+        let clue   = knownIds[i];
 
         if ( (clue.coordinates[0] + clue.coordinates[1] * maxCoord) <= (prevClue.coordinates[0] + prevClue.coordinates[1] * maxCoord) ) {
           if (clue.coordinates[1] < prevClue.coordinates[1]) {
@@ -422,7 +422,7 @@
       "Coordinates of clue in grid are (across,down), so (1,1) = top left, (17,17) = bottom right.",
       "ID is a number, followed by a full stop.",
       "(WORDS,IN,ANSWER): capitalised, and separated by commas or hyphens, or (numbers) separated by commas or hyphens.",
-      "ANSWERS with all words of XXXXXX are converted to numbers.",
+      "ANSWERS with all words of ***** are converted to numbers.",
     ];
     lines = lines.concat( footerComments.map(c => { return `# ${c}`; } ) );
 
