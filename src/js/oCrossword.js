@@ -118,7 +118,8 @@ function buildGrid(
 				tempInput.setAttribute('data-link-identifier', 'A' + across[0] + '-' + i);
 				tempInput.setAttribute('tabindex', -1);
 				if(answers) {
-					tempInput.value = answers.across[index][i];
+					let val = (answers.across[index][i] === '_')?'':answers.across[index][i];
+					tempInput.value = val;
 				}
 
 				let count = 0;
@@ -172,7 +173,8 @@ function buildGrid(
 				tempInput.setAttribute('tabindex', -1);
 
 				if(answers) {
-					tempInput.value = answers.down[index][i];
+					let val = (answers.down[index][i] === '_')?'':answers.down[index][i];
+					tempInput.value = val;
 				}
 
 				let count = 0;
@@ -212,7 +214,8 @@ function buildGrid(
 			const answerLength = answer.length;
 			getGridCellsByNumber(gridEl, across[0], 'across', answerLength);
 			getGridCellsByNumber(gridEl, across[0], 'across', answerLength).forEach((td, i) => {
-				td.textContent = answer[i];
+				let val = (answer[i] === '_')?'':answer[i];
+				td.textContent = val;
 			});
 		});
 
@@ -220,7 +223,8 @@ function buildGrid(
 			const answer = answers.down[i];
 			const answerLength = answer.length;
 			getGridCellsByNumber(gridEl, down[0], 'down', answerLength).forEach((td, i) => {
-				td.textContent = answer[i];
+				let val = (answer[i] === '_')?'':answer[i];
+				td.textContent = val;
 			});
 		});
 	}
