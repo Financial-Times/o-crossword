@@ -57,6 +57,21 @@ function buildGrid(
 	const cluesEl = rootEl.querySelector('ul.o-crossword-clues');
 	const {cols, rows} = size;
 	const emptyCell = rootEl.querySelector('.empty-fallback');
+	let answerStore, isStorage;
+
+	if(answers === undefined) {
+		if(localStorage.getItem('crossword')) {
+			answerStore = JSON.parse(localStorage.getItem('crossword'));
+			isStorage = true;
+		} else {	
+			answerStore = {
+				"across": [],
+				"down": []
+			}
+
+			isStorage = false;
+		}
+	}
 
 	for (let i=0; i<rows; i++) {
 		const tr = document.createElement('tr');
@@ -118,8 +133,20 @@ function buildGrid(
 				tempInput.setAttribute('data-link-identifier', 'A' + across[0] + '-' + i);
 				tempInput.setAttribute('tabindex', -1);
 				if(answers) {
-					let val = (answers.across[index][i] === '_')?'':answers.across[index][i];
+					let val = (answers.across[index][i] === '*')?'':answers.across[index][i];
 					tempInput.value = val;
+				}
+
+				if(answerStore) {
+					if(isStorage) {
+						let val = (answerStore.across[index][i] === '*')?'':answerStore.across[index][i];
+						tempInput.value = val;
+					} else {
+						if(answerStore.across[index] === undefined) {
+							answerStore.across[index] = '';
+						}
+						answerStore.across[index] += '*';
+					}
 				}
 
 				let count = 0;
@@ -173,8 +200,20 @@ function buildGrid(
 				tempInput.setAttribute('tabindex', -1);
 
 				if(answers) {
-					let val = (answers.down[index][i] === '_')?'':answers.down[index][i];
+					let val = (answers.down[index][i] === '*')?'':answers.down[index][i];
 					tempInput.value = val;
+				}
+
+				if(answerStore) {
+					if(isStorage) {
+						let val = (answerStore.down[index][i] === '*')?'':answerStore.down[index][i];
+						tempInput.value = val;
+					} else {
+						if(answerStore.down[index] === undefined) {
+							answerStore.down[index] = '';
+						}
+						answerStore.down[index] += '*';
+					}
 				}
 
 				let count = 0;
@@ -208,25 +247,29 @@ function buildGrid(
 		});
 	}
 
-	if (answers) {
+	if (answers || answerStore) {
+		let target = (answers)?answers:answerStore;
 		clues.across.forEach(function acrossForEach(across, i) {
-			const answer = answers.across[i];
+			const answer = target.across[i];
 			const answerLength = answer.length;
-			getGridCellsByNumber(gridEl, across[0], 'across', answerLength);
 			getGridCellsByNumber(gridEl, across[0], 'across', answerLength).forEach((td, i) => {
-				let val = (answer[i] === '_')?'':answer[i];
+				let val = (answer[i] === '*')?'':answer[i];
 				td.textContent = val;
 			});
 		});
 
 		clues.down.forEach(function downForEach(down, i) {
-			const answer = answers.down[i];
+			const answer = target.down[i];
 			const answerLength = answer.length;
 			getGridCellsByNumber(gridEl, down[0], 'down', answerLength).forEach((td, i) => {
-				let val = (answer[i] === '_')?'':answer[i];
+				let val = (answer[i] === '*')?'':answer[i];
 				td.textContent = val;
 			});
 		});
+	}
+
+	if(answerStore) {
+		rootEl.setAttribute('storage', JSON.stringify(answerStore));
 	}
 }
 
@@ -323,6 +366,7 @@ function getLetterIndex(gridEl, cell, number, direction) {
 OCrossword.prototype.assemble = function assemble() {
 	const gridEl = this.rootEl.querySelector('table');
 	const cluesEl = this.rootEl.querySelector('ul.o-crossword-clues');
+	let answerStore = JSON.parse(this.rootEl.getAttribute('storage'));
 	const gridMap = new Map();
 	let currentlySelectedGridItem = null;
 	for (const el of cluesEl.querySelectorAll('[data-o-crossword-number]')) {
@@ -810,17 +854,26 @@ OCrossword.prototype.assemble = function assemble() {
 					++filledCount;
 					answerValue.push(input.value);
 				} else {
-					answerValue.push(".");
+					answerValue.push("*");
 				}
 			});
+
+			if(answerStore) {
+				const dir = targetData.getAttribute('data-o-crossword-direction');
+				const offset = (dir === 'down')?cluesEl.querySelector('.o-crossword-clues-across').childElementCount:0;
+				const targetIndex = parseInt(targetData.getAttribute('data-o-crossword-clue-id')) - offset;
+				answerStore[dir][targetIndex] = answerValue.join('');
+
+				saveLocal();
+			}
 
 			let combineCount = 0;
 			let combinedValue = [];
 
 			for(let i = 0; i < answerValue.length; ++i) {
-				if(answerValue[i] === '.') {
+				if(answerValue[i] === '*') {
 					++combineCount;
-					if((i < answerValue.length - 1 && answerValue[i + 1] !== '.') || i === answerValue.length - 1) {
+					if((i < answerValue.length - 1 && answerValue[i + 1] !== '*') || i === answerValue.length - 1) {
 						if(combineCount > 1) {
 							combinedValue.push(" " + combineCount + " blanks ");
 						} else {
@@ -858,6 +911,15 @@ OCrossword.prototype.assemble = function assemble() {
 				target.value = letter;
 				updateScreenReaderAnswer(target);
 			});
+		}
+
+		function saveLocal() {
+			try{
+				//TODO: save per Xword
+				localStorage.setItem('crossword', JSON.stringify( answerStore ) );
+			} catch(err){
+				console.log('Error trying to save state', err);
+			}
 		}
 
 		const onResize = function onResize(init) {
