@@ -441,6 +441,15 @@ OCrossword.prototype.assemble = function assemble() {
 		let previousClueSelection = null;
 		let isTab = false;
 
+		if(answerStore) {
+			const resetButton = document.createElement('button');
+			resetButton.classList.add('o-crossword-reset');
+			resetButton.textContent = 'Reset grid';
+			
+			this.rootEl.appendChild(resetButton);	
+			this.addEventListener(resetButton, 'click', clearAnswers);
+		}
+
 		function constructInputIdentifier(data, direction) {
 			let identifier;
 
@@ -923,6 +932,26 @@ OCrossword.prototype.assemble = function assemble() {
 				console.log('Error trying to save state', err);
 			}
 		}.bind(this);
+
+		 function clearAnswers(e) {
+			let inputs = cluesEl.querySelectorAll('input');
+			let cells = gridEl.querySelectorAll('td:not(.empty)');
+
+			Array.from(inputs).forEach(input => {
+				input.value = '';
+			});
+
+			Array.from(cells).forEach(cell => {
+				cell.textContent = '';
+			});
+
+			try {
+				let answerStoreID = this.parentElement.getAttribute('data-storage-id');
+				localStorage.removeItem(answerStoreID);
+			} catch(err){
+				console.log('Error trying to save state', err);
+			}
+		}
 
 		const onResize = function onResize(init) {
 			var isMobile = false;
