@@ -58,12 +58,13 @@ function buildGrid(
 	const {cols, rows} = size;
 	const emptyCell = rootEl.querySelector('.empty-fallback');
 	let answerStore, isStorage;
+	const cookie = 'FT-crossword_' + name.split(/[ ,]+/).join('');
 
-	if(answers === undefined) {
-		if(localStorage.getItem('crossword')) {
-			answerStore = JSON.parse(localStorage.getItem('crossword'));
+	if(!answers) {
+		if(localStorage.getItem(cookie)) {
+			answerStore = JSON.parse(localStorage.getItem(cookie));
 			isStorage = true;
-		} else {	
+		} else {
 			answerStore = {
 				"across": [],
 				"down": []
@@ -269,7 +270,8 @@ function buildGrid(
 	}
 
 	if(answerStore) {
-		rootEl.setAttribute('storage', JSON.stringify(answerStore));
+		rootEl.setAttribute('data-storage', JSON.stringify(answerStore));
+		rootEl.setAttribute('data-storage-id', cookie);
 	}
 }
 
@@ -366,7 +368,7 @@ function getLetterIndex(gridEl, cell, number, direction) {
 OCrossword.prototype.assemble = function assemble() {
 	const gridEl = this.rootEl.querySelector('table');
 	const cluesEl = this.rootEl.querySelector('ul.o-crossword-clues');
-	let answerStore = JSON.parse(this.rootEl.getAttribute('storage'));
+	let answerStore = JSON.parse(this.rootEl.getAttribute('data-storage'));
 	const gridMap = new Map();
 	let currentlySelectedGridItem = null;
 	for (const el of cluesEl.querySelectorAll('[data-o-crossword-number]')) {
@@ -913,14 +915,14 @@ OCrossword.prototype.assemble = function assemble() {
 			});
 		}
 
-		function saveLocal() {
-			try{
-				//TODO: save per Xword
-				localStorage.setItem('crossword', JSON.stringify( answerStore ) );
+		const saveLocal = function saveLocal() {
+			try {
+				let answerStoreID = this.rootEl.getAttribute('data-storage-id');
+				localStorage.setItem(answerStoreID, JSON.stringify( answerStore ) );
 			} catch(err){
 				console.log('Error trying to save state', err);
 			}
-		}
+		}.bind(this);
 
 		const onResize = function onResize(init) {
 			var isMobile = false;
