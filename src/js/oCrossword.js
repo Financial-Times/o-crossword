@@ -57,6 +57,25 @@ function buildGrid(
 	const cluesEl = rootEl.querySelector('ul.o-crossword-clues');
 	const {cols, rows} = size;
 	const emptyCell = rootEl.querySelector('.empty-fallback');
+	let answerStore, isStorage;
+	const cookie = 'FT-crossword_' + name.split(/[ ,]+/).join('');
+
+	expireStorage();
+
+	if(!answers) {
+		if(localStorage.getItem(cookie)) {
+			answerStore = JSON.parse(localStorage.getItem(cookie));
+			isStorage = true;
+		} else {
+			answerStore = {
+				"across": [],
+				"down": [],
+				"timestamp": Date.now()
+			}
+
+			isStorage = false;
+		}
+	}
 
 	for (let i=0; i<rows; i++) {
 		const tr = document.createElement('tr');
@@ -118,7 +137,20 @@ function buildGrid(
 				tempInput.setAttribute('data-link-identifier', 'A' + across[0] + '-' + i);
 				tempInput.setAttribute('tabindex', -1);
 				if(answers) {
-					tempInput.value = answers.across[index][i];
+					let val = (answers.across[index][i] === '*')?'':answers.across[index][i];
+					tempInput.value = val;
+				}
+
+				if(answerStore) {
+					if(isStorage) {
+						let val = (answerStore.across[index][i] === '*')?'':answerStore.across[index][i];
+						tempInput.value = val;
+					} else {
+						if(answerStore.across[index] === undefined) {
+							answerStore.across[index] = '';
+						}
+						answerStore.across[index] += '*';
+					}
 				}
 
 				let count = 0;
@@ -172,7 +204,20 @@ function buildGrid(
 				tempInput.setAttribute('tabindex', -1);
 
 				if(answers) {
-					tempInput.value = answers.down[index][i];
+					let val = (answers.down[index][i] === '*')?'':answers.down[index][i];
+					tempInput.value = val;
+				}
+
+				if(answerStore) {
+					if(isStorage) {
+						let val = (answerStore.down[index][i] === '*')?'':answerStore.down[index][i];
+						tempInput.value = val;
+					} else {
+						if(answerStore.down[index] === undefined) {
+							answerStore.down[index] = '';
+						}
+						answerStore.down[index] += '*';
+					}
 				}
 
 				let count = 0;
@@ -206,23 +251,47 @@ function buildGrid(
 		});
 	}
 
-	if (answers) {
+	if (answers || answerStore) {
+		let target = (answers)?answers:answerStore;
 		clues.across.forEach(function acrossForEach(across, i) {
-			const answer = answers.across[i];
+			const answer = target.across[i];
 			const answerLength = answer.length;
-			getGridCellsByNumber(gridEl, across[0], 'across', answerLength);
 			getGridCellsByNumber(gridEl, across[0], 'across', answerLength).forEach((td, i) => {
-				td.textContent = answer[i];
+				let val = (answer[i] === '*')?'':answer[i];
+				td.textContent = val;
 			});
 		});
 
 		clues.down.forEach(function downForEach(down, i) {
-			const answer = answers.down[i];
+			const answer = target.down[i];
 			const answerLength = answer.length;
 			getGridCellsByNumber(gridEl, down[0], 'down', answerLength).forEach((td, i) => {
-				td.textContent = answer[i];
+				let val = (answer[i] === '*')?'':answer[i];
+				td.textContent = val;
 			});
 		});
+	}
+
+	if(answerStore) {
+		rootEl.setAttribute('data-storage', JSON.stringify(answerStore));
+		rootEl.setAttribute('data-storage-id', cookie);
+	}
+}
+
+function expireStorage() {
+	const ts = Date.now();
+
+	for (let i = 0; i < localStorage.length; i++){
+	    if (localStorage.key(i).substring(0,12) == 'FT-crossword') {
+	    	let storedItem = JSON.parse(localStorage.getItem(localStorage.key(i)));
+	    	let difference = ts - storedItem.timestamp;
+
+	    	let daysCreated = difference/1000/60/60/24;
+
+	    	if(daysCreated > 28) {
+	    		localStorage.removeItem(localStorage.key(i));
+	    	}
+	    }
 	}
 }
 
@@ -319,6 +388,7 @@ function getLetterIndex(gridEl, cell, number, direction) {
 OCrossword.prototype.assemble = function assemble() {
 	const gridEl = this.rootEl.querySelector('table');
 	const cluesEl = this.rootEl.querySelector('ul.o-crossword-clues');
+	let answerStore = JSON.parse(this.rootEl.getAttribute('data-storage'));	
 	const gridMap = new Map();
 	let currentlySelectedGridItem = null;
 	for (const el of cluesEl.querySelectorAll('[data-o-crossword-number]')) {
@@ -390,6 +460,16 @@ OCrossword.prototype.assemble = function assemble() {
 		let blockHighlight = false;
 		let previousClueSelection = null;
 		let isTab = false;
+
+		const resetButton = document.createElement('button');
+		resetButton.classList.add('o-crossword-reset');
+		if(answersEmpty()) {
+			resetButton.classList.add('hidden');
+		}
+		resetButton.textContent = 'Reset grid';
+		
+		this.addEventListener(resetButton, 'click', clearAnswers);
+		this.rootEl.insertBefore(resetButton, gridWrapper);	
 
 		function constructInputIdentifier(data, direction) {
 			let identifier;
@@ -549,7 +629,7 @@ OCrossword.prototype.assemble = function assemble() {
 						defSync.value = e.target.value;
 					}
 
-					updateScreenReaderAnswer(e.target);
+					updateScreenReaderAnswer(e.target, gridSync);
 
 					nextInput(e.target, -1);
 				}, timer);
@@ -806,17 +886,32 @@ OCrossword.prototype.assemble = function assemble() {
 					++filledCount;
 					answerValue.push(input.value);
 				} else {
-					answerValue.push(".");
+					answerValue.push("*");
 				}
 			});
+
+			if(answerStore) {
+				const dir = targetData.getAttribute('data-o-crossword-direction');
+				const offset = (dir === 'down')?cluesEl.querySelector('.o-crossword-clues-across').childElementCount:0;
+				const targetIndex = parseInt(targetData.getAttribute('data-o-crossword-clue-id')) - offset;
+				answerStore[dir][targetIndex] = answerValue.join('');
+
+				saveLocal();
+
+				if(answersEmpty()) {
+					resetButton.classList.add('hidden');
+				} else {
+					resetButton.classList.remove('hidden');
+				}
+			}
 
 			let combineCount = 0;
 			let combinedValue = [];
 
 			for(let i = 0; i < answerValue.length; ++i) {
-				if(answerValue[i] === '.') {
+				if(answerValue[i] === '*') {
 					++combineCount;
-					if((i < answerValue.length - 1 && answerValue[i + 1] !== '.') || i === answerValue.length - 1) {
+					if((i < answerValue.length - 1 && answerValue[i + 1] !== '*') || i === answerValue.length - 1) {
 						if(combineCount > 1) {
 							combinedValue.push(" " + combineCount + " blanks ");
 						} else {
@@ -854,6 +949,40 @@ OCrossword.prototype.assemble = function assemble() {
 				target.value = letter;
 				updateScreenReaderAnswer(target);
 			});
+		}
+
+		const saveLocal = function saveLocal() {
+			try {
+				let answerStoreID = this.rootEl.getAttribute('data-storage-id');
+				localStorage.setItem(answerStoreID, JSON.stringify( answerStore ) );
+			} catch(err){
+				console.log('Error trying to save state', err);
+			}
+		}.bind(this);
+
+		function clearAnswers(e) {
+			resetButton.classList.add('hidden');
+			let inputs = cluesEl.querySelectorAll('input');
+			let cells = gridEl.querySelectorAll('td:not(.empty)');
+
+			Array.from(inputs).forEach(input => {
+				input.value = '';
+			});
+
+			Array.from(cells).forEach(cell => {
+				cell.textContent = '';
+			});
+
+			try {
+				let answerStoreID = this.parentElement.getAttribute('data-storage-id');
+				localStorage.removeItem(answerStoreID);
+			} catch(err){
+				console.log('Error trying to save state', err);
+			}
+		}
+
+		function answersEmpty() {
+			return (/^[*,\-]+$/).test(answerStore.across) && (/^[*,\-]+$/).test(answerStore.down);
 		}
 
 		const onResize = function onResize(init) {
