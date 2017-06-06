@@ -468,8 +468,8 @@ OCrossword.prototype.assemble = function assemble() {
 		}
 		resetButton.textContent = 'Reset grid';
 		
-		this.rootEl.insertBefore(resetButton, gridWrapper);	
 		this.addEventListener(resetButton, 'click', clearAnswers);
+		this.rootEl.insertBefore(resetButton, gridWrapper);	
 
 		function constructInputIdentifier(data, direction) {
 			let identifier;
