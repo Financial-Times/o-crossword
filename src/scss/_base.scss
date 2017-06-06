@@ -309,7 +309,7 @@
 	.o-crossword-reset {
 		margin: 0 10px 20px;
 
-		@includ oGridRespondTo(M) {
+		@include oGridRespondTo(M) {
 			margin: 0;
 			right: 10px;
 			top: 10px;
