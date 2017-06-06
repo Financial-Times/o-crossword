@@ -60,6 +60,8 @@ function buildGrid(
 	let answerStore, isStorage;
 	const cookie = 'FT-crossword_' + name.split(/[ ,]+/).join('');
 
+	expireStorage();
+
 	if(!answers) {
 		if(localStorage.getItem(cookie)) {
 			answerStore = JSON.parse(localStorage.getItem(cookie));
@@ -67,7 +69,8 @@ function buildGrid(
 		} else {
 			answerStore = {
 				"across": [],
-				"down": []
+				"down": [],
+				"timestamp": Date.now()
 			}
 
 			isStorage = false;
@@ -272,6 +275,23 @@ function buildGrid(
 	if(answerStore) {
 		rootEl.setAttribute('data-storage', JSON.stringify(answerStore));
 		rootEl.setAttribute('data-storage-id', cookie);
+	}
+}
+
+function expireStorage() {
+	const ts = Date.now();
+
+	for (let i = 0; i < localStorage.length; i++){
+	    if (localStorage.key(i).substring(0,12) == 'FT-crossword') {
+	    	let storedItem = JSON.parse(localStorage.getItem(localStorage.key(i)));
+	    	let difference = ts - storedItem.timestamp;
+
+	    	let daysCreated = difference/1000/60/60/24;
+
+	    	if(daysCreated > 28) {
+	    		localStorage.removeItem(localStorage.key(i));
+	    	}
+	    }
 	}
 }
 
