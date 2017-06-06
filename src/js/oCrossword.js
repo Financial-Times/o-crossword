@@ -368,7 +368,7 @@ function getLetterIndex(gridEl, cell, number, direction) {
 OCrossword.prototype.assemble = function assemble() {
 	const gridEl = this.rootEl.querySelector('table');
 	const cluesEl = this.rootEl.querySelector('ul.o-crossword-clues');
-	let answerStore = JSON.parse(this.rootEl.getAttribute('data-storage'));
+	let answerStore = JSON.parse(this.rootEl.getAttribute('data-storage'));	
 	const gridMap = new Map();
 	let currentlySelectedGridItem = null;
 	for (const el of cluesEl.querySelectorAll('[data-o-crossword-number]')) {
@@ -441,14 +441,15 @@ OCrossword.prototype.assemble = function assemble() {
 		let previousClueSelection = null;
 		let isTab = false;
 
-		if(answerStore) {
-			const resetButton = document.createElement('button');
-			resetButton.classList.add('o-crossword-reset');
-			resetButton.textContent = 'Reset grid';
-			
-			this.rootEl.appendChild(resetButton);	
-			this.addEventListener(resetButton, 'click', clearAnswers);
+		const resetButton = document.createElement('button');
+		resetButton.classList.add('o-crossword-reset');
+		if(answersEmpty()) {
+			resetButton.classList.add('hidden');
 		}
+		resetButton.textContent = 'Reset grid';
+		
+		this.rootEl.appendChild(resetButton);	
+		this.addEventListener(resetButton, 'click', clearAnswers);
 
 		function constructInputIdentifier(data, direction) {
 			let identifier;
@@ -608,7 +609,7 @@ OCrossword.prototype.assemble = function assemble() {
 						defSync.value = e.target.value;
 					}
 
-					updateScreenReaderAnswer(e.target);
+					updateScreenReaderAnswer(e.target, gridSync);
 
 					nextInput(e.target, -1);
 				}, timer);
@@ -876,6 +877,12 @@ OCrossword.prototype.assemble = function assemble() {
 				answerStore[dir][targetIndex] = answerValue.join('');
 
 				saveLocal();
+
+				if(answersEmpty()) {
+					resetButton.classList.add('hidden');
+				} else {
+					resetButton.classList.remove('hidden');
+				}
 			}
 
 			let combineCount = 0;
@@ -933,7 +940,8 @@ OCrossword.prototype.assemble = function assemble() {
 			}
 		}.bind(this);
 
-		 function clearAnswers(e) {
+		function clearAnswers(e) {
+			resetButton.classList.add('hidden');
 			let inputs = cluesEl.querySelectorAll('input');
 			let cells = gridEl.querySelectorAll('td:not(.empty)');
 
@@ -951,6 +959,10 @@ OCrossword.prototype.assemble = function assemble() {
 			} catch(err){
 				console.log('Error trying to save state', err);
 			}
+		}
+
+		function answersEmpty() {
+			return (/^[*,\-]+$/).test(answerStore.across) && (/^[*,\-]+$/).test(answerStore.down);
 		}
 
 		const onResize = function onResize(init) {
