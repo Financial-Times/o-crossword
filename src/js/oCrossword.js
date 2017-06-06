@@ -98,6 +98,7 @@ function buildGrid(
 	}
 
 	rootEl.parentElement.setAttribute('data-o-crossword-title', name);
+	rootEl.setAttribute('data-answer-version', !!answers);
 
 	if (clues) {
 		rootEl.parentElement.setAttribute('data-o-crossword-clue-length', clues.across.length + clues.down.length);
@@ -388,7 +389,8 @@ function getLetterIndex(gridEl, cell, number, direction) {
 OCrossword.prototype.assemble = function assemble() {
 	const gridEl = this.rootEl.querySelector('table');
 	const cluesEl = this.rootEl.querySelector('ul.o-crossword-clues');
-	let answerStore = JSON.parse(this.rootEl.getAttribute('data-storage'));	
+	let answerStore = JSON.parse(this.rootEl.getAttribute('data-storage'));
+	const isAnswerVersion = JSON.parse(this.rootEl.getAttribute('data-answer-version'));
 	const gridMap = new Map();
 	let currentlySelectedGridItem = null;
 	for (const el of cluesEl.querySelectorAll('[data-o-crossword-number]')) {
@@ -463,7 +465,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 		const resetButton = document.createElement('button');
 		resetButton.classList.add('o-crossword-reset');
-		if(answersEmpty()) {
+		if(answersEmpty() || isAnswerVersion) {
 			resetButton.classList.add('hidden');
 		}
 		resetButton.textContent = 'Reset grid';
@@ -898,7 +900,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 				saveLocal();
 
-				if(answersEmpty()) {
+				if(answersEmpty() || isAnswerVersion) {
 					resetButton.classList.add('hidden');
 				} else {
 					resetButton.classList.remove('hidden');
@@ -982,7 +984,8 @@ OCrossword.prototype.assemble = function assemble() {
 		}
 
 		function answersEmpty() {
-			return (/^[*,\-]+$/).test(answerStore.across) && (/^[*,\-]+$/).test(answerStore.down);
+
+			return answerStore && (/^[*,\-]+$/).test(answerStore.across) && (/^[*,\-]+$/).test(answerStore.down);
 		}
 
 		const onResize = function onResize(init) {
