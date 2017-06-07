@@ -997,8 +997,8 @@ OCrossword.prototype.assemble = function assemble() {
 			} else if (window.innerWidth > window.innerHeight && window.innerHeight <=739 ) { //rotated phones and small devices, but not iOS
 				isMobile = true;
 			}
-
-			if(isMobile && !!init) {
+			console.log('touch::', isTouch());
+			if(isMobile && isTouch() && !!init) {
 				clueNavigationNext.click();
 			}
 
@@ -1232,6 +1232,10 @@ function isiOS() {
 function isAndroid() {
 	var android = navigator.userAgent.toLowerCase().indexOf("android") > -1;
 	return android;
+}
+
+function isTouch() {
+	return 'ontouchstart' in window || 'onmsgesturechange' in window;
 }
 
 function isEquivalent(a, b) {
