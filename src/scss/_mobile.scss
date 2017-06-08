@@ -13,21 +13,32 @@
         overflow: auto;
     }
 
-    .o-crossword .o-crossword-grid-wrapper .o-crossword-clue-displayer {
+    .o-crossword .o-crossword-clue-displayer {
         height: 3.6em;
         font-size: .85rem;
-        padding: 0 0.5em;
+        padding: 0 0.5em 1em;
 
         span {
-            padding: 0 10%;
+            padding: 0.5em 10%;
         }
     }
 
-    .o-crossword .o-crossword-grid-wrapper .o-crossword-clue-navigation {
+    .o-crossword .o-crossword-clue-navigation {
         display: initial;
     }
 
     .o-crossword .o-crossword-clues li, .o-crossword .o-crossword-clues ul li {
         line-height: 1.1em;
+        margin-bottom: .5em;
+
+        &.featured {
+            .o-crossword-user-answer {  
+                position: fixed;
+                // top: 20px;
+                left: 0;
+                z-index: 3;
+                margin: 0 10%;
+            }
+        }
     }
 }

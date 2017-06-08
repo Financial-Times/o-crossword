@@ -424,7 +424,8 @@ OCrossword.prototype.assemble = function assemble() {
 
 		const clueDisplayer = document.createElement('div');
 		clueDisplayer.classList.add('o-crossword-clue-displayer');
-		gridScaleWrapper.appendChild(clueDisplayer);
+		clueDisplayer.classList.add('hidden');
+		cluesEl.appendChild(clueDisplayer);
 
 		const clueDisplayerText = document.createElement('span');
 		clueDisplayer.appendChild(clueDisplayerText);
@@ -770,7 +771,8 @@ OCrossword.prototype.assemble = function assemble() {
 				Array.from(inputs).forEach(input => {
 					input.setAttribute('tabindex', -1);
 				});
-				def.click();
+				// def.click();
+				clueNavigationNext.click();
 			}
 		}
 
@@ -835,9 +837,18 @@ OCrossword.prototype.assemble = function assemble() {
 			const el = cluesEl.querySelector(`li[data-o-crossword-number="${number}"][data-o-crossword-direction="${direction}"]`);
 			if (el) {
 				clueDisplayerText.innerHTML = el.querySelector('span').innerHTML;
+				clueDisplayer.style.height = el.clientHeight + 20 +'px';
+				el.style.height = el.clientHeight + 'px';
+				clueDisplayer.classList.remove('hidden');
 				const els = Array.from(cluesEl.getElementsByClassName('has-hover'));
-				els.filter(el2 => el2 !== el).forEach(el => el.classList.remove('has-hover'));
+				els.filter(el2 => el2 !== el).forEach(el => {
+					el.classList.remove('has-hover');
+					el.classList.remove('featured');
+					el.style.height = 'auto';
+				});
 				el.classList.add('has-hover');
+				el.classList.add('featured');
+				el.querySelector('.o-crossword-user-answer').style.top = clueDisplayerText.clientHeight + 'px';
 				currentClue = parseInt(el.getAttribute('data-o-crossword-clue-id'));
 			}
 		}
@@ -845,15 +856,19 @@ OCrossword.prototype.assemble = function assemble() {
 		function unsetClue(number, direction) {
 			const el = cluesEl.querySelector(`li[data-o-crossword-number="${number}"][data-o-crossword-direction="${direction}"]`);
 			const els = Array.from(gridEl.querySelectorAll('td[data-o-crossword-highlighted]'));
-			
+
 			for (const o of els) {
 				delete o.dataset.oCrosswordHighlighted;
 			}
 
 			if (el) {
 				clueDisplayerText.innerHTML = '';
+				clueDisplayer.classList.add('hidden');
 				const els = Array.from(cluesEl.getElementsByClassName('has-hover'));
-				els.forEach(el => el.classList.remove('has-hover'));
+				els.forEach(el => {
+					el.classList.remove('has-hover');
+					el.classList.remove('featured');
+				});
 				el.classList.remove('has-hover');
 			}
 
@@ -997,7 +1012,7 @@ OCrossword.prototype.assemble = function assemble() {
 			} else if (window.innerWidth > window.innerHeight && window.innerHeight <=739 ) { //rotated phones and small devices, but not iOS
 				isMobile = true;
 			}
-			console.log('touch::', isTouch());
+
 			if(isMobile && isTouch() && !!init) {
 				clueNavigationNext.click();
 			}
@@ -1039,6 +1054,13 @@ OCrossword.prototype.assemble = function assemble() {
 				inputEl.style.width = Math.min(newTdWidth, cellSizeMax) + "px";
 				inputEl.style.height = Math.min(newTdWidth, cellSizeMax) + "px";
 				inputEl.style.maxWidth = "initial";
+
+				let el = cluesEl.querySelector('.has-hover');
+				if(el) {
+					clueDisplayer.style.height = el.clientHeight + 20 +'px';
+					el.style.height = el.clientHeight + 'px';
+					el.querySelector('.o-crossword-user-answer').style.top = clueDisplayerText.clientHeight + 'px';
+				}
 			} else {
 				for (let i = 0; i < gridTDs.length; i++) {
 					let td = gridTDs[i];
@@ -1054,7 +1076,6 @@ OCrossword.prototype.assemble = function assemble() {
 			}
 
 			d2 = gridEl.getBoundingClientRect();
-			clueDisplayer.style.width = d2.width + 'px';
 
 		}.bind(this);
 

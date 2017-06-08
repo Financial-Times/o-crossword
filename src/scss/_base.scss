@@ -65,76 +65,82 @@
 		display: none;
 	}
 
+	.o-crossword-clue-displayer {
+		font-size: 1rem;
+		min-height: 1.5em;
+		padding: 0.5em;
+		border-top-width: 0;
+		box-sizing: border-box;
+		text-transform: none;
+		margin: 0 auto;
+		display: table;
+		box-shadow: 2px 0 1px rgba(0,0,0,.5);
+
+		position: fixed;
+		top:0;
+		background: white;
+		width: 100%;
+
+		span {
+			display: block;
+			padding: 0;
+			width: 100%;
+
+			.sr-direction, 
+			.sr-instruction,
+			.sr-answer {
+				display: none;
+			}
+		}
+
+		@include oGridRespondTo(M) {
+			display: none;
+		}
+	}
+
+	.o-crossword-clue-navigation {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		display: none;
+
+		a {
+			background: transparent;
+			display: inline-block;
+			height: 100%;
+			width: 50%;
+			font-size: 0;
+			vertical-align: middle;
+
+			&:before {
+				content: '';
+				display: block;
+				width: 30px;
+				height: 30px;
+				background-image: url('https://www.ft.com/__origami/service/image/v2/images/raw/fticon-v1:arrow-left?source=o-crossword');
+				background-repeat: no-repeat;
+				background-size: cover;
+				margin-top: 20px;
+				user-select: none;
+			}
+
+			&.o-crossword-clue-nav-next {
+				&:before {
+					background-image: url('https://www.ft.com/__origami/service/image/v2/images/raw/fticon-v1:arrow-right?source=o-crossword');
+					float: right;
+				}
+
+			}
+		}
+	}
+
 	.o-crossword-grid-wrapper {
 		flex-shrink: 0;
 		position: relative;
 		font-size: 1.5em;
 		text-transform: uppercase;
-
-		.o-crossword-clue-displayer {
-			font-size: 1rem;
-			min-height: 1.5em;
-			padding: 0.5em;
-			border: 1px solid;
-			border-top-width: 0;
-			box-sizing: border-box;
-			@include oColorsFor(o-crossword-border, border);
-			text-transform: none;
-			margin: 0 auto;
-			position: relative;
-			display: table;
-
-			span {
-				display: table-cell;
-				vertical-align: middle;
-				padding: 0;
-				width: 100%;
-
-				.sr-direction, 
-				.sr-instruction,
-				.sr-answer {
-					display: none;
-				}
-			}
-		}
-
-		.o-crossword-clue-navigation {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			display: none;
-
-			a {
-				background: transparent;
-				display: inline-block;
-				height: 100%;
-				width: 50%;
-				font-size: 0;
-				vertical-align: middle;
-
-				&:before {
-					content: '';
-					display: block;
-					width: 30px;
-					height: 30px;
-					background-image: url('https://www.ft.com/__origami/service/image/v2/images/raw/fticon-v1:arrow-left?source=o-crossword');
-					background-repeat: no-repeat;
-					background-size: cover;
-					margin-top: 8px;
-					user-select: none;
-				}
-
-				&.o-crossword-clue-nav-next {
-					&:before {
-						background-image: url('https://www.ft.com/__origami/service/image/v2/images/raw/fticon-v1:arrow-right?source=o-crossword');
-						float: right;
-					}
-
-				}
-			}
-		}
 
 		.o-crossword-magic-input {
 			@include oCrosswordType;
@@ -235,6 +241,7 @@
 				padding-bottom: 0.5em;
 				margin-left: 1em;
 				cursor: pointer;
+				display: block;
 
 				.has-hover > span{
 					@include oColorsFor(o-crossword-clue-highlight, text);
