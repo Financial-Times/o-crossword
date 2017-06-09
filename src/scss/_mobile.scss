@@ -27,13 +27,23 @@
         display: initial;
     }
 
-    .o-crossword .o-crossword-clues li, .o-crossword .o-crossword-clues ul li {
-        line-height: 1.1em;
-        margin-bottom: .5em;
+    .o-crossword .o-crossword-clues ul {
+        &:before {
+            display: none;
+        }
+    }
+
+    .o-crossword .o-crossword-clues ul li {
+        display: none;
 
         &.featured {
+            display: block;
+            visibility: hidden;
+
             .o-crossword-user-answer {  
                 position: fixed;
+                -webkit-overflow-scrolling: touch;
+                visibility: visible;
                 // top: 20px;
                 left: 0;
                 z-index: 3;

@@ -424,7 +424,6 @@ OCrossword.prototype.assemble = function assemble() {
 
 		const clueDisplayer = document.createElement('div');
 		clueDisplayer.classList.add('o-crossword-clue-displayer');
-		clueDisplayer.classList.add('hidden');
 		cluesEl.appendChild(clueDisplayer);
 
 		const clueDisplayerText = document.createElement('span');
@@ -463,6 +462,7 @@ OCrossword.prototype.assemble = function assemble() {
 		let blockHighlight = false;
 		let previousClueSelection = null;
 		let isTab = false;
+		let isMobile = false;
 
 		const resetButton = document.createElement('button');
 		resetButton.classList.add('o-crossword-reset');
@@ -558,7 +558,7 @@ OCrossword.prototype.assemble = function assemble() {
 		});
 
 		this.addEventListener(cluesEl, 'keydown', function(e){
-			let timer = 5;
+			let timer = 2;
 
 			if (!isAndroid()) {
 				e.preventDefault();
@@ -704,6 +704,12 @@ OCrossword.prototype.assemble = function assemble() {
 			magicInput.value ='';
 			magicInput.style.display = 'none';
 
+			// console.log(document.body.scrollTop);
+			// if(isiOS() && document.body.scrollTop < 20) {
+			// 	// window.scrollTo(0, 0);
+			// 	document.body.scrollTop = 0;
+			// }
+
 			let def = e.target.parentElement.parentElement;
 			let targetClue = {
 				'number': def.getAttribute('data-o-crossword-number'),
@@ -747,7 +753,7 @@ OCrossword.prototype.assemble = function assemble() {
 			magicInput.style.left = magicInputTargetEl.offsetLeft + 'px';
 			magicInput.style.top = magicInputTargetEl.offsetTop + 'px';
 
-			let timer = (isAndroid())?5:0;
+			let timer = (isAndroid())?2:0;
 
 			setTimeout(function(){
 				magicInput.focus();
@@ -836,10 +842,9 @@ OCrossword.prototype.assemble = function assemble() {
 		function setClue(number, direction) {
 			const el = cluesEl.querySelector(`li[data-o-crossword-number="${number}"][data-o-crossword-direction="${direction}"]`);
 			if (el) {
+				el.classList.add('featured');
 				clueDisplayerText.innerHTML = el.querySelector('span').innerHTML;
-				clueDisplayer.style.height = el.clientHeight + 20 +'px';
-				el.style.height = el.clientHeight + 'px';
-				clueDisplayer.classList.remove('hidden');
+				clueDisplayer.style.height = clueDisplayerText.clientHeight + 50 +'px';
 				const els = Array.from(cluesEl.getElementsByClassName('has-hover'));
 				els.filter(el2 => el2 !== el).forEach(el => {
 					el.classList.remove('has-hover');
@@ -847,7 +852,6 @@ OCrossword.prototype.assemble = function assemble() {
 					el.style.height = 'auto';
 				});
 				el.classList.add('has-hover');
-				el.classList.add('featured');
 				el.querySelector('.o-crossword-user-answer').style.top = clueDisplayerText.clientHeight + 'px';
 				currentClue = parseInt(el.getAttribute('data-o-crossword-clue-id'));
 			}
@@ -863,7 +867,6 @@ OCrossword.prototype.assemble = function assemble() {
 
 			if (el) {
 				clueDisplayerText.innerHTML = '';
-				clueDisplayer.classList.add('hidden');
 				const els = Array.from(cluesEl.getElementsByClassName('has-hover'));
 				els.forEach(el => {
 					el.classList.remove('has-hover');
@@ -1004,7 +1007,6 @@ OCrossword.prototype.assemble = function assemble() {
 		}
 
 		const onResize = function onResize(init) {
-			var isMobile = false;
 			const cellSizeMax = 40;
 			
 			if (window.innerWidth <= 739) {
@@ -1013,7 +1015,7 @@ OCrossword.prototype.assemble = function assemble() {
 				isMobile = true;
 			}
 
-			if(isMobile && isTouch() && !!init) {
+			if(isMobile && !!init) {
 				clueNavigationNext.click();
 			}
 
@@ -1057,8 +1059,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 				let el = cluesEl.querySelector('.has-hover');
 				if(el) {
-					clueDisplayer.style.height = el.clientHeight + 20 +'px';
-					el.style.height = el.clientHeight + 'px';
+					clueDisplayer.style.height = clueDisplayerText.clientHeight + 50 +'px';
 					el.querySelector('.o-crossword-user-answer').style.top = clueDisplayerText.clientHeight + 'px';
 				}
 			} else {
