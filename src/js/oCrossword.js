@@ -487,7 +487,7 @@ OCrossword.prototype.assemble = function assemble() {
 		resetButton.textContent = 'Reset grid';
 		
 		this.addEventListener(resetButton, 'click', clearAnswers);
-		this.rootEl.insertBefore(resetButton, gridWrapper);	
+		this.rootEl.insertBefore(resetButton, wrapper);	
 
 		function constructInputIdentifier(data, direction) {
 			let identifier;
@@ -1086,6 +1086,8 @@ OCrossword.prototype.assemble = function assemble() {
 					clueDisplayer.style.height = clueDisplayerText.clientHeight + 50 +'px';
 					el.querySelector('.o-crossword-user-answer').style.top = clueDisplayerText.clientHeight + 'px';
 				}
+
+				gridEl.style.marginTop = clueDisplayer.style.height;
 			} else {
 				for (let i = 0; i < gridTDs.length; i++) {
 					let td = gridTDs[i];
@@ -1098,6 +1100,7 @@ OCrossword.prototype.assemble = function assemble() {
 				let desktopSize = gridTDs[0].getBoundingClientRect().width;
 				inputEl.style.width = desktopSize + "px";
 				inputEl.style.height = desktopSize + "px";
+				gridEl.style.marginTop = "initial";
 			}
 
 			d2 = gridEl.getBoundingClientRect();

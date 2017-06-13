@@ -322,7 +322,8 @@
 	}
 
 	.o-crossword-reset {
-		margin: 0 10px 20px;
+		margin: 20px 10px;
+		float: right;
 
 		@include oGridRespondTo(M) {
 			margin: 0;
