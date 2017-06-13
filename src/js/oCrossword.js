@@ -132,6 +132,8 @@ function buildGrid(
 			tempLi.dataset.oCrosswordDirection = 'across';
 			tempLi.dataset.oCrosswordClueId = index;
 
+			let srAnswer = answerStore.across[index];
+
 			for(var i = 0; i < answerLength; ++i) {
 				let tempInput = document.createElement('input');
 				tempInput.setAttribute('maxlength', 1);
@@ -179,6 +181,11 @@ function buildGrid(
 				tempPartial.appendChild(tempInput);
 			}
 
+			if(!(/^[*,\-]+$/).test(srAnswer)) {
+				srAnswer = srAnswer.split('*').join(' blank ');
+				tempSpan.querySelector('.sr-answer').textContent = 'Your answer: ' + srAnswer + '.';	
+			}
+
 			acrossEl.appendChild(tempLi);
 			tempLi.appendChild(tempSpan);
 			tempLi.appendChild(tempPartial);
@@ -197,6 +204,8 @@ function buildGrid(
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'down';
 			tempLi.dataset.oCrosswordClueId = clues.across.length + index;
+
+			let srAnswer = answerStore.down[index];
 
 			for(var i = 0; i < answerLength; ++i) {
 				let tempInput = document.createElement('input');
@@ -244,6 +253,11 @@ function buildGrid(
 				}
 
 				tempPartial.appendChild(tempInput);
+			}
+
+			if(!(/^[*,\-]+$/).test(srAnswer)) {
+				srAnswer = srAnswer.split('*').join(' blank ');
+				tempSpan.querySelector('.sr-answer').textContent = 'Your answer: ' + srAnswer + '.';	
 			}
 
 			downEl.appendChild(tempLi);
@@ -435,12 +449,14 @@ OCrossword.prototype.assemble = function assemble() {
 		const clueNavigationPrev = document.createElement('a');
 		clueNavigationPrev.classList.add('o-crossword-clue-nav-prev');
 		clueNavigationPrev.setAttribute('href', '#');
+		clueNavigationPrev.setAttribute('aria-hidden', false);
 		clueNavigationPrev.textContent = 'Previous';
 		clueNavigation.appendChild(clueNavigationPrev);
 
 		const clueNavigationNext = document.createElement('a');
 		clueNavigationNext.classList.add('o-crossword-clue-nav-next');
 		clueNavigationNext.setAttribute('href', '#');
+		clueNavigationNext.setAttribute('aria-hidden', true);
 		clueNavigationNext.textContent = 'Next';
 		clueNavigation.appendChild(clueNavigationNext);
 
@@ -562,7 +578,12 @@ OCrossword.prototype.assemble = function assemble() {
 
 			if (!isAndroid()) {
 				e.preventDefault();
-				timer = 0;
+
+				if(!isTouch()) {
+					timer = 10;
+				} else {
+					timer = 0;
+				}
 			}
 			
 			if(e.target.nodeName !== 'INPUT') {
@@ -602,7 +623,6 @@ OCrossword.prototype.assemble = function assemble() {
 			}
 
 			if (e.keyCode === 13) { //enter
-				e.target.blur();
 				return;
 			}
 
@@ -650,7 +670,7 @@ OCrossword.prototype.assemble = function assemble() {
 			if(e.keyCode >= 65 && e.keyCode <= 90) {
 				if(!isAndroid()) {
 					e.target.value = String.fromCharCode(e.keyCode);
-					e.target.select(); //a11y: screen reader reads value properly
+					e.target.select();
 				}
 
 				setTimeout(function(){
@@ -703,12 +723,6 @@ OCrossword.prototype.assemble = function assemble() {
 		this.addEventListener(clueInputs, 'focus', function(e){
 			magicInput.value ='';
 			magicInput.style.display = 'none';
-
-			// console.log(document.body.scrollTop);
-			// if(isiOS() && document.body.scrollTop < 20) {
-			// 	// window.scrollTo(0, 0);
-			// 	document.body.scrollTop = 0;
-			// }
 
 			let def = e.target.parentElement.parentElement;
 			let targetClue = {
@@ -777,8 +791,17 @@ OCrossword.prototype.assemble = function assemble() {
 				Array.from(inputs).forEach(input => {
 					input.setAttribute('tabindex', -1);
 				});
-				// def.click();
-				clueNavigationNext.click();
+
+				if(!isMobile) {
+					isTab = true;
+				}
+				
+				if(direction === 1) {
+					clueNavigationNext.click();	
+				} else {
+					def.click();
+				}
+
 			}
 		}
 
@@ -1002,7 +1025,6 @@ OCrossword.prototype.assemble = function assemble() {
 		}
 
 		function answersEmpty() {
-
 			return answerStore && (/^[*,\-]+$/).test(answerStore.across) && (/^[*,\-]+$/).test(answerStore.down);
 		}
 
@@ -1111,6 +1133,8 @@ OCrossword.prototype.assemble = function assemble() {
 				if (!toggleClueSelection(clueDetails)) {
 					return;
 				}
+
+				defEl.focus();
 				
 				const el = gridEl.querySelector(`td[data-o-crossword-number="${clueDetails.number}"]`);
 				target = el;

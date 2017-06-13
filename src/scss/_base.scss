@@ -252,6 +252,14 @@
 				.sr-answer {
 					display: none;
 				}
+
+				&:focus {
+					outline: none;
+
+					& > span{
+						@include oColorsFor(o-crossword-clue-highlight, text);
+					}
+				}
 			}
 		}
 
