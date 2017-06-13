@@ -126,7 +126,7 @@ function buildGrid(
 			tempPartial.classList.add('o-crossword-user-answer');
 
 			const answerLength = across[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
-			tempSpan.innerHTML = across[0] + '<span class="sr-direction" aria-hidden=false>across</span>' + '. ' + across[1] + ' <span class="sr-answer" aria-hidden=false></span> <span class="sr-instruction" aria-hidden=false>Press ENTER to add your answer</span>';
+			tempSpan.innerHTML = across[0] + '<span class="sr-direction" aria-hidden=false>across</span>' + '. ' + across[1] + ' <span class="sr-answer" aria-hidden=false></span> <span class="sr-instruction" aria-hidden=false>Press ENTER to complete your answer</span>';
 			tempLi.dataset.oCrosswordNumber = across[0];
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'across';
@@ -199,7 +199,7 @@ function buildGrid(
 			tempPartial.classList.add('o-crossword-user-answer');
 
 			const answerLength = down[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
-			tempSpan.innerHTML = down[0] + '<span class="sr-direction" aria-hidden=false>down</span>' + '. ' + down[1] + ' <span class="sr-answer" aria-hidden=false></span> <span class="sr-instruction" aria-hidden=false>Press ENTER to add your answer</span>';
+			tempSpan.innerHTML = down[0] + '<span class="sr-direction" aria-hidden=false>down</span>' + '. ' + down[1] + ' <span class="sr-answer" aria-hidden=false></span> <span class="sr-instruction" aria-hidden=false>Press ENTER to complete your answer</span>';
 			tempLi.dataset.oCrosswordNumber = down[0];
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'down';
@@ -794,7 +794,7 @@ OCrossword.prototype.assemble = function assemble() {
 				});
 
 				if(!isMobile) {
-					isTab = true;
+					// isTab = true;
 
 					if(direction === 1) {
 						clueNavigationNext.click();
@@ -1035,7 +1035,8 @@ OCrossword.prototype.assemble = function assemble() {
 			
 			if (window.innerWidth <= 739) {
 				isMobile = true;
-			} else if (window.innerWidth > window.innerHeight && window.innerHeight <=739 ) { //rotated phones and small devices, but not iOS
+			} else if (window.innerWidth > window.innerHeight && window.innerWidth <=739 ) { //rotated phones and small devices, but not iOS
+				console.log('ismobile??');
 				isMobile = true;
 			}
 
@@ -1100,6 +1101,11 @@ OCrossword.prototype.assemble = function assemble() {
 				let desktopSize = gridTDs[0].getBoundingClientRect().width;
 				inputEl.style.width = desktopSize + "px";
 				inputEl.style.height = desktopSize + "px";
+			}
+
+			let displayerHidden = (window.getComputedStyle(clueDisplayer).getPropertyValue('display') === 'none');
+			
+			if(displayerHidden) {
 				gridEl.style.marginTop = "initial";
 			}
 
