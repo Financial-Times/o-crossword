@@ -573,7 +573,7 @@ OCrossword.prototype.assemble = function assemble() {
 		});
 
 		this.addEventListener(cluesEl, 'keydown', function(e){
-			let timer = 5;
+			let timer = 2;
 
 			if (!isAndroid()) {
 				e.preventDefault();
@@ -768,7 +768,7 @@ OCrossword.prototype.assemble = function assemble() {
 			magicInput.style.left = magicInputTargetEl.offsetLeft + 'px';
 			magicInput.style.top = magicInputTargetEl.offsetTop + 'px';
 
-			let timer = (isAndroid())?5:0;
+			let timer = (isAndroid())?2:0;
 
 			setTimeout(function(){
 				magicInput.focus();
@@ -783,13 +783,8 @@ OCrossword.prototype.assemble = function assemble() {
 
 			if(newInput >= 0 && newInput < inputGroup.length) {
 				let next = cluesEl.querySelector('input[data-link-identifier="' + inputID.split('-')[0] +'-'+ newInput+'"]');
-				
-				let timer = (isAndroid())?10:0;
-
-				setTimeout(() => {
-					next.focus();
-					next.select();
-				}, timer);
+				next.focus();
+				next.select();
 			} else {
 				source.blur();
 				let def = source.parentElement.parentElement;
