@@ -132,7 +132,6 @@ function buildGrid(
 			tempLi.dataset.oCrosswordDirection = 'across';
 			tempLi.dataset.oCrosswordClueId = index;
 
-			let srAnswer = answerStore.across[index];
 
 			for(var i = 0; i < answerLength; ++i) {
 				let tempInput = document.createElement('input');
@@ -181,7 +180,8 @@ function buildGrid(
 				tempPartial.appendChild(tempInput);
 			}
 
-			if(!(/^[*,\-]+$/).test(srAnswer)) {
+			if(answerStore && !(/^[*,\-]+$/).test(answerStore.across[index])) {
+				let srAnswer = answerStore.across[index];
 				srAnswer = srAnswer.split('*').join(' blank ');
 				tempSpan.querySelector('.sr-answer').textContent = 'Your answer: ' + srAnswer + '.';	
 			}
@@ -204,8 +204,6 @@ function buildGrid(
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'down';
 			tempLi.dataset.oCrosswordClueId = clues.across.length + index;
-
-			let srAnswer = answerStore.down[index];
 
 			for(var i = 0; i < answerLength; ++i) {
 				let tempInput = document.createElement('input');
@@ -255,7 +253,8 @@ function buildGrid(
 				tempPartial.appendChild(tempInput);
 			}
 
-			if(!(/^[*,\-]+$/).test(srAnswer)) {
+			if(answerStore && !(/^[*,\-]+$/).test(answerStore.down[index])) {
+				let srAnswer = answerStore.down[index];
 				srAnswer = srAnswer.split('*').join(' blank ');
 				tempSpan.querySelector('.sr-answer').textContent = 'Your answer: ' + srAnswer + '.';	
 			}
@@ -555,7 +554,7 @@ OCrossword.prototype.assemble = function assemble() {
 				return;
 			}
 
-			if(e.keyCode >= 65 && e.keyCode <= 90) {
+			if((e.keyCode >= 65 && e.keyCode <= 90) || isAndroid()) {
 				if(!isAndroid()) {
 					magicInput.value = String.fromCharCode(e.keyCode);
 
@@ -574,7 +573,7 @@ OCrossword.prototype.assemble = function assemble() {
 		});
 
 		this.addEventListener(cluesEl, 'keydown', function(e){
-			let timer = 2;
+			let timer = 5;
 
 			if (!isAndroid()) {
 				e.preventDefault();
@@ -585,7 +584,7 @@ OCrossword.prototype.assemble = function assemble() {
 					timer = 0;
 				}
 			}
-			
+
 			if(e.target.nodeName !== 'INPUT') {
 				if(e.keyCode === 9) {
 					if(e.shiftKey) {
@@ -667,7 +666,7 @@ OCrossword.prototype.assemble = function assemble() {
 				return;
 			}
 
-			if(e.keyCode >= 65 && e.keyCode <= 90) {
+			if((e.keyCode >= 65 && e.keyCode <= 90) || isAndroid()) {
 				if(!isAndroid()) {
 					e.target.value = String.fromCharCode(e.keyCode);
 					e.target.select();
@@ -685,6 +684,8 @@ OCrossword.prototype.assemble = function assemble() {
 
 					nextInput(e.target, 1);
 				}, timer);
+
+				
 			} else {
 				return;
 			}
@@ -767,7 +768,7 @@ OCrossword.prototype.assemble = function assemble() {
 			magicInput.style.left = magicInputTargetEl.offsetLeft + 'px';
 			magicInput.style.top = magicInputTargetEl.offsetTop + 'px';
 
-			let timer = (isAndroid())?2:0;
+			let timer = (isAndroid())?5:0;
 
 			setTimeout(function(){
 				magicInput.focus();
@@ -782,8 +783,13 @@ OCrossword.prototype.assemble = function assemble() {
 
 			if(newInput >= 0 && newInput < inputGroup.length) {
 				let next = cluesEl.querySelector('input[data-link-identifier="' + inputID.split('-')[0] +'-'+ newInput+'"]');
-				next.focus();
-				next.select();
+				
+				let timer = (isAndroid())?10:0;
+
+				setTimeout(() => {
+					next.focus();
+					next.select();
+				}, timer);
 			} else {
 				source.blur();
 				let def = source.parentElement.parentElement;
@@ -799,7 +805,11 @@ OCrossword.prototype.assemble = function assemble() {
 				if(direction === 1) {
 					clueNavigationNext.click();	
 				} else {
-					def.click();
+					if(isTouch()) {
+						clueNavigationPrev.click();
+					} else {
+						def.click();	
+					}
 				}
 
 			}
@@ -1134,7 +1144,9 @@ OCrossword.prototype.assemble = function assemble() {
 					return;
 				}
 
-				defEl.focus();
+				if(!isMobile) {
+					defEl.focus();
+				}
 				
 				const el = gridEl.querySelector(`td[data-o-crossword-number="${clueDetails.number}"]`);
 				target = el;
