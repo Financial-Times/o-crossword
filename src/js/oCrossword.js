@@ -646,7 +646,7 @@ OCrossword.prototype.assemble = function assemble() {
 					e.target.value = '';
 					gridSync.grid.textContent = e.target.value;
 					
-					if(gridSync.defSync) {
+					if(!!gridSync.defSync) {
 						let defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
 						defSync.value = e.target.value;
 					}
@@ -674,8 +674,8 @@ OCrossword.prototype.assemble = function assemble() {
 
 				setTimeout(function(){
 					gridSync.grid.textContent = e.target.value;
-					
-					if(gridSync.defSync) {
+
+					if(!!gridSync.defSync) {
 						let defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
 						defSync.value = e.target.value;
 					}
@@ -795,18 +795,15 @@ OCrossword.prototype.assemble = function assemble() {
 
 				if(!isMobile) {
 					isTab = true;
-				}
-				
-				if(direction === 1) {
-					clueNavigationNext.click();	
-				} else {
-					if(isTouch()) {
-						clueNavigationPrev.click();
-					} else {
-						def.click();	
-					}
-				}
 
+					if(direction === 1) {
+						clueNavigationNext.click();
+					} else {
+						def.click();
+					}
+				} else {
+					isTab = false;
+				}
 			}
 		}
 
