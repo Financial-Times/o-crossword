@@ -481,7 +481,6 @@ OCrossword.prototype.assemble = function assemble() {
 		let isGridView = true;
 
 		if(localStorage.getItem('FT-crossword_view')) {
-			console.log('list view', localStorage.getItem('FT-crossword_view'));
 			isGridView = JSON.parse(localStorage.getItem('FT-crossword_view'));
 		}
 
@@ -586,15 +585,13 @@ OCrossword.prototype.assemble = function assemble() {
 		});
 
 		this.addEventListener(cluesEl, 'keydown', function(e){
-			let timer = 2;
+			let timer = 0;
 
 			if (!isAndroid()) {
 				e.preventDefault();
 
 				if(!isTouch()) {
 					timer = 10;
-				} else {
-					timer = 0;
 				}
 			}
 
@@ -780,12 +777,9 @@ OCrossword.prototype.assemble = function assemble() {
 			magicInputNextEls = nextEls;
 			magicInput.style.left = magicInputTargetEl.offsetLeft + 'px';
 			magicInput.style.top = magicInputTargetEl.offsetTop + 'px';
-
-			let timer = (isAndroid())?2:0;
-
-			setTimeout(function(){
-				magicInput.focus();
-			}, timer);
+			
+			magicInput.focus();
+			magicInput.select();
 		}
 
 		function nextInput(source, direction) {
@@ -807,8 +801,6 @@ OCrossword.prototype.assemble = function assemble() {
 				});
 
 				if(!isMobile) {
-					// isTab = true;
-
 					if(direction === 1) {
 						clueNavigationNext.click();
 					} else {
