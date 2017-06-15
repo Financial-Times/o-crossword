@@ -480,6 +480,11 @@ OCrossword.prototype.assemble = function assemble() {
 		let isMobile = false;
 		let isGridView = true;
 
+		if(localStorage.getItem('FT-crossword_view')) {
+			console.log('list view', localStorage.getItem('FT-crossword_view'));
+			isGridView = JSON.parse(localStorage.getItem('FT-crossword_view'));
+		}
+
 		const resetButton = document.createElement('button');
 		resetButton.classList.add('o-crossword-reset');
 		if(answersEmpty() || isAnswerVersion) {
@@ -492,7 +497,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 		const toggleViewButton = document.createElement('button');
 		toggleViewButton.classList.add('o-crossword-mobile-toggle');
-		toggleViewButton.textContent = 'List view';
+		toggleViewButton.textContent = isGridView?'List view':'Grid view';
 
 		this.addEventListener(toggleViewButton, 'click', toggleMobileViews);
 		this.rootEl.insertBefore(toggleViewButton, wrapper);
@@ -1045,6 +1050,12 @@ OCrossword.prototype.assemble = function assemble() {
 			toggleViewButton.textContent = buttonText;
 
 			onResize(false);
+
+			try {
+				localStorage.setItem('FT-crossword_view', isGridView );
+			} catch(err){
+				console.log('Error trying to save state', err);
+			}
 		}
 
 		function answersEmpty() {
