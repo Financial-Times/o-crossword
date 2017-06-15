@@ -887,6 +887,10 @@ OCrossword.prototype.assemble = function assemble() {
 				el.classList.add('has-hover');
 				el.querySelector('.o-crossword-user-answer').style.top = clueDisplayerText.clientHeight + 'px';
 				currentClue = parseInt(el.getAttribute('data-o-crossword-clue-id'));
+
+				if(isCSSMobile(clueDisplayer)) {
+					onResize(false);
+				}
 			}
 		}
 
@@ -1116,11 +1120,11 @@ OCrossword.prototype.assemble = function assemble() {
 					} else {
 						clueDisplayer.style.height = clueDisplayerText.clientHeight + 50 +'px';
 						el.querySelector('.o-crossword-user-answer').style.top = clueDisplayerText.clientHeight + 'px';
-					}
-					
+					}	
+
+					gridEl.style.marginTop = clueDisplayer.style.height;
 				}
 
-				gridEl.style.marginTop = clueDisplayer.style.height;
 			} else {
 				for (let i = 0; i < gridTDs.length; i++) {
 					let td = gridTDs[i];
@@ -1142,6 +1146,8 @@ OCrossword.prototype.assemble = function assemble() {
 				cluesEl.classList.remove('visually_hidden');
 			}
 
+
+			console.log('MT::', gridEl.style.marginTop, clueDisplayer.style.height);
 			d2 = gridEl.getBoundingClientRect();
 
 		}.bind(this);
@@ -1267,8 +1273,6 @@ OCrossword.prototype.assemble = function assemble() {
 					currentClue = cluesTotal;
 				}
 			}
-
-			onResize(false);
 
 			return cluesEl.querySelector('li[data-o-crossword-clue-id="'+ currentClue +'"]');
 		}.bind(this);
