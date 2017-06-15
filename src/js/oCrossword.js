@@ -1057,7 +1057,6 @@ OCrossword.prototype.assemble = function assemble() {
 			if (window.innerWidth <= 739) {
 				isMobile = true;
 			} else if (window.innerWidth > window.innerHeight && window.innerWidth <=739 ) { //rotated phones and small devices, but not iOS
-				console.log('ismobile??');
 				isMobile = true;
 			}
 
@@ -1146,8 +1145,6 @@ OCrossword.prototype.assemble = function assemble() {
 				cluesEl.classList.remove('visually_hidden');
 			}
 
-
-			console.log('MT::', gridEl.style.marginTop, clueDisplayer.style.height);
 			d2 = gridEl.getBoundingClientRect();
 
 		}.bind(this);
