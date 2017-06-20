@@ -386,6 +386,7 @@ function getGridCellsByNumber(gridEl, number, direction, length) {
 			}
 		}
 	}
+
 	return out;
 }
 
@@ -394,21 +395,20 @@ function getLetterIndex(gridEl, cell, number, direction) {
 
 	if(direction === 'across') {
 		return cell.cellIndex - el.cellIndex;
-	} else {
+	} else if (direction === 'down'){
 		return parseInt(cell.parentNode.getAttribute('data-tr-index')) - parseInt(el.parentNode.getAttribute('data-tr-index'));
 	}
+
+	return;
 }
 
 OCrossword.prototype.assemble = function assemble() {
 	const gridEl = this.rootEl.querySelector('table');
 	const cluesEl = this.rootEl.querySelector('ul.o-crossword-clues');
-	let answerStore = JSON.parse(this.rootEl.getAttribute('data-storage'));
-	const isAnswerVersion = JSON.parse(this.rootEl.getAttribute('data-answer-version'));
 	const gridMap = new Map();
-	let currentlySelectedGridItem = null;
 	for (const el of cluesEl.querySelectorAll('[data-o-crossword-number]')) {
 		const els = getGridCellsByNumber(gridEl, el.dataset.oCrosswordNumber,el.dataset.oCrosswordDirection, el.dataset.oCrosswordAnswerLength);
-		els.forEach(cell => {
+		Array.from(els).forEach(cell => {
 			const arr = gridMap.get(cell) || [];
 			arr.push({
 				number: el.dataset.oCrosswordNumber,
@@ -416,9 +416,15 @@ OCrossword.prototype.assemble = function assemble() {
 				answerLength: el.dataset.oCrosswordAnswerLength,
 				answerPos: getLetterIndex(gridEl, cell, el.dataset.oCrosswordNumber, el.dataset.oCrosswordDirection)
 			});
+
 			gridMap.set(cell, arr);
 		});
 	}
+
+	let currentlySelectedGridItem = null;	
+	let answerStore = JSON.parse(this.rootEl.getAttribute('data-storage'));
+	const isAnswerVersion = JSON.parse(this.rootEl.getAttribute('data-answer-version'));
+
 
 	if (cluesEl) {
 		let currentClue = -1;
@@ -533,7 +539,6 @@ OCrossword.prototype.assemble = function assemble() {
 			}
 
 			if (e.keyCode === 9) { //tab
-				//TODO: get next clue;
 				isTab = true;
 				return clueNavigationNext.click();
 			}
@@ -624,8 +629,6 @@ OCrossword.prototype.assemble = function assemble() {
 
 				return;
 			}
-
-			let gridSync = getCellFromClue(e.target);
 			
 			if(e.shiftKey && e.keyCode === 9) {
 				return nextInput(e.target, -1);
@@ -649,21 +652,14 @@ OCrossword.prototype.assemble = function assemble() {
 			) {
 				return nextInput(e.target, -1);
 			}
+
 			if (
 				e.keyCode === 8 //backspace
 			) {
 				setTimeout(function(){
 					e.target.value = '';
-					gridSync.grid.textContent = e.target.value;
-					
-					if(!!gridSync.defSync) {
-						let defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
-						defSync.value = e.target.value;
-					}
-
-					updateScreenReaderAnswer(e.target, gridSync);
-
 					nextInput(e.target, -1);
+					updateInBackground(e);
 				}, timer);
 				
 				return;
@@ -679,20 +675,13 @@ OCrossword.prototype.assemble = function assemble() {
 			if((e.keyCode >= 65 && e.keyCode <= 90) || isAndroid()) {
 				if(!isAndroid()) {
 					e.target.value = String.fromCharCode(e.keyCode);
-					e.target.select();
 				}
 
+				e.target.select();
+
 				setTimeout(function(){
-					gridSync.grid.textContent = e.target.value;
-
-					if(!!gridSync.defSync) {
-						let defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
-						defSync.value = e.target.value;
-					}
-
-					updateScreenReaderAnswer(e.target, gridSync);
-
 					nextInput(e.target, 1);
+					updateInBackground(e);
 				}, timer);
 
 				
@@ -700,6 +689,22 @@ OCrossword.prototype.assemble = function assemble() {
 				return;
 			}
 		});
+
+		function updateInBackground(e) {
+			// console.log(e, e.target);
+
+			getCellFromClue(e.target, gridSync => {
+				// console.log('GS::', gridSync);
+				gridSync.grid.textContent = e.target.value;
+
+				if(!!gridSync.defSync) {
+					let defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
+					defSync.value = e.target.value;
+				}
+
+				updateScreenReaderAnswer(e.target, gridSync);
+			});	
+		}
 
 		const progress = debounce(function progress(direction) {
 			direction = direction === -1 ? -1 : 1;
@@ -801,11 +806,17 @@ OCrossword.prototype.assemble = function assemble() {
 				});
 
 				if(!isMobile) {
+					def.click();
 					if(direction === 1) {
-						clueNavigationNext.click();
-					} else {
-						def.click();
+						++currentClue;
+						if(currentClue > cluesTotal) {
+							currentClue = 0;
+						}
 					}
+
+					let nextFocus = cluesEl.querySelector('li[data-o-crossword-clue-id="'+ currentClue +'"]');
+					nextFocus.focus();
+
 				} else {
 					isTab = false;
 				}
@@ -839,34 +850,37 @@ OCrossword.prototype.assemble = function assemble() {
 			gridElsToHighlight.forEach(el => el.dataset.oCrosswordHighlighted = direction);
 		}
 
-		function getCellFromClue(clue) {
+		function getCellFromClue(clue, callback) {
 			let inputIdentifier = clue.getAttribute('data-link-identifier');
 			let defDirection = (inputIdentifier.slice(0,1) === 'A')?'across':'down';
 			let defNum = inputIdentifier.slice(1,inputIdentifier.length).split('-')[0];
 			let defIndex = parseInt(inputIdentifier.split('-')[1]);
-			
-			let cells = gridEl.querySelectorAll('td:not(.empty)');
+
 			let selectedCell = {};
 
-			Array.from(cells).forEach(cell => {
-				let cellData = gridMap.get(cell);
+			console.log('GM:', gridMap);
+			const entries = Array.from(gridMap);
+
+			for(let e in entries) {
+				const entry = entries[e];
+				let cellData = entry[1];
+
 				for(let i = 0; i < cellData.length; ++i) {
 					if(
 						cellData[i].direction === defDirection &&
 						parseInt(cellData[i].number) === parseInt(defNum) &&
 						parseInt(cellData[i].answerPos) === parseInt(defIndex)
 					) {
-						selectedCell.grid = cell;
+						selectedCell.grid = entry[0];
 						if(cellData.length > 1) {
-							selectedCell.defSync = true;
-
 							selectedCell.defSyncInput = constructInputIdentifier(cellData, defDirection);
+							selectedCell.defSync = (selectedCell.defSyncInput !== undefined);
 						}
 					}
 				}
-			});
+			}
 
-			return selectedCell;
+			callback(selectedCell);
 		}
 
 		function setClue(number, direction) {
@@ -1176,7 +1190,7 @@ OCrossword.prototype.assemble = function assemble() {
 				}
 
 				clueDetails = {};
-				clueDetails.number = defEl.getAttribute('data-o-crossword-number');;
+				clueDetails.number = defEl.getAttribute('data-o-crossword-number');
 				clueDetails.direction = defEl.getAttribute('data-o-crossword-direction');
 				clueDetails.answerLength = defEl.getAttribute('data-o-crossword-answer-length');
 
@@ -1185,6 +1199,7 @@ OCrossword.prototype.assemble = function assemble() {
 				}
 
 				if(!isMobile) {
+					console.log(defEl);
 					defEl.focus();
 				}
 				
