@@ -421,6 +421,8 @@ OCrossword.prototype.assemble = function assemble() {
 		});
 	}
 
+	console.log('init Map::', gridMap);
+
 	let currentlySelectedGridItem = null;	
 	let answerStore = JSON.parse(this.rootEl.getAttribute('data-storage'));
 	const isAnswerVersion = JSON.parse(this.rootEl.getAttribute('data-answer-version'));
