@@ -860,11 +860,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 			let selectedCell = {};
 
-			console.log('GM:', gridMap);
-			const entries = Array.from(gridMap);
-
-			for(let e in entries) {
-				const entry = entries[e];
+			for(const entry of gridMap) {
 				let cellData = entry[1];
 
 				for(let i = 0; i < cellData.length; ++i) {
