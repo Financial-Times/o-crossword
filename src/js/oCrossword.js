@@ -270,7 +270,7 @@ function buildGrid(
 		clues.across.forEach(function acrossForEach(across, i) {
 			const answer = target.across[i];
 			const answerLength = answer.length;
-			getGridCellsByNumber(gridEl, across[0], 'across', answerLength).forEach((td, i) => {
+			getGridCellsByNumber(gridEl, across[0], 'across', answerLength, 'answersAcross').forEach((td, i) => {
 				let val = (answer[i] === '*')?'':answer[i];
 				td.textContent = val;
 			});
@@ -279,7 +279,7 @@ function buildGrid(
 		clues.down.forEach(function downForEach(down, i) {
 			const answer = target.down[i];
 			const answerLength = answer.length;
-			getGridCellsByNumber(gridEl, down[0], 'down', answerLength).forEach((td, i) => {
+			getGridCellsByNumber(gridEl, down[0], 'down', answerLength, 'answersDown').forEach((td, i) => {
 				let val = (answer[i] === '*')?'':answer[i];
 				td.textContent = val;
 			});
@@ -363,9 +363,10 @@ function OCrossword(rootEl) {
 	}
 }
 
-function getGridCellsByNumber(gridEl, number, direction, length) {
+function getGridCellsByNumber(gridEl, number, direction, length, initiator) {
 	const out = [];
 	let el = gridEl.querySelector(`td[data-o-crossword-number="${number}"]`);
+	console.log(el, initiator);
 	if (el) {
 		if (direction === 'across') {
 			while (length--) {
@@ -407,7 +408,7 @@ OCrossword.prototype.assemble = function assemble() {
 	const cluesEl = this.rootEl.querySelector('ul.o-crossword-clues');
 	const gridMap = new Map();
 	for (const el of cluesEl.querySelectorAll('[data-o-crossword-number]')) {
-		const els = getGridCellsByNumber(gridEl, el.dataset.oCrosswordNumber,el.dataset.oCrosswordDirection, el.dataset.oCrosswordAnswerLength);
+		const els = getGridCellsByNumber(gridEl, el.dataset.oCrosswordNumber,el.dataset.oCrosswordDirection, el.dataset.oCrosswordAnswerLength, 'map');
 		Array.from(els).forEach(cell => {
 			const arr = gridMap.get(cell) || [];
 			arr.push({
@@ -693,10 +694,7 @@ OCrossword.prototype.assemble = function assemble() {
 		});
 
 		function updateInBackground(e) {
-			// console.log(e, e.target);
-
 			getCellFromClue(e.target, gridSync => {
-				// console.log('GS::', gridSync);
 				gridSync.grid.textContent = e.target.value;
 
 				if(!!gridSync.defSync) {
@@ -848,7 +846,7 @@ OCrossword.prototype.assemble = function assemble() {
 			for (const o of els) {
 				delete o.dataset.oCrosswordHighlighted;
 			}
-			const gridElsToHighlight = getGridCellsByNumber(gridEl, number, direction, length);
+			const gridElsToHighlight = getGridCellsByNumber(gridEl, number, direction, length, 'highlightGridByNumber');
 			gridElsToHighlight.forEach(el => el.dataset.oCrosswordHighlighted = direction);
 		}
 
@@ -862,6 +860,12 @@ OCrossword.prototype.assemble = function assemble() {
 
 			for(const entry of gridMap) {
 				let cellData = entry[1];
+
+				//DEBUG ONLY
+				if(cellData.length > 1 && cellData[0].direction == cellData[1].direction) {
+					console.log('PROBLEM!!', entry);
+				}
+				//ENDOF DEBUG
 
 				for(let i = 0; i < cellData.length; ++i) {
 					if(
@@ -1197,7 +1201,6 @@ OCrossword.prototype.assemble = function assemble() {
 				}
 
 				if(!isMobile) {
-					console.log(defEl);
 					defEl.focus();
 				}
 				
@@ -1262,7 +1265,8 @@ OCrossword.prototype.assemble = function assemble() {
 						gridEl,
 						currentlySelectedGridItem.number,
 						currentlySelectedGridItem.direction,
-						currentlySelectedGridItem.answerLength
+						currentlySelectedGridItem.answerLength,
+						'onTap'
 					));
 
 					isTab = false;
