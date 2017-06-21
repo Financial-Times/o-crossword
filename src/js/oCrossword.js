@@ -366,7 +366,10 @@ function OCrossword(rootEl) {
 function getGridCellsByNumber(gridEl, number, direction, length, initiator) {
 	const out = [];
 	let el = gridEl.querySelector(`td[data-o-crossword-number="${number}"]`);
-	console.log(el, initiator);
+	if(initiator === 'debug') {
+		console.log(gridEl, el, number);
+	}
+	// console.log(el, initiator); TODO: rem initiatior debug
 	if (el) {
 		if (direction === 'across') {
 			while (length--) {
@@ -423,6 +426,9 @@ OCrossword.prototype.assemble = function assemble() {
 	}
 
 	console.log('init Map::', gridMap);
+	//DEBUG ONLY
+	debug('initMap');
+	//ENDOF DEBUG
 
 	let currentlySelectedGridItem = null;	
 	let answerStore = JSON.parse(this.rootEl.getAttribute('data-storage'));
@@ -851,22 +857,19 @@ OCrossword.prototype.assemble = function assemble() {
 		}
 
 		function getCellFromClue(clue, callback) {
-			let inputIdentifier = clue.getAttribute('data-link-identifier');
-			let defDirection = (inputIdentifier.slice(0,1) === 'A')?'across':'down';
-			let defNum = inputIdentifier.slice(1,inputIdentifier.length).split('-')[0];
-			let defIndex = parseInt(inputIdentifier.split('-')[1]);
+			const inputIdentifier = clue.getAttribute('data-link-identifier');
+			const defDirection = (inputIdentifier.slice(0,1) === 'A')?'across':'down';
+			const defNum = inputIdentifier.slice(1,inputIdentifier.length).split('-')[0];
+			const defIndex = parseInt(inputIdentifier.split('-')[1]);
 
 			let selectedCell = {};
 
+			//DEBUG ONLY
+			debug('getCellFromClue');
+			//ENDOF DEBUG
+
 			for(const entry of gridMap) {
 				let cellData = entry[1];
-
-				//DEBUG ONLY
-				if(cellData.length > 1 && cellData[0].direction == cellData[1].direction) {
-					console.log('PROBLEM!!', entry);
-				}
-				//ENDOF DEBUG
-
 				for(let i = 0; i < cellData.length; ++i) {
 					if(
 						cellData[i].direction === defDirection &&
@@ -1191,6 +1194,7 @@ OCrossword.prototype.assemble = function assemble() {
 					defEl = (e.target.nodeName === 'SPAN')?e.target.parentElement:e.target;
 				}
 
+				// console.log(defEl);
 				clueDetails = {};
 				clueDetails.number = defEl.getAttribute('data-o-crossword-number');
 				clueDetails.direction = defEl.getAttribute('data-o-crossword-direction');
@@ -1204,8 +1208,9 @@ OCrossword.prototype.assemble = function assemble() {
 					defEl.focus();
 				}
 				
-				const el = gridEl.querySelector(`td[data-o-crossword-number="${clueDetails.number}"]`);
-				target = el;
+				target = gridEl.querySelector(`td[data-o-crossword-number="${clueDetails.number}"]`);
+
+				// console.log(target, clueDetails, gridMap.get(target));
 			}
 
 			if (target === magicInput) {
@@ -1276,9 +1281,11 @@ OCrossword.prototype.assemble = function assemble() {
 
 		const navigateClues = function navigateClues (e) {
 			e.preventDefault();
-			const dir = (e.target === clueNavigationNext)?'forward':'backward';
 
-			if (dir === 'forward') {
+			//DEBUG ONLY
+			debug('navigateClues');
+			//ENDOF DEBUG
+			if (e.target === clueNavigationNext) {
 				++currentClue;
 
 				if(currentClue > cluesTotal) {
@@ -1291,7 +1298,7 @@ OCrossword.prototype.assemble = function assemble() {
 				}
 			}
 
-			return cluesEl.querySelector('li[data-o-crossword-clue-id="'+ currentClue +'"]');
+			return cluesEl.querySelector(`li[data-o-crossword-clue-id="${currentClue}"]`);
 		}.bind(this);
 
 		this.addEventListener(cluesEl, 'mousemove', e => highlightGridByCluesEl(e.target));
@@ -1304,6 +1311,18 @@ OCrossword.prototype.assemble = function assemble() {
 
 	if(isiOS()) {
 		document.getElementsByTagName('body')[0].className += " iOS";
+	}
+
+	function debug(trigger) {
+		console.log('--DEBUG FROM ', trigger);
+		for(const entry of gridMap) {
+			let cellData = entry[1];
+			if(cellData.length > 1 && cellData[0].direction == cellData[1].direction) {
+				console.log('PROBLEM!! NAVIGATE', entry);
+				console.log(gridMap.size, gridMap);
+			}
+		}
+		console.log("--END DEBUG LOOP --");
 	}
 };
 
