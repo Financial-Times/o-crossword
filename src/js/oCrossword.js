@@ -270,7 +270,7 @@ function buildGrid(
 		clues.across.forEach(function acrossForEach(across, i) {
 			const answer = target.across[i];
 			const answerLength = answer.length;
-			getGridCellsByNumber(gridEl, across[0], 'across', answerLength, 'answersAcross').forEach((td, i) => {
+			getGridCellsByNumber(gridEl, across[0], 'across', answerLength).forEach((td, i) => {
 				let val = (answer[i] === '*')?'':answer[i];
 				td.textContent = val;
 			});
@@ -279,7 +279,7 @@ function buildGrid(
 		clues.down.forEach(function downForEach(down, i) {
 			const answer = target.down[i];
 			const answerLength = answer.length;
-			getGridCellsByNumber(gridEl, down[0], 'down', answerLength, 'answersDown').forEach((td, i) => {
+			getGridCellsByNumber(gridEl, down[0], 'down', answerLength).forEach((td, i) => {
 				let val = (answer[i] === '*')?'':answer[i];
 				td.textContent = val;
 			});
@@ -363,13 +363,10 @@ function OCrossword(rootEl) {
 	}
 }
 
-function getGridCellsByNumber(gridEl, number, direction, length, initiator) {
+function getGridCellsByNumber(gridEl, number, direction, length) {
 	const out = [];
 	let el = gridEl.querySelector(`td[data-o-crossword-number="${number}"]`);
-	if(initiator === 'debug') {
-		console.log(gridEl, el, number);
-	}
-	// console.log(el, initiator); TODO: rem initiatior debug
+
 	if (el) {
 		if (direction === 'across') {
 			while (length--) {
@@ -411,7 +408,7 @@ OCrossword.prototype.assemble = function assemble() {
 	const cluesEl = this.rootEl.querySelector('ul.o-crossword-clues');
 	const gridMap = new Map();
 	for (const el of cluesEl.querySelectorAll('[data-o-crossword-number]')) {
-		const els = getGridCellsByNumber(gridEl, el.dataset.oCrosswordNumber,el.dataset.oCrosswordDirection, el.dataset.oCrosswordAnswerLength, 'map');
+		const els = getGridCellsByNumber(gridEl, el.dataset.oCrosswordNumber,el.dataset.oCrosswordDirection, el.dataset.oCrosswordAnswerLength);
 		Array.from(els).forEach(cell => {
 			const arr = gridMap.get(cell) || [];
 			arr.push({
@@ -424,11 +421,6 @@ OCrossword.prototype.assemble = function assemble() {
 			gridMap.set(cell, arr);
 		});
 	}
-
-	console.log('init Map::', gridMap);
-	//DEBUG ONLY
-	debug('initMap');
-	//ENDOF DEBUG
 
 	let currentlySelectedGridItem = null;	
 	let answerStore = JSON.parse(this.rootEl.getAttribute('data-storage'));
@@ -852,7 +844,7 @@ OCrossword.prototype.assemble = function assemble() {
 			for (const o of els) {
 				delete o.dataset.oCrosswordHighlighted;
 			}
-			const gridElsToHighlight = getGridCellsByNumber(gridEl, number, direction, length, 'highlightGridByNumber');
+			const gridElsToHighlight = getGridCellsByNumber(gridEl, number, direction, length);
 			gridElsToHighlight.forEach(el => el.dataset.oCrosswordHighlighted = direction);
 		}
 
@@ -863,10 +855,6 @@ OCrossword.prototype.assemble = function assemble() {
 			const defIndex = parseInt(inputIdentifier.split('-')[1]);
 
 			let selectedCell = {};
-
-			//DEBUG ONLY
-			debug('getCellFromClue');
-			//ENDOF DEBUG
 
 			for(const entry of gridMap) {
 				let cellData = entry[1];
@@ -1012,7 +1000,6 @@ OCrossword.prototype.assemble = function assemble() {
 		function syncPartialClue(letter, src, index) {
 			const gridItems = gridMap.get(src[index]);
 			let targets = [];
-
 			for(let i = 0; i < gridItems.length; ++i) {
 				let linkName = gridItems[i].direction[0].toUpperCase() + gridItems[i].number + '-' + gridItems[i].answerPos;
 				targets.push(cluesEl.querySelector('input[data-link-identifier="'+linkName+'"]'));
@@ -1194,7 +1181,6 @@ OCrossword.prototype.assemble = function assemble() {
 					defEl = (e.target.nodeName === 'SPAN')?e.target.parentElement:e.target;
 				}
 
-				// console.log(defEl);
 				clueDetails = {};
 				clueDetails.number = defEl.getAttribute('data-o-crossword-number');
 				clueDetails.direction = defEl.getAttribute('data-o-crossword-direction');
@@ -1209,9 +1195,8 @@ OCrossword.prototype.assemble = function assemble() {
 				}
 				
 				target = gridEl.querySelector(`td[data-o-crossword-number="${clueDetails.number}"]`);
-
-				// console.log(target, clueDetails, gridMap.get(target));
 			}
+
 
 			if (target === magicInput) {
 				target = magicInputTargetEl;
@@ -1226,6 +1211,7 @@ OCrossword.prototype.assemble = function assemble() {
 						cell = cell.parentNode;
 					}
 				}
+
 				const clues = gridMap.get(cell);
 				if (!clues) {
 					return;
@@ -1240,23 +1226,25 @@ OCrossword.prototype.assemble = function assemble() {
 				if (index === -1 && currentlySelectedGridItem) {
 					const oldClue = currentlySelectedGridItem;
 
-					currentlySelectedGridItem = clues.find(item => (
-						item.direction === oldClue.direction &&
-						item.number === oldClue.number &&
-						item.answerLength === oldClue.answerLength
-					));
+					if(clueDetails !== undefined) {
+						currentlySelectedGridItem = clues.find(item => (
+							item.direction === clueDetails.direction &&
+							item.number === clueDetails.number &&
+							item.answerLength === clueDetails.answerLength
+						));
+					} else {
+						currentlySelectedGridItem = clues.find(item => (
+							item.direction === oldClue.direction &&
+							item.number === oldClue.number &&
+							item.answerLength === oldClue.answerLength
+						));
+					}
 				}
 
 				if (index !== -1 || !currentlySelectedGridItem) {
 					// the same cell has been clicked on again so
 					if (index + 1 === clues.length) index = -1;
 					currentlySelectedGridItem = clues[index + 1];
-				}
-
-				if (clueDetails !== undefined) {
-					currentlySelectedGridItem.number = clueDetails.number;
-					currentlySelectedGridItem.direction = clueDetails.direction;
-					currentlySelectedGridItem.answerLength = clueDetails.answerLength;
 				}
 
 				highlightGridByNumber(
@@ -1270,8 +1258,7 @@ OCrossword.prototype.assemble = function assemble() {
 						gridEl,
 						currentlySelectedGridItem.number,
 						currentlySelectedGridItem.direction,
-						currentlySelectedGridItem.answerLength,
-						'onTap'
+						currentlySelectedGridItem.answerLength
 					));
 
 					isTab = false;
@@ -1282,9 +1269,6 @@ OCrossword.prototype.assemble = function assemble() {
 		const navigateClues = function navigateClues (e) {
 			e.preventDefault();
 
-			//DEBUG ONLY
-			debug('navigateClues');
-			//ENDOF DEBUG
 			if (e.target === clueNavigationNext) {
 				++currentClue;
 
@@ -1311,18 +1295,6 @@ OCrossword.prototype.assemble = function assemble() {
 
 	if(isiOS()) {
 		document.getElementsByTagName('body')[0].className += " iOS";
-	}
-
-	function debug(trigger) {
-		console.log('--DEBUG FROM ', trigger);
-		for(const entry of gridMap) {
-			let cellData = entry[1];
-			if(cellData.length > 1 && cellData[0].direction == cellData[1].direction) {
-				console.log('PROBLEM!! NAVIGATE', entry);
-				console.log(gridMap.size, gridMap);
-			}
-		}
-		console.log("--END DEBUG LOOP --");
 	}
 };
 
