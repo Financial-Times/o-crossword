@@ -9,8 +9,17 @@
 
     .o-crossword .o-crossword-clues-wrapper {
         display: block;
-        width: auto;
+        width: 100%;
         overflow: auto;
+
+        &.visually_hidden {
+            display: inline-block;
+            margin: -1px;
+            overflow: hidden;
+            padding: 0;
+            width: 1px;
+            height: 1px;
+        }
     }
 
     .o-crossword .o-crossword-clue-displayer {
@@ -21,20 +30,18 @@
         span {
             padding: 0.5em 10%;
         }
+
+        &.visually_hidden {
+           visibility: hidden;
+        }
     }
 
     .o-crossword .o-crossword-clue-navigation {
         display: initial;
     }
 
-    .o-crossword .o-crossword-clues ul {
-        &:before {
-            display: none;
-        }
-    }
-
-    .o-crossword .o-crossword-clues ul li {
-        display: none;
+    .o-crossword .o-crossword-clues.visually_hidden ul li {
+        // display: none;
 
         &.featured {
             display: block;
