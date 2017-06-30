@@ -41,8 +41,6 @@
     }
 
     .o-crossword .o-crossword-clues.visually_hidden ul li {
-        // display: none;
-
         &.featured {
             display: block;
             visibility: hidden;
@@ -51,7 +49,6 @@
                 position: fixed;
                 -webkit-overflow-scrolling: touch;
                 visibility: visible;
-                // top: 20px;
                 left: 0;
                 z-index: 3;
                 margin: 0 10%;
