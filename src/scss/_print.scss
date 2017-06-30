@@ -27,6 +27,10 @@
 		display: block;
 	}
 
+	.o-crossword table {
+		margin-top: 0!important;
+	}
+
 	.o-crossword table td {
 		min-width: 0!important;
 		width: 25px!important;
@@ -56,15 +60,22 @@
 		background: transparent!important;
 	}
 
+	.o-crossword .o-crossword-mobile-toggle, 
+	.o-crossword .o-crossword-reset {
+		display: none!important;
+	}
+
 	.o-crossword .o-crossword-clues, 
 	.o-crossword .o-crossword-clues ul {
 		padding-bottom: 0!important;
 	}
 	
-	.o-crossword .o-crossword-clues {
+	.o-crossword .o-crossword-clues,
+	.o-crossword .o-crossword-clues.visually_hidden {
 		width: 100%!important;
 		max-width: none!important;
 		display: block!important;
+		height: auto!important;
 	}
 
 	.o-crossword .o-crossword-clues li.has-hover,
