@@ -186,6 +186,7 @@
 			border: 1px solid;
 			padding: 0;
 			@include oColorsFor(o-crossword-border, border);
+			@include oColorsFor(o-crossword-cell, background);
 			@include oCrosswordType;
 			position: relative;
 			overflow: hidden;
