@@ -22,8 +22,8 @@
 
 	// scss-lint:disable QualifyingElement
 	@include oTypographyBody;
-	background-color: oColorsGetColorFor(o-crossword page, background);
-	@include oTypographySans(s);
+	@include oColorsFor(o-crossword, background);
+	@include oTypographySans(-2);
 	position: relative;
 	display: block;
 	max-width: 100%;
