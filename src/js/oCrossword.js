@@ -501,12 +501,19 @@ OCrossword.prototype.assemble = function assemble() {
 		this.addEventListener(resetButton, 'click', clearAnswers);
 		this.rootEl.insertBefore(resetButton, wrapper);	
 
-		const toggleViewButton = document.createElement('button');
-		toggleViewButton.classList.add('o-crossword-mobile-toggle');
-		toggleViewButton.textContent = isGridView?'List view':'Grid view';
+		const toggleViewButtonTop = document.createElement('button');
+		toggleViewButtonTop.classList.add('o-crossword-mobile-toggle');
+		toggleViewButtonTop.textContent = isGridView?'List view':'Grid view';
 
-		this.addEventListener(toggleViewButton, 'click', toggleMobileViews);
-		this.rootEl.insertBefore(toggleViewButton, wrapper);
+		this.addEventListener(toggleViewButtonTop, 'click', toggleMobileViews);
+		this.rootEl.insertBefore(toggleViewButtonTop, wrapper);
+
+		const toggleViewButtonBottom = document.createElement('button');
+		toggleViewButtonBottom.classList.add('o-crossword-mobile-toggle');
+		toggleViewButtonBottom.textContent = isGridView?'List view':'Grid view';
+
+		this.addEventListener(toggleViewButtonBottom, 'click', toggleMobileViews);
+		this.rootEl.appendChild(toggleViewButtonBottom, wrapper);
 
 		function constructInputIdentifier(data, direction) {
 			let identifier;
@@ -1045,7 +1052,10 @@ OCrossword.prototype.assemble = function assemble() {
 			isGridView = !isGridView;
 
 			let buttonText = isGridView?'List view':'Grid view';
-			toggleViewButton.textContent = buttonText;
+			toggleViewButtonTop.textContent = buttonText;
+			toggleViewButtonBottom.textContent = buttonText;
+
+			toggleViewButtonBottom.style.display = isGridView?'none':'block';
 
 			onResize(false);
 
