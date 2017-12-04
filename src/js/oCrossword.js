@@ -1055,7 +1055,11 @@ OCrossword.prototype.assemble = function assemble() {
 			toggleViewButtonTop.textContent = buttonText;
 			toggleViewButtonBottom.textContent = buttonText;
 
-			toggleViewButtonBottom.style.display = isGridView?'none':'block';
+			if (isGridView) {
+				toggleViewButtonBottom.classList.add('visually_hidden');						
+			} else {
+				toggleViewButtonBottom.classList.remove('visually_hidden');									
+			}
 
 			onResize(false);
 
@@ -1123,12 +1127,14 @@ OCrossword.prototype.assemble = function assemble() {
 
 				if(isGridView) {
 					cluesEl.classList.add('visually_hidden');
+					toggleViewButtonBottom.classList.add('visually_hidden');					
 					gridWrapper.classList.remove('visually_hidden');
 					clueDisplayer.classList.remove('visually_hidden');
 				} else {
 					gridWrapper.classList.add('visually_hidden');
 					clueDisplayer.classList.add('visually_hidden');
 					cluesEl.classList.remove('visually_hidden');
+					toggleViewButtonBottom.classList.remove('visually_hidden');
 				}
 
 				let el = cluesEl.querySelector('.has-hover');
