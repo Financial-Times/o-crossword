@@ -152,8 +152,6 @@
 		position: relative;
 		font-size: 1.5em;
 		text-transform: uppercase;
-		margin-bottom: 1.5em;
-		margin-left: 1em;
 
 		.o-crossword-magic-input {
 			@include oCrosswordType;
@@ -170,6 +168,11 @@
     		max-width: none!important;
     		border-radius: 0;
     		padding: 0;
+		}
+
+		@include oGridRespondTo(M) {
+			margin-bottom: 1.5em;
+			margin-left: 1em;
 		}
 	}
 
@@ -231,23 +234,25 @@
 	.o-crossword-clues-wrapper {
 		position: relative;
 		margin-top: 2em;
-		width: 44em;
 		float: left;
 
 		@include oGridRespondTo(M) {
 			margin-top: 0;
+			width: 44em;		
 		}
 	}
 
 	.o-crossword-clues {
 		float: left;
-		max-width: 80vw;
+		max-width: 90vw;
+		display: flex;
 
 		&, ul {
 			list-style: none;
 			margin: 0;
 			padding: 0;
 			padding-bottom: 1em;
+			flex-grow: 1;
 
 			li {
 				line-height: 1.5em;
