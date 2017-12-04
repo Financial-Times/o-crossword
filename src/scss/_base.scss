@@ -234,17 +234,18 @@
 	.o-crossword-clues-wrapper {
 		position: relative;
 		margin-top: 2em;
-		float: left;
+		padding-left: 1em;
+		padding-right: 1em;
 
 		@include oGridRespondTo(M) {
 			margin-top: 0;
-			width: 44em;		
+			width: 44em;	
+			float: left;		
 		}
 	}
 
 	.o-crossword-clues {
 		float: left;
-		max-width: 90vw;
 		display: flex;
 
 		&, ul {
@@ -252,12 +253,11 @@
 			margin: 0;
 			padding: 0;
 			padding-bottom: 1em;
-			flex-grow: 1;
 
 			li {
 				line-height: 1.5em;
 				padding-bottom: 0.5em;
-				margin-left: 1em;
+				flex-grow: 1;				
 				cursor: pointer;
 				display: block;
 
@@ -312,6 +312,14 @@
 				display: inline-block;
 				padding: 0 5px;
 			}
+		}	
+		
+		.o-crossword-clues-down {
+			padding-left: 0.5em;
+		}
+
+		.o-crossword-clues-across {
+			padding-right: 0.5em;
 		}
 
 		.o-crossword-clues-down:before,
@@ -319,7 +327,6 @@
 			line-height: 1.3em;
 			font-size: 1.2em;
 			padding-bottom: 1em;
-			margin-left: 0.9em;
 		}
 
 		.o-crossword-clues-down:before {
@@ -334,7 +341,7 @@
 			position: relative;
 			opacity: 1;
 			height: auto;
-			// margin-left: 1em !important;
+			margin-left: 0.9em !important;			
 			box-shadow: none;
 			border: none;
 			transition: none;
