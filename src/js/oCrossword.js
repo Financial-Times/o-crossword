@@ -501,6 +501,13 @@ OCrossword.prototype.assemble = function assemble() {
 		this.addEventListener(resetButton, 'click', clearAnswers);
 		this.rootEl.insertBefore(resetButton, wrapper);	
 
+		const toggleViewButtonAboveGrid = document.createElement('button');
+		toggleViewButtonAboveGrid.classList.add('o-crossword-mobile-toggle');
+		toggleViewButtonAboveGrid.textContent = isGridView?'List view':'Grid view';
+
+		this.addEventListener(toggleViewButtonAboveGrid, 'click', toggleMobileViews);
+		this.rootEl.insertBefore(toggleViewButtonAboveGrid, gridWrapper);
+
 		const toggleViewButtonTop = document.createElement('button');
 		toggleViewButtonTop.classList.add('o-crossword-mobile-toggle');
 		toggleViewButtonTop.textContent = isGridView?'List view':'Grid view';
@@ -1052,6 +1059,7 @@ OCrossword.prototype.assemble = function assemble() {
 			isGridView = !isGridView;
 
 			let buttonText = isGridView?'List view':'Grid view';
+			toggleViewButtonAboveGrid.textContent = buttonText;			
 			toggleViewButtonTop.textContent = buttonText;
 			toggleViewButtonBottom.textContent = buttonText;
 
@@ -1130,9 +1138,11 @@ OCrossword.prototype.assemble = function assemble() {
 					toggleViewButtonBottom.classList.add('visually_hidden');					
 					gridWrapper.classList.remove('visually_hidden');
 					clueDisplayer.classList.remove('visually_hidden');
+					toggleViewButtonAboveGrid.classList.remove('visually_removed');					
 				} else {
 					gridWrapper.classList.add('visually_hidden');
 					clueDisplayer.classList.add('visually_hidden');
+					toggleViewButtonAboveGrid.classList.add('visually_removed');
 					cluesEl.classList.remove('visually_hidden');
 					toggleViewButtonBottom.classList.remove('visually_hidden');
 				}
@@ -1145,8 +1155,6 @@ OCrossword.prototype.assemble = function assemble() {
 						clueDisplayer.style.height = clueDisplayerText.clientHeight + 50 +'px';
 						el.querySelector('.o-crossword-user-answer').style.top = clueDisplayerText.clientHeight + 'px';
 					}	
-
-					gridEl.style.marginTop = clueDisplayer.style.height;
 				}
 
 			} else {

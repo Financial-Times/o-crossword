@@ -375,6 +375,15 @@
 		margin: 20px 10px;
 		float: left;
 
+		&:first-child {
+			float: none;
+			margin-top: 80px;
+		}
+
+		&.visually_removed {
+			display: none;
+		}
+
 		@include oGridRespondTo(M) {
 			display: none;
 		}
