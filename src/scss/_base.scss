@@ -181,12 +181,12 @@
 		border-spacing: 0;
 		font-size: 1.5rem;
 		margin: 0 auto;
+		@include oColorsFor(o-crossword-cell, background);		
 
 		td {
 			border: 1px solid;
 			padding: 0;
 			@include oColorsFor(o-crossword-border, border);
-			@include oColorsFor(o-crossword-cell, background);
 			@include oCrosswordType;
 			position: relative;
 			overflow: hidden;
