@@ -486,9 +486,14 @@ OCrossword.prototype.assemble = function assemble() {
 		let isTab = false;
 		let isMobile = false;
 		let isGridView = true;
+		let isSingleColumnView = true;
 
 		if(localStorage.getItem('FT-crossword_view')) {
 			isGridView = JSON.parse(localStorage.getItem('FT-crossword_view'));
+		}
+
+		if(localStorage.getItem('FT-crossword_columns')) {
+			isSingleColumnView = JSON.parse(localStorage.getItem('FT-crossword_columns'));
 		}
 
 		const buttonRow = document.createElement('div');
@@ -517,7 +522,14 @@ OCrossword.prototype.assemble = function assemble() {
 		toggleViewButtonTop.textContent = isGridView?'List view':'Grid view';
 
 		this.addEventListener(toggleViewButtonTop, 'click', toggleMobileViews);
-		buttonRow.appendChild(toggleViewButtonTop);		
+		buttonRow.appendChild(toggleViewButtonTop);	
+		
+		const toggleColumnsButton = document.createElement('button');
+		toggleColumnsButton.classList.add('o-crossword-mobile-toggle');
+		toggleColumnsButton.textContent = isSingleColumnView?'Two Columns':'Single Column';
+
+		this.addEventListener(toggleColumnsButton, 'click', toggleColumnView);
+		buttonRow.appendChild(toggleColumnsButton);	
 
 		const toggleViewButtonBottom = document.createElement('button');
 		toggleViewButtonBottom.classList.add('o-crossword-mobile-toggle');
@@ -1068,8 +1080,10 @@ OCrossword.prototype.assemble = function assemble() {
 			toggleViewButtonBottom.textContent = buttonText;
 
 			if (isGridView) {
+				toggleColumnsButton.classList.add('visually_hidden');
 				toggleViewButtonBottom.classList.add('visually_hidden');						
 			} else {
+				toggleColumnsButton.classList.remove('visually_hidden');				
 				toggleViewButtonBottom.classList.remove('visually_hidden');									
 			}
 
@@ -1077,6 +1091,28 @@ OCrossword.prototype.assemble = function assemble() {
 
 			try {
 				localStorage.setItem('FT-crossword_view', isGridView );
+			} catch(err){
+				console.log('Error trying to save state', err);
+			}
+		}
+
+		function toggleColumnView(e) {
+			isSingleColumnView = !isSingleColumnView;
+
+			let buttonText = isSingleColumnView?'Two Columns':'Single Column';
+			toggleColumnsButton.textContent = buttonText;
+
+			if (isSingleColumnView) {
+				cluesEl.classList.add('o-crossword-clues-single-column');
+				cluesEl.classList.remove('o-crossword-clues-two-columns');				
+				// o-crossword-clues-single-column
+			} else {
+				cluesEl.classList.remove('o-crossword-clues-single-column');	
+				cluesEl.classList.add('o-crossword-clues-two-columns');								
+			}
+			
+			try {
+				localStorage.setItem('FT-crossword_columns',  isSingleColumnView);
 			} catch(err){
 				console.log('Error trying to save state', err);
 			}
@@ -1139,16 +1175,26 @@ OCrossword.prototype.assemble = function assemble() {
 
 				if(isGridView) {
 					cluesEl.classList.add('visually_hidden');
-					toggleViewButtonBottom.classList.add('visually_hidden');					
+					toggleViewButtonBottom.classList.add('visually_hidden');	
+					toggleColumnsButton.classList.add('visually_hidden');					
 					gridWrapper.classList.remove('visually_hidden');
 					clueDisplayer.classList.remove('visually_hidden');
-					toggleViewButtonAboveGrid.classList.remove('visually_removed');					
+					toggleViewButtonAboveGrid.classList.remove('visually_removed');
 				} else {
 					gridWrapper.classList.add('visually_hidden');
 					clueDisplayer.classList.add('visually_hidden');
 					toggleViewButtonAboveGrid.classList.add('visually_removed');
 					cluesEl.classList.remove('visually_hidden');
 					toggleViewButtonBottom.classList.remove('visually_hidden');
+					toggleColumnsButton.classList.remove('visually_hidden');									
+				}
+
+				if (isSingleColumnView) {
+					cluesEl.classList.add('o-crossword-clues-single-column');
+					cluesEl.classList.remove('o-crossword-clues-two-columns');					
+				} else {
+					cluesEl.classList.remove('o-crossword-clues-single-column');
+					cluesEl.classList.add('o-crossword-clues-two-columns');										
 				}
 
 				let el = cluesEl.querySelector('.has-hover');

@@ -163,7 +163,7 @@
 			outline: none;
 			box-sizing: border-box;
 			background: rgba(0,0,0,0.2);
-			font-size: inherit;
+			font-size: 1.5rem;
     		text-transform: inherit;
     		max-width: none!important;
     		border-radius: 0;
@@ -318,14 +318,6 @@
 		.o-crossword-clues-across li:first-child {
 			margin-top: 1em;
 		}
-		
-		.o-crossword-clues-down {
-			padding-left: 0.5em;
-		}
-
-		.o-crossword-clues-across {
-			padding-right: 0.5em;
-		}
 
 		.o-crossword-clues-down:before,
 		.o-crossword-clues-across:before {
@@ -392,5 +384,27 @@
 	.o-crossword-button-row {
 		margin-top: -1em;
 	}
+
+	.o-crossword-clues-single-column {
+        display: block;
+    }
+
+    .o-crossword-clues-two-columns {
+		display: flex;
+
+		.o-crossword-clues-down {
+			padding-left: 0.5em;
+		}
+		.o-crossword-clues-across {
+			padding-right: 0.5em;
+		}
+	}
+	
+	@include oGridRespondTo(M) {
+		.o-crossword-clues-single-column,
+		.o-crossword-clues-two-columns {
+			display: flex;
+		}
+	}		
 }
 
