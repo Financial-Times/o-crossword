@@ -491,6 +491,10 @@ OCrossword.prototype.assemble = function assemble() {
 			isGridView = JSON.parse(localStorage.getItem('FT-crossword_view'));
 		}
 
+		const buttonRow = document.createElement('div');
+		buttonRow.classList.add('o-crossword-button-row');
+		this.rootEl.insertBefore(buttonRow, wrapper);			
+
 		const resetButton = document.createElement('button');
 		resetButton.classList.add('o-crossword-reset');
 		if(answersEmpty() || isAnswerVersion) {
@@ -499,7 +503,7 @@ OCrossword.prototype.assemble = function assemble() {
 		resetButton.textContent = 'Clear answers';
 
 		this.addEventListener(resetButton, 'click', clearAnswers);
-		this.rootEl.insertBefore(resetButton, wrapper);	
+		buttonRow.appendChild(resetButton);
 
 		const toggleViewButtonAboveGrid = document.createElement('button');
 		toggleViewButtonAboveGrid.classList.add('o-crossword-mobile-toggle');
@@ -513,7 +517,7 @@ OCrossword.prototype.assemble = function assemble() {
 		toggleViewButtonTop.textContent = isGridView?'List view':'Grid view';
 
 		this.addEventListener(toggleViewButtonTop, 'click', toggleMobileViews);
-		this.rootEl.insertBefore(toggleViewButtonTop, wrapper);
+		buttonRow.appendChild(toggleViewButtonTop);		
 
 		const toggleViewButtonBottom = document.createElement('button');
 		toggleViewButtonBottom.classList.add('o-crossword-mobile-toggle');
@@ -1154,7 +1158,9 @@ OCrossword.prototype.assemble = function assemble() {
 					} else {
 						clueDisplayer.style.height = clueDisplayerText.clientHeight + 50 +'px';
 						el.querySelector('.o-crossword-user-answer').style.top = clueDisplayerText.clientHeight + 'px';
-					}	
+					}
+					
+					toggleViewButtonAboveGrid.style.marginTop = clueDisplayer.style.height;
 				}
 
 			} else {
