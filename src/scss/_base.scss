@@ -234,8 +234,8 @@
 	.o-crossword-clues-wrapper {
 		position: relative;
 		margin-top: 2em;
-		padding-left: 1em;
-		padding-right: 1em;
+		padding-left: 1.5em;
+		padding-right: 1.5em;
 
 		@include oGridRespondTo(M) {
 			margin-top: 0;
@@ -387,6 +387,10 @@
 		@include oGridRespondTo(M) {
 			display: none;
 		}
+	}
+
+	.o-crossword-button-row {
+		margin-top: -1em;
 	}
 }
 
