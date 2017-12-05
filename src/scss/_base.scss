@@ -406,6 +406,21 @@
 		.o-crossword-user-answer {
 			margin-top: 0.5em;
 		}
+
+		@include oGridRespondTo(M) {
+			li span {
+				font-size: 1em;
+			}
+	
+			ul li {
+				margin-top: none;
+			}
+	
+			.o-crossword-clues-down:before,
+			.o-crossword-clues-across:before {
+				font-size: 1.2em;
+			}
+		}
     }
 
     .o-crossword-clues-two-columns {
