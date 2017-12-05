@@ -288,6 +288,8 @@
 		}
 
 		.o-crossword-user-answer {
+			margin-top: 0.5em;
+
 			input {
 				border:0;
 				display: inline-block;
@@ -386,7 +388,24 @@
 	}
 
 	.o-crossword-clues-single-column {
-        display: block;
+		display: block;
+		
+		li span {
+			font-size: 1.5em;
+		}
+
+		ul li {
+			margin-top: 1em;
+		}
+
+		.o-crossword-clues-down:before,
+		.o-crossword-clues-across:before {
+			font-size: 2em;
+		}
+		
+		.o-crossword-user-answer {
+			margin-top: 0.5em;
+		}
     }
 
     .o-crossword-clues-two-columns {
