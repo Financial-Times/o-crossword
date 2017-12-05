@@ -22,8 +22,8 @@
 
 	// scss-lint:disable QualifyingElement
 	@include oTypographyBody;
-	background-color: oColorsGetColorFor(o-crossword page, background);
-	@include oTypographySans(s);
+	@include oColorsFor(o-crossword, background);
+	@include oTypographySans(-2);
 	position: relative;
 	display: block;
 	max-width: 100%;
@@ -35,21 +35,16 @@
 
 	@include oGridRespondTo(M) {
 		display: flex;
+		flex-flow: wrap;
 
-		.o-crossword-clues-wrapper {
-			flex-grow: 1;
-			display: flex;
-		}
-
-		ul, li {
-			flex-basis: 18em;
-			flex-grow: 1;
+		li {
+			flex-basis: 20em;
 		}
 
 		ul {
 			display: flex;
-			flex-grow: 1;
 			flex-flow: wrap;
+			align-content: flex-start;
 
 			.o-crossword-clues-across, .o-crossword-clues-down {
 				display: block;
@@ -168,11 +163,16 @@
 			outline: none;
 			box-sizing: border-box;
 			background: rgba(0,0,0,0.2);
-			font-size: inherit;
+			font-size: 1.5rem;
     		text-transform: inherit;
     		max-width: none!important;
     		border-radius: 0;
     		padding: 0;
+		}
+
+		@include oGridRespondTo(M) {
+			margin-bottom: 1.5em;
+			margin-left: 1em;
 		}
 	}
 
@@ -181,6 +181,7 @@
 		border-spacing: 0;
 		font-size: 1.5rem;
 		margin: 0 auto;
+		@include oColorsFor(o-crossword-cell, background);		
 
 		td {
 			border: 1px solid;
@@ -232,19 +233,20 @@
 
 	.o-crossword-clues-wrapper {
 		position: relative;
-		width: 20em;
 		margin-top: 2em;
-		float: left;
+		padding-left: 1.5em;
+		padding-right: 1.5em;
 
 		@include oGridRespondTo(M) {
-			width: auto;
 			margin-top: 0;
+			width: 44em;	
+			float: left;		
 		}
 	}
 
 	.o-crossword-clues {
 		float: left;
-		max-width: 80vw;
+		display: flex;
 
 		&, ul {
 			list-style: none;
@@ -255,7 +257,7 @@
 			li {
 				line-height: 1.5em;
 				padding-bottom: 0.5em;
-				margin-left: 1em;
+				flex-grow: 1;				
 				cursor: pointer;
 				display: block;
 
@@ -286,6 +288,8 @@
 		}
 
 		.o-crossword-user-answer {
+			margin-top: 0.5em;
+
 			input {
 				border:0;
 				display: inline-block;
@@ -312,25 +316,38 @@
 			}
 		}
 
-		.o-crossword-clues-down:before {
-			content: 'Down';
+		.o-crossword-clues-down {
+			padding-left: 0.5em;
+		}
+		
+		.o-crossword-clues-across {
+			padding-right: 0.5em;
+		}
+		
+		.o-crossword-clues-down li:first-child,
+		.o-crossword-clues-across li:first-child {
+			margin-top: 1em;
+		}
+
+		.o-crossword-clues-down:before,
+		.o-crossword-clues-across:before {
 			line-height: 1.3em;
 			font-size: 1.2em;
-			padding-bottom: 0.5em;
+		}
+
+		.o-crossword-clues-down:before {
+			content: 'Down';		
 		}
 
 		.o-crossword-clues-across:before {
-			content: 'Across';
-			line-height: 1.3em;
-			font-size: 1.2em;
-			padding-bottom: 0.5em;
+			content: 'Across';			
 		}
 
 		@include oGridRespondTo(M) {
 			position: relative;
 			opacity: 1;
 			height: auto;
-			margin-left: 1em !important;
+			margin-left: 0.9em !important;			
 			box-shadow: none;
 			border: none;
 			transition: none;
@@ -360,9 +377,77 @@
 		margin: 20px 10px;
 		float: left;
 
+		&:first-child {
+			float: none;
+			margin-top: 80px;
+		}
+
+		&.visually_removed {
+			display: none;
+		}
+
 		@include oGridRespondTo(M) {
 			display: none;
 		}
 	}
+
+	.o-crossword-button-row {
+		margin-top: -1em;
+	}
+
+	.o-crossword-clues-single-column {
+		display: block;
+		
+		li span {
+			font-size: 1.5em;
+		}
+
+		ul li {
+			margin-top: 1em;
+		}
+
+		.o-crossword-clues-down {
+			padding-left: none;
+		}
+
+		.o-crossword-clues-across {
+			padding-right: none;
+		}
+
+		.o-crossword-clues-down:before,
+		.o-crossword-clues-across:before {
+			font-size: 2em;
+		}
+		
+		.o-crossword-user-answer {
+			margin-top: 0.5em;
+		}
+
+		@include oGridRespondTo(M) {
+			li span {
+				font-size: 1em;
+			}
+	
+			ul li {
+				margin-top: none;
+			}
+	
+			.o-crossword-clues-down:before,
+			.o-crossword-clues-across:before {
+				font-size: 1.2em;
+			}
+		}
+    }
+
+    .o-crossword-clues-two-columns {
+		display: flex;
+	}
+	
+	@include oGridRespondTo(M) {
+		.o-crossword-clues-single-column,
+		.o-crossword-clues-two-columns {
+			display: flex;
+		}
+	}		
 }
 
