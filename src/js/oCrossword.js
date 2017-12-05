@@ -1221,6 +1221,8 @@ OCrossword.prototype.assemble = function assemble() {
 				let desktopSize = gridTDs[0].getBoundingClientRect().width;
 				inputEl.style.width = desktopSize + "px";
 				inputEl.style.height = desktopSize + "px";
+
+				cluesEl.classList.add('o-crossword-clues-two-columns');
 			}
 			
 			if(!isCSSMobile(clueDisplayer)){
