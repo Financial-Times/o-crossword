@@ -1064,7 +1064,7 @@ OCrossword.prototype.assemble = function assemble() {
 			});
 
 			try {
-				let answerStoreID = this.parentElement.getAttribute('data-storage-id');
+				let answerStoreID = this.parentElement.parentElement.getAttribute('data-storage-id');
 				localStorage.removeItem(answerStoreID);
 			} catch(err){
 				console.log('Error trying to save state', err);
