@@ -1034,9 +1034,9 @@ OCrossword.prototype.assemble = function assemble() {
 				let linkName = gridItems[i].direction[0].toUpperCase() + gridItems[i].number + '-' + gridItems[i].answerPos;
 				targets.push(cluesEl.querySelector('input[data-link-identifier="'+linkName+'"]'));
 			}
-			
+
 			Array.from(targets).forEach((target) => {
-				target.value = letter;
+				target.value = letter.substr(0,1);
 				updateScreenReaderAnswer(target);
 			});
 		}
