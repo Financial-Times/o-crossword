@@ -62,7 +62,7 @@
 
 	.visually_hidden {
 		display: inline-block;
-		margin: -1px;
+		margin: -1px !important;
 	    overflow: hidden;
 	    padding: 0;
 	    width: 1px;

@@ -1153,7 +1153,13 @@ OCrossword.prototype.assemble = function assemble() {
 			magicInput.style.display = 'none';
 
 			//update grid size to fill 100% on mobile view
-			const fullWidth = Math.min(window.innerHeight, window.innerWidth);
+			let fullWidth;
+			if (isAndroid()) {
+				fullWidth = Math.min(window.screen.height, window.screen.width);			
+			} else {
+				fullWidth = Math.min(window.innerHeight, window.innerWidth);				
+			}
+			
 			this.rootEl.width = fullWidth + 'px !important';
 			const gridTDs = gridEl.querySelectorAll('td');
 			const gridSize = gridEl.querySelectorAll('tr').length;
@@ -1164,7 +1170,7 @@ OCrossword.prototype.assemble = function assemble() {
 				for (let i = 0; i < gridTDs.length; i++) {
 					let td = gridTDs[i];
 					td.style.width = Math.min(newTdWidth, cellSizeMax) + "px";
-					td.style.height = Math.min(newTdWidth, cellSizeMax) + "px";
+					td.style.height = Math.min(newTdWidth, cellSizeMax) + "px";			
 					td.style.maxWidth = "initial";
 					td.style.minWidth = "initial";
 				}
