@@ -1138,12 +1138,15 @@ OCrossword.prototype.assemble = function assemble() {
 		}
 
 		const onResize = function onResize(init) {
+			console.log('::onResize::');
 			const cellSizeMax = 40;
 			
 			if (window.innerWidth <= 739) {
 				isMobile = true;
 			} else if (window.innerWidth > window.innerHeight && window.innerWidth <=739 ) { //rotated phones and small devices, but not iOS
 				isMobile = true;
+			} else {
+				isMobile = false;
 			}
 
 			if(isMobile && !!init) {
