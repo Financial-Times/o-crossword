@@ -23,7 +23,7 @@
 	// scss-lint:disable QualifyingElement
 	@include oTypographyBody;
 	@include oColorsFor(o-crossword, background);
-	@include oTypographySans(-2);
+	@include oTypographySans(-1);
 	position: relative;
 	display: block;
 	max-width: 100%;
@@ -67,6 +67,8 @@
 	    padding: 0;
 	    width: 1px;
 	    height: 1px;
+	    min-height: 0;
+	    min-width: 0;
 	}
 
 	.o-crossword-clue-displayer {

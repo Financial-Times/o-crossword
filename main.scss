@@ -1,8 +1,10 @@
 $o-crossword-is-silent: true !default;
+$o-buttons-is-silent: false;
 
 @import "o-colors/main";
 @import "o-grid/main";
 @import "o-typography/main";
+@import "o-buttons/main";
 
 @import "src/scss/variables";
 @import "src/scss/color-use-cases";
