@@ -7,6 +7,7 @@
 
 const debounce = require('o-viewport/src/utils').debounce;
 const crosswordParser = require('./crossword_parser');
+const oTracking = require('o-tracking');
 
 function prevAll(node) {
 	const nodes = Array.from(node.parentNode.children);
@@ -404,6 +405,7 @@ function getLetterIndex(gridEl, cell, number, direction) {
 }
 
 OCrossword.prototype.assemble = function assemble() {
+	initTracking(this.rootEl.parentElement.getAttribute('data-o-crossword-title'));
 	const gridEl = this.rootEl.querySelector('table');
 	const cluesEl = this.rootEl.querySelector('ul.o-crossword-clues');
 	const gridMap = new Map();
@@ -614,6 +616,9 @@ OCrossword.prototype.assemble = function assemble() {
 					}); //a11y fix for screen reader
 				}
 
+				const clueId = currentlySelectedGridItem.direction[0].toUpperCase() + currentlySelectedGridItem.number;
+				trackEvent({action: 'gridInput', clueId: clueId, letterId: currentlySelectedGridItem.answerPos});
+
 				progress();
 			} else {
 				return;
@@ -704,11 +709,15 @@ OCrossword.prototype.assemble = function assemble() {
 			}
 
 			if((e.keyCode >= 65 && e.keyCode <= 90) || isAndroid()) {
+
 				if(!isAndroid()) {
 					e.target.value = String.fromCharCode(e.keyCode);
 				}
 
 				e.target.select();
+				
+				const identifier = e.target.getAttribute('data-link-identifier').split('-');
+				trackEvent({action: 'clueInput', clueId: identifier[0], letterId: identifier[1]});
 
 				setTimeout(function(){
 					nextInput(e.target, 1);
@@ -1051,6 +1060,8 @@ OCrossword.prototype.assemble = function assemble() {
 		}.bind(this);
 
 		function clearAnswers(e) {
+			trackEvent({action: 'clearAnswers'});
+
 			resetButton.classList.add('hidden');
 			let inputs = cluesEl.querySelectorAll('input');
 			let cells = gridEl.querySelectorAll('td:not(.empty)');
@@ -1073,6 +1084,8 @@ OCrossword.prototype.assemble = function assemble() {
 
 		function toggleMobileViews(e) {
 			isGridView = !isGridView;
+
+			trackEvent({action: 'viewToggle', view: isGridView?'grid':'list'});
 
 			let buttonText = isGridView?'List view':'Grid view';
 			toggleViewButtonAboveGrid.textContent = buttonText;			
@@ -1098,6 +1111,8 @@ OCrossword.prototype.assemble = function assemble() {
 
 		function toggleColumnView(e) {
 			isSingleColumnView = !isSingleColumnView;
+
+			trackEvent({action: 'columnToggle', column: isSingleColumnView?'single':'double'})
 
 			let buttonText = isSingleColumnView?'Two Columns':'Single Column';
 			toggleColumnsButton.textContent = buttonText;
@@ -1348,6 +1363,16 @@ OCrossword.prototype.assemble = function assemble() {
 					isTab = false;
 				}
 			}
+
+			if(target!== null) {
+				if(target.getAttribute('data-link-identifier')) {
+					const focus = target.getAttribute('data-link-identifier').split('-');
+					trackEvent({action: 'focusClueInput', clueId: focus[0], letterId: focus[1]})
+				} else{
+					const identifier = currentlySelectedGridItem.direction[0].toUpperCase() + currentlySelectedGridItem.number;
+					trackEvent({action: 'focusCell', clueId: identifier, letterId: currentlySelectedGridItem.answerPos});
+				}
+			}
 		}.bind(this);
 
 		const navigateClues = function navigateClues (e) {
@@ -1448,4 +1473,34 @@ function isEquivalent(a, b) {
     }
 
     return true;
+}
+
+function initTracking(id) {
+	const config_data = {
+        server: 'https://spoor-api.ft.com/px.gif',
+        context: {
+            product: 'o-crossword',
+            crosswordNumber: id
+        },
+        user: {
+            ft_session: oTracking.utils.getValueFromCookie(/FTSession=([^;]+)/)
+        }
+    }
+
+	oTracking.init(config_data);
+	oTracking.page({});
+}
+
+function trackEvent(action) {
+	document.body.dispatchEvent(new CustomEvent('oTracking.event', {
+		detail: {
+			action: action.action,
+			view: action.view,
+			column: action.column,
+			clueId: action.clueId,
+			letterId: action.letterId,
+			category: 'o-crossword'
+		},
+		bubbles: true
+	}));
 }
