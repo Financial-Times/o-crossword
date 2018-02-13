@@ -405,7 +405,6 @@ function getLetterIndex(gridEl, cell, number, direction) {
 }
 
 OCrossword.prototype.assemble = function assemble() {
-	initTracking(this.rootEl.parentElement.getAttribute('data-o-crossword-title'));
 	const gridEl = this.rootEl.querySelector('table');
 	const cluesEl = this.rootEl.querySelector('ul.o-crossword-clues');
 	const gridMap = new Map();
@@ -498,6 +497,8 @@ OCrossword.prototype.assemble = function assemble() {
 			isSingleColumnView = JSON.parse(localStorage.getItem('FT-crossword_columns'));
 		}
 
+		initTracking(this.rootEl.parentElement.getAttribute('data-o-crossword-title'), isGridView, isSingleColumnView);
+
 		const buttonRow = document.createElement('div');
 		buttonRow.classList.add('o-crossword-button-row');
 		this.rootEl.insertBefore(buttonRow, wrapper);			
@@ -539,6 +540,8 @@ OCrossword.prototype.assemble = function assemble() {
 
 		this.addEventListener(toggleViewButtonBottom, 'click', toggleMobileViews);
 		this.rootEl.appendChild(toggleViewButtonBottom, wrapper);
+
+		console.log('::IS MOBILE??::', isMobile);
 
 		function constructInputIdentifier(data, direction) {
 			let identifier;
@@ -1475,7 +1478,7 @@ function isEquivalent(a, b) {
     return true;
 }
 
-function initTracking(id) {
+function initTracking(id, view, column) {
 	const config_data = {
         server: 'https://spoor-api.ft.com/px.gif',
         context: {
@@ -1488,7 +1491,10 @@ function initTracking(id) {
     }
 
 	oTracking.init(config_data);
-	oTracking.page({});
+	oTracking.page({
+		preferredView: `${view?'grid':'list'}`,
+		preferredColumn: `${column?'single':'double'}`
+	});
 }
 
 function trackEvent(action) {
