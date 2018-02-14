@@ -502,44 +502,42 @@ OCrossword.prototype.assemble = function assemble() {
 		this.rootEl.insertBefore(buttonRow, wrapper);			
 
 		const resetButton = document.createElement('button');
-		resetButton.classList.add('o-crossword-reset');
+		resetButton.classList.add('o-crossword-reset', 'o-buttons', 'o-buttons--mono');
 		if(answersEmpty() || isAnswerVersion) {
 			resetButton.classList.add('hidden');
 		}
-		resetButton.textContent = 'Clear answers';
+		resetButton.textContent = 'Clear all';
 
 		this.addEventListener(resetButton, 'click', clearAnswers);
 		buttonRow.appendChild(resetButton);
 
 		const toggleViewButtonAboveGrid = document.createElement('button');
-		toggleViewButtonAboveGrid.classList.add('o-crossword-mobile-toggle');
+		toggleViewButtonAboveGrid.classList.add('o-crossword-mobile-toggle', 'o-buttons', 'o-buttons--mono');
 		toggleViewButtonAboveGrid.textContent = isGridView?'List view':'Grid view';
 
 		this.addEventListener(toggleViewButtonAboveGrid, 'click', toggleMobileViews);
 		this.rootEl.insertBefore(toggleViewButtonAboveGrid, gridWrapper);
 
 		const toggleViewButtonTop = document.createElement('button');
-		toggleViewButtonTop.classList.add('o-crossword-mobile-toggle');
+		toggleViewButtonTop.classList.add('o-crossword-mobile-toggle', 'o-buttons', 'o-buttons--mono');
 		toggleViewButtonTop.textContent = isGridView?'List view':'Grid view';
 
 		this.addEventListener(toggleViewButtonTop, 'click', toggleMobileViews);
 		buttonRow.appendChild(toggleViewButtonTop);	
 		
 		const toggleColumnsButton = document.createElement('button');
-		toggleColumnsButton.classList.add('o-crossword-mobile-toggle');
-		toggleColumnsButton.textContent = isSingleColumnView?'Two Columns':'Single Column';
+		toggleColumnsButton.classList.add('o-crossword-mobile-toggle', 'o-buttons', 'o-buttons--mono');
+		toggleColumnsButton.textContent = isSingleColumnView?'2 col':'1 col';
 
 		this.addEventListener(toggleColumnsButton, 'click', toggleColumnView);
 		buttonRow.appendChild(toggleColumnsButton);	
 
 		const toggleViewButtonBottom = document.createElement('button');
-		toggleViewButtonBottom.classList.add('o-crossword-mobile-toggle');
+		toggleViewButtonBottom.classList.add('o-crossword-mobile-toggle', 'o-buttons', 'o-buttons--mono');
 		toggleViewButtonBottom.textContent = isGridView?'List view':'Grid view';
 
 		this.addEventListener(toggleViewButtonBottom, 'click', toggleMobileViews);
 		this.rootEl.appendChild(toggleViewButtonBottom, wrapper);
-
-		console.log('::IS MOBILE??::', isMobile);
 
 		function constructInputIdentifier(data, direction) {
 			let identifier;
@@ -1093,7 +1091,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 			trackEvent({action: 'columnToggle', column: isSingleColumnView?'single':'double'})
 
-			let buttonText = isSingleColumnView?'Two Columns':'Single Column';
+			let buttonText = isSingleColumnView?'2 col':'1 col';
 			toggleColumnsButton.textContent = buttonText;
 
 			if (isSingleColumnView) {
