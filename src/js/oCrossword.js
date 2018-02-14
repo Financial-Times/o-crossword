@@ -183,8 +183,7 @@ function buildGrid(
 
 			if(answerStore && !(/^[*,\-]+$/).test(answerStore.across[index])) {
 				let srAnswer = answerStore.across[index];
-				srAnswer = srAnswer.split('*').join(' blank ');
-				tempSpan.querySelector('.sr-answer').textContent = 'Your answer: ' + srAnswer + '.';	
+				tempSpan.querySelector('.sr-answer').textContent = joinBlanks(srAnswer, 1);
 			}
 
 			acrossEl.appendChild(tempLi);
@@ -256,8 +255,7 @@ function buildGrid(
 
 			if(answerStore && !(/^[*,\-]+$/).test(answerStore.down[index])) {
 				let srAnswer = answerStore.down[index];
-				srAnswer = srAnswer.split('*').join(' blank ');
-				tempSpan.querySelector('.sr-answer').textContent = 'Your answer: ' + srAnswer + '.';	
+				tempSpan.querySelector('.sr-answer').textContent = joinBlanks(srAnswer, 1);	
 			}
 
 			downEl.appendChild(tempLi);
@@ -1008,30 +1006,8 @@ OCrossword.prototype.assemble = function assemble() {
 				}
 			}
 
-			let combineCount = 0;
-			let combinedValue = [];
-
-			for(let i = 0; i < answerValue.length; ++i) {
-				if(answerValue[i] === '*') {
-					++combineCount;
-					if((i < answerValue.length - 1 && answerValue[i + 1] !== '*') || i === answerValue.length - 1) {
-						if(combineCount > 1) {
-							combinedValue.push(" " + combineCount + " blanks ");
-						} else {
-							combinedValue.push(" blank ");
-						}
-					}
-				} else {	
-					combineCount = 0;
-					combinedValue.push(answerValue[i]);
-				}
-			}
-
-			if(filledCount > 0) {
-				screenReaderAnswer.textContent = 'Your Answer: ' + combinedValue.join('') + '.';
-			} else {
-				screenReaderAnswer.textContent = '';
-			}
+			screenReaderAnswer.textContent = joinBlanks(answerValue, filledCount);
+			
 
 			if(dataGrid && dataGrid.defSync) {
 				let syncTarget = cluesEl.querySelector('input[data-link-identifier=' + dataGrid.defSyncInput + ']');
@@ -1141,7 +1117,6 @@ OCrossword.prototype.assemble = function assemble() {
 		}
 
 		const onResize = function onResize(init) {
-			console.log('::onResize::');
 			const cellSizeMax = 40;
 			
 			if (window.innerWidth <= 739) {
@@ -1512,4 +1487,31 @@ function trackEvent(action) {
 		},
 		bubbles: true
 	}));
+}
+
+function joinBlanks (answerValue, filledCount) {
+	let combineCount = 0;
+	let combinedValue = [];
+
+	for(let i = 0; i < answerValue.length; ++i) {
+		if(answerValue[i] === '*') {
+			++combineCount;
+			if((i < answerValue.length - 1 && answerValue[i + 1] !== '*') || i === answerValue.length - 1) {
+				if(combineCount > 1) {
+					combinedValue.push(" " + combineCount + " blanks ");
+				} else {
+					combinedValue.push(" blank ");
+				}
+			}
+		} else {	
+			combineCount = 0;
+			combinedValue.push(answerValue[i]);
+		}
+	}
+
+	if(filledCount > 0) {
+		return 'Your Answer: ' + combinedValue.join('') + '.';
+	}
+	
+	return '';
 }
