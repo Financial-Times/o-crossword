@@ -34,18 +34,6 @@
 			"template": "demos/src/answered.mustache",
 			"expanded": false,
 			"description": ""
-		},
-		{
-			"name": "pre-compiled",
-			"template": "demos/src/pre-compiled.mustache",
-			"expanded": false,
-			"description": ""
-		},
-		{
-			"name": "force-compact",
-			"template": "demos/src/force-compact.mustache",
-			"expanded": false,
-			"description": "Force a compact view even on desktops."
 		}
 	]
 }
