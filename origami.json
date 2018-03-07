@@ -4,6 +4,10 @@
 	"origamiVersion": 1,
 	"support": "https://github.com/ftlabs/o-crossword/issues",
 	"supportStatus": "experimental",
+	"supportContact": {
+		"email": "ftlabs@ft.com",
+		"slack": "financialtimes/ftlabs"
+	},
 	"ci": {
 		"circle": "https://circleci.com/api/v1/project/ftlabs/o-crossword"
 	},
