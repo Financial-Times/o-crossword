@@ -916,6 +916,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 		function setClue(number, direction) {
 			const el = cluesEl.querySelector(`li[data-o-crossword-number="${number}"][data-o-crossword-direction="${direction}"]`);
+
 			if (el) {
 				el.classList.add('featured');
 				clueDisplayerText.innerHTML = el.querySelector('span').innerHTML;
@@ -941,6 +942,10 @@ OCrossword.prototype.assemble = function assemble() {
 			const els = Array.from(gridEl.querySelectorAll('td[data-o-crossword-highlighted]'));
 
 			for (const o of els) {
+				if(o.classList.contains('receiving-input')) {
+					o.textContent = magicInput.value;
+					o.classList.remove('receiving-input');
+				}
 				delete o.dataset.oCrosswordHighlighted;
 			}
 
