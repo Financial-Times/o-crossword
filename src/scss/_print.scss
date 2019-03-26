@@ -1,5 +1,6 @@
 // sass-lint:disable no-qualifying-elements, no-important, no-vendor-prefixes
-@media print {
+@mixin _oCrosswordPrint () {
+	@media print {
 	@page {
 		margin: 1cm 0.5cm;
 	}
@@ -139,5 +140,6 @@
 
 	.o-crossword-reset {
 		display: none;
+	}
 	}
 }

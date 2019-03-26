@@ -493,7 +493,7 @@ OCrossword.prototype.assemble = function assemble() {
 		this.rootEl.insertBefore(buttonRow, wrapper);
 
 		const resetButton = document.createElement('button');
-		resetButton.classList.add('o-crossword-reset', 'o-buttons', 'o-buttons--mono');
+		resetButton.classList.add('o-crossword-reset', 'o-buttons', 'o-crossword-button');
 		if(answersEmpty() || isAnswerVersion) {
 			resetButton.classList.add('hidden');
 		}
@@ -503,28 +503,28 @@ OCrossword.prototype.assemble = function assemble() {
 		buttonRow.appendChild(resetButton);
 
 		const toggleViewButtonAboveGrid = document.createElement('button');
-		toggleViewButtonAboveGrid.classList.add('o-crossword-mobile-toggle', 'o-buttons', 'o-buttons--mono');
+		toggleViewButtonAboveGrid.classList.add('o-crossword-mobile-toggle', 'o-buttons', 'o-crossword-button');
 		toggleViewButtonAboveGrid.textContent = isGridView?'List view':'Grid view';
 
 		this.addEventListener(toggleViewButtonAboveGrid, 'click', toggleMobileViews);
 		this.rootEl.insertBefore(toggleViewButtonAboveGrid, gridWrapper);
 
 		const toggleViewButtonTop = document.createElement('button');
-		toggleViewButtonTop.classList.add('o-crossword-mobile-toggle', 'o-buttons', 'o-buttons--mono');
+		toggleViewButtonTop.classList.add('o-crossword-mobile-toggle', 'o-buttons', 'o-crossword-button');
 		toggleViewButtonTop.textContent = isGridView?'List view':'Grid view';
 
 		this.addEventListener(toggleViewButtonTop, 'click', toggleMobileViews);
 		buttonRow.appendChild(toggleViewButtonTop);
 
 		const toggleColumnsButton = document.createElement('button');
-		toggleColumnsButton.classList.add('o-crossword-mobile-toggle', 'o-buttons', 'o-buttons--mono');
+		toggleColumnsButton.classList.add('o-crossword-mobile-toggle', 'o-buttons', 'o-crossword-button');
 		toggleColumnsButton.textContent = isSingleColumnView?'2 col':'1 col';
 
 		this.addEventListener(toggleColumnsButton, 'click', toggleColumnView);
 		buttonRow.appendChild(toggleColumnsButton);
 
 		const toggleViewButtonBottom = document.createElement('button');
-		toggleViewButtonBottom.classList.add('o-crossword-mobile-toggle', 'o-buttons', 'o-buttons--mono');
+		toggleViewButtonBottom.classList.add('o-crossword-mobile-toggle', 'o-buttons', 'o-crossword-button');
 		toggleViewButtonBottom.textContent = isGridView?'List view':'Grid view';
 
 		this.addEventListener(toggleViewButtonBottom, 'click', toggleMobileViews);

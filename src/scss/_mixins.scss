@@ -11,4 +11,8 @@
 	.#{$classname} {
 		@include oCrosswordBase;
 	}
+	@include _oCrosswordOrientation;
+	@include _oCrosswordPrint;
+	@include _oCrosswordMobile;
+
 }

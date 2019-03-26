@@ -1,6 +1,4 @@
 $o-crossword-is-silent: true !default;
-$o-buttons-is-silent: false;
-
 @import "o-colors/main";
 @import "o-grid/main";
 @import "o-typography/main";
@@ -12,6 +10,7 @@ $o-buttons-is-silent: false;
 @import "src/scss/base";
 @import "src/scss/orientation";
 @import "src/scss/print";
+@import "src/scss/mobile";
 
 @if ($o-crossword-is-silent == false) {
 	@include oCrosswordAll;
@@ -20,4 +19,3 @@ $o-buttons-is-silent: false;
 	$o-crossword-is-silent: true !global;
 }
 
-@import "src/scss/mobile";

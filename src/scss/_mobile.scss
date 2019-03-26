@@ -1,5 +1,6 @@
 // sass-lint:disable no-vendor-prefixes
-@media screen and (max-width: $break-phone) {
+@mixin _oCrosswordMobile () {
+    @media screen and (max-width: $break-phone) {
     .o-crossword table, 
     .o-crossword .o-crossword-grid-wrapper .o-crossword-magic-input {
         font-size: 1.2rem;
@@ -56,5 +57,6 @@
                 margin: 0 10%;
             }
         }
+    }
     }
 }
