@@ -58,7 +58,7 @@ function buildGrid(
 	const cluesEl = rootEl.querySelector('ul.o-crossword-clues');
 	const {cols, rows} = size;
 	const emptyCell = rootEl.querySelector('.empty-fallback');
-	let answerStore, isStorage;
+	let answerStore; let isStorage;
 	const cookie = 'FT-crossword_' + name.split(/[ ,]+/).join('');
 
 	expireStorage();
@@ -72,7 +72,7 @@ function buildGrid(
 				"across": [],
 				"down": [],
 				"timestamp": Date.now()
-			}
+			};
 
 			isStorage = false;
 		}
@@ -134,19 +134,19 @@ function buildGrid(
 			tempLi.dataset.oCrosswordClueId = index;
 
 
-			for(var i = 0; i < answerLength; ++i) {
-				let tempInput = document.createElement('input');
+			for(let i = 0; i < answerLength; ++i) {
+				const tempInput = document.createElement('input');
 				tempInput.setAttribute('maxlength', 1);
 				tempInput.setAttribute('data-link-identifier', 'A' + across[0] + '-' + i);
 				tempInput.setAttribute('tabindex', -1);
 				if(answers) {
-					let val = (answers.across[index][i] === '*')?'':answers.across[index][i];
+					const val = (answers.across[index][i] === '*')?'':answers.across[index][i];
 					tempInput.value = val;
 				}
 
 				if(answerStore) {
 					if(isStorage) {
-						let val = (answerStore.across[index][i] === '*')?'':answerStore.across[index][i];
+						const val = (answerStore.across[index][i] === '*')?'':answerStore.across[index][i];
 						tempInput.value = val;
 					} else {
 						if(answerStore.across[index] === undefined) {
@@ -159,10 +159,10 @@ function buildGrid(
 				let count = 0;
 
 				if(across[3].length > 1) {
-					for(var j = 0; j < across[3].length; ++j) {
+					for(let j = 0; j < across[3].length; ++j) {
 						if(j%2 === 1) {
 							count += parseInt(across[3][j-1]);
-							let separator = document.createElement('span');
+							const separator = document.createElement('span');
 							separator.classList.add('separator');
 
 							if(across[3][j] === '-') {
@@ -182,7 +182,7 @@ function buildGrid(
 			}
 
 			if(answerStore && !(/^[*,\-]+$/).test(answerStore.across[index])) {
-				let srAnswer = answerStore.across[index];
+				const srAnswer = answerStore.across[index];
 				tempSpan.querySelector('.sr-answer').textContent = joinBlanks(srAnswer, 1);
 			}
 
@@ -205,20 +205,20 @@ function buildGrid(
 			tempLi.dataset.oCrosswordDirection = 'down';
 			tempLi.dataset.oCrosswordClueId = clues.across.length + index;
 
-			for(var i = 0; i < answerLength; ++i) {
-				let tempInput = document.createElement('input');
+			for(let i = 0; i < answerLength; ++i) {
+				const tempInput = document.createElement('input');
 				tempInput.setAttribute('maxlength', 1);
 				tempInput.setAttribute('data-link-identifier', 'D' + down[0] + '-' + i);
 				tempInput.setAttribute('tabindex', -1);
 
 				if(answers) {
-					let val = (answers.down[index][i] === '*')?'':answers.down[index][i];
+					const val = (answers.down[index][i] === '*')?'':answers.down[index][i];
 					tempInput.value = val;
 				}
 
 				if(answerStore) {
 					if(isStorage) {
-						let val = (answerStore.down[index][i] === '*')?'':answerStore.down[index][i];
+						const val = (answerStore.down[index][i] === '*')?'':answerStore.down[index][i];
 						tempInput.value = val;
 					} else {
 						if(answerStore.down[index] === undefined) {
@@ -231,10 +231,10 @@ function buildGrid(
 				let count = 0;
 
 				if(down[3].length > 1) {
-					for(var j = 0; j < down[3].length; ++j) {
+					for(let j = 0; j < down[3].length; ++j) {
 						if(j%2 === 1) {
 							count += parseInt(down[3][j-1]);
-							let separator = document.createElement('span');
+							const separator = document.createElement('span');
 							separator.classList.add('separator');
 
 							if(down[3][j] === '-') {
@@ -254,7 +254,7 @@ function buildGrid(
 			}
 
 			if(answerStore && !(/^[*,\-]+$/).test(answerStore.down[index])) {
-				let srAnswer = answerStore.down[index];
+				const srAnswer = answerStore.down[index];
 				tempSpan.querySelector('.sr-answer').textContent = joinBlanks(srAnswer, 1);	
 			}
 
@@ -265,12 +265,12 @@ function buildGrid(
 	}
 
 	if (answers || answerStore) {
-		let target = (answers)?answers:answerStore;
+		const target = (answers)?answers:answerStore;
 		clues.across.forEach(function acrossForEach(across, i) {
 			const answer = target.across[i];
 			const answerLength = answer.length;
 			getGridCellsByNumber(gridEl, across[0], 'across', answerLength).forEach((td, i) => {
-				let val = (answer[i] === '*')?'':answer[i];
+				const val = (answer[i] === '*')?'':answer[i];
 				td.textContent = val;
 			});
 		});
@@ -279,7 +279,7 @@ function buildGrid(
 			const answer = target.down[i];
 			const answerLength = answer.length;
 			getGridCellsByNumber(gridEl, down[0], 'down', answerLength).forEach((td, i) => {
-				let val = (answer[i] === '*')?'':answer[i];
+				const val = (answer[i] === '*')?'':answer[i];
 				td.textContent = val;
 			});
 		});
@@ -295,25 +295,17 @@ function expireStorage() {
 	const ts = Date.now();
 
 	for (let i = 0; i < localStorage.length; i++){
-	    if (localStorage.key(i).substring(0,12) == 'FT-crossword') {
-	    	let storedItem = JSON.parse(localStorage.getItem(localStorage.key(i)));
-	    	let difference = ts - storedItem.timestamp;
+	    if (localStorage.key(i).substring(0,12) === 'FT-crossword') {
+	    	const storedItem = JSON.parse(localStorage.getItem(localStorage.key(i)));
+	    	const difference = ts - storedItem.timestamp;
 
-	    	let daysCreated = difference/1000/60/60/24;
+	    	const daysCreated = difference/1000/60/60/24;
 
 	    	if(daysCreated > 28) {
 	    		localStorage.removeItem(localStorage.key(i));
 	    	}
 	    }
 	}
-}
-
-function getRelativeCenter(e, el) {
-	const bb = el.getBoundingClientRect();
-	e.relativeCenter = {
-		x: e.center.x - bb.left,
-		y: e.center.y - bb.top,
-	};
 }
 
 function OCrossword(rootEl) {
@@ -335,7 +327,7 @@ function OCrossword(rootEl) {
 				- parse, generate data struct
 				- render
 			*/
-			let p = new Promise( (resolve) => {
+			new Promise( (resolve) => {
 				if (this.rootEl.dataset.oCrosswordData.startsWith('http')) {
 					return fetch(this.rootEl.dataset.oCrosswordData)
 						.then(res => resolve(res.text()));
@@ -391,7 +383,7 @@ function getGridCellsByNumber(gridEl, number, direction, length) {
 }
 
 function getLetterIndex(gridEl, cell, number, direction) {
-	let el = gridEl.querySelector(`td[data-o-crossword-number="${number}"]`);
+	const el = gridEl.querySelector(`td[data-o-crossword-number="${number}"]`);
 
 	if(direction === 'across') {
 		return cell.cellIndex - el.cellIndex;
@@ -422,15 +414,13 @@ OCrossword.prototype.assemble = function assemble() {
 	}
 
 	let currentlySelectedGridItem = null;	
-	let answerStore = JSON.parse(this.rootEl.getAttribute('data-storage'));
+	const answerStore = JSON.parse(this.rootEl.getAttribute('data-storage'));
 	const isAnswerVersion = JSON.parse(this.rootEl.getAttribute('data-answer-version'));
 
 
 	if (cluesEl) {
 		let currentClue = -1;
 		const cluesTotal = parseInt(this.rootEl.parentElement.getAttribute('data-o-crossword-clue-length')) - 1;
-
-		const cluesUlEls = Array.from(cluesEl.querySelectorAll('ul'));
 
 		const gridWrapper = document.createElement('div');
 		gridWrapper.classList.add('o-crossword-grid-wrapper');
@@ -607,7 +597,7 @@ OCrossword.prototype.assemble = function assemble() {
 				if(!isAndroid()) {
 					magicInput.value = String.fromCharCode(e.keyCode);
 
-					let last = gridMap.get(magicInputTargetEl);
+					const last = gridMap.get(magicInputTargetEl);
 					Array.from(last).forEach(cell => {
 						if(parseInt(cell.answerLength) - cell.answerPos === 1) {
 							e.target.select();
@@ -649,12 +639,12 @@ OCrossword.prototype.assemble = function assemble() {
 						}
 					}
 
-					let nextFocus = cluesEl.querySelector('li[data-o-crossword-clue-id="'+ currentClue +'"]');
+					const nextFocus = cluesEl.querySelector('li[data-o-crossword-clue-id="'+ currentClue +'"]');
 					nextFocus.focus();
 				}
 
 				if(e.keyCode === 13) {
-					let inputs = e.target.querySelectorAll('input');
+					const inputs = e.target.querySelectorAll('input');
 					Array.from(inputs).forEach(input => {
 						input.setAttribute('tabindex', 1);
 					});
@@ -734,7 +724,7 @@ OCrossword.prototype.assemble = function assemble() {
 				gridSync.grid.textContent = e.target.value;
 
 				if(!!gridSync.defSync) {
-					let defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
+					const defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
 					defSync.value = e.target.value;
 				}
 
@@ -776,8 +766,8 @@ OCrossword.prototype.assemble = function assemble() {
 			magicInput.value ='';
 			magicInput.style.display = 'none';
 
-			let def = e.target.parentElement.parentElement;
-			let targetClue = {
+			const def = e.target.parentElement.parentElement;
+			const targetClue = {
 				'number': def.getAttribute('data-o-crossword-number'),
 				'direction': def.getAttribute('data-o-crossword-direction'),
 				'answerLength': def.getAttribute('data-o-crossword-answer-length')
@@ -824,19 +814,19 @@ OCrossword.prototype.assemble = function assemble() {
 		}
 
 		function nextInput(source, direction) {
-			let inputID = source.getAttribute('data-link-identifier');
-			let inputGroup = document.querySelectorAll('input[data-link-identifier^="' + inputID.split('-')[0] +'-"]');
+			const inputID = source.getAttribute('data-link-identifier');
+			const inputGroup = document.querySelectorAll('input[data-link-identifier^="' + inputID.split('-')[0] +'-"]');
 			let currentInput = inputID.split('-')[1];
-			let newInput = (direction === 1)?++currentInput:--currentInput;
+			const newInput = (direction === 1)?++currentInput:--currentInput;
 
 			if(newInput >= 0 && newInput < inputGroup.length) {
-				let next = cluesEl.querySelector('input[data-link-identifier="' + inputID.split('-')[0] +'-'+ newInput+'"]');
+				const next = cluesEl.querySelector('input[data-link-identifier="' + inputID.split('-')[0] +'-'+ newInput+'"]');
 				next.focus();
 				next.select();
 			} else {
 				source.blur();
-				let def = source.parentElement.parentElement;
-				let inputs = cluesEl.querySelectorAll('input');
+				const def = source.parentElement.parentElement;
+				const inputs = cluesEl.querySelectorAll('input');
 				Array.from(inputs).forEach(input => {
 					input.setAttribute('tabindex', -1);
 				});
@@ -850,7 +840,7 @@ OCrossword.prototype.assemble = function assemble() {
 						}
 					}
 
-					let nextFocus = cluesEl.querySelector('li[data-o-crossword-clue-id="'+ currentClue +'"]');
+					const nextFocus = cluesEl.querySelector('li[data-o-crossword-clue-id="'+ currentClue +'"]');
 					nextFocus.focus();
 
 				} else {
@@ -892,10 +882,10 @@ OCrossword.prototype.assemble = function assemble() {
 			const defNum = inputIdentifier.slice(1,inputIdentifier.length).split('-')[0];
 			const defIndex = parseInt(inputIdentifier.split('-')[1]);
 
-			let selectedCell = {};
+			const selectedCell = {};
 
 			for(const entry of gridMap) {
-				let cellData = entry[1];
+				const cellData = entry[1];
 				for(let i = 0; i < cellData.length; ++i) {
 					if(
 						cellData[i].direction === defDirection &&
@@ -979,10 +969,9 @@ OCrossword.prototype.assemble = function assemble() {
 
 		function updateScreenReaderAnswer(target, dataGrid) {
 			const targetData = target.parentNode.parentNode;
-			const answerLength = parseInt(targetData.getAttribute('data-o-crossword-answer-length'));
 			const inputs = targetData.querySelectorAll('input');
 			const screenReaderAnswer = targetData.querySelector('.sr-answer');
-			let answerValue = [];
+			const answerValue = [];
 			let filledCount = 0;
 
 			Array.from(inputs).forEach(input => {
@@ -1013,16 +1002,16 @@ OCrossword.prototype.assemble = function assemble() {
 			
 
 			if(dataGrid && dataGrid.defSync) {
-				let syncTarget = cluesEl.querySelector('input[data-link-identifier=' + dataGrid.defSyncInput + ']');
+				const syncTarget = cluesEl.querySelector('input[data-link-identifier=' + dataGrid.defSyncInput + ']');
 				updateScreenReaderAnswer(syncTarget);
 			}
 		}
 
 		function syncPartialClue(letter, src, index) {
 			const gridItems = gridMap.get(src[index]);
-			let targets = [];
+			const targets = [];
 			for(let i = 0; i < gridItems.length; ++i) {
-				let linkName = gridItems[i].direction[0].toUpperCase() + gridItems[i].number + '-' + gridItems[i].answerPos;
+				const linkName = gridItems[i].direction[0].toUpperCase() + gridItems[i].number + '-' + gridItems[i].answerPos;
 				targets.push(cluesEl.querySelector('input[data-link-identifier="'+linkName+'"]'));
 			}
 
@@ -1034,19 +1023,19 @@ OCrossword.prototype.assemble = function assemble() {
 
 		const saveLocal = function saveLocal() {
 			try {
-				let answerStoreID = this.rootEl.getAttribute('data-storage-id');
+				const answerStoreID = this.rootEl.getAttribute('data-storage-id');
 				localStorage.setItem(answerStoreID, JSON.stringify( answerStore ) );
 			} catch(err){
 				console.log('Error trying to save state', err);
 			}
 		}.bind(this);
 
-		function clearAnswers(e) {
+		function clearAnswers() {
 			trackEvent({action: 'clearAnswers'});
 
 			resetButton.classList.add('hidden');
-			let inputs = cluesEl.querySelectorAll('input');
-			let cells = gridEl.querySelectorAll('td:not(.empty)');
+			const inputs = cluesEl.querySelectorAll('input');
+			const cells = gridEl.querySelectorAll('td:not(.empty)');
 
 			Array.from(inputs).forEach(input => {
 				input.value = '';
@@ -1057,19 +1046,19 @@ OCrossword.prototype.assemble = function assemble() {
 			});
 
 			try {
-				let answerStoreID = this.parentElement.parentElement.getAttribute('data-storage-id');
+				const answerStoreID = this.parentElement.parentElement.getAttribute('data-storage-id');
 				localStorage.removeItem(answerStoreID);
 			} catch(err){
 				console.log('Error trying to save state', err);
 			}
 		}
 
-		function toggleMobileViews(e) {
+		function toggleMobileViews() {
 			isGridView = !isGridView;
 
 			trackEvent({action: 'viewToggle', view: isGridView?'grid':'list'});
 
-			let buttonText = isGridView?'List view':'Grid view';
+			const buttonText = isGridView?'List view':'Grid view';
 			toggleViewButtonAboveGrid.textContent = buttonText;			
 			toggleViewButtonTop.textContent = buttonText;
 			toggleViewButtonBottom.textContent = buttonText;
@@ -1091,12 +1080,12 @@ OCrossword.prototype.assemble = function assemble() {
 			}
 		}
 
-		function toggleColumnView(e) {
+		function toggleColumnView() {
 			isSingleColumnView = !isSingleColumnView;
 
-			trackEvent({action: 'columnToggle', column: isSingleColumnView?'single':'double'})
+			trackEvent({action: 'columnToggle', column: isSingleColumnView?'single':'double'});
 
-			let buttonText = isSingleColumnView?'2 col':'1 col';
+			const buttonText = isSingleColumnView?'2 col':'1 col';
 			toggleColumnsButton.textContent = buttonText;
 
 			if (isSingleColumnView) {
@@ -1109,7 +1098,7 @@ OCrossword.prototype.assemble = function assemble() {
 			}
 			
 			try {
-				localStorage.setItem('FT-crossword_columns',  isSingleColumnView);
+				localStorage.setItem('FT-crossword_columns', isSingleColumnView);
 			} catch(err){
 				console.log('Error trying to save state', err);
 			}
@@ -1138,7 +1127,6 @@ OCrossword.prototype.assemble = function assemble() {
 			let d2 = gridEl.getBoundingClientRect();
 			const width1 = d1.width;
 			const height1 = d1.height;
-			let width2 = d2.width;
 			const height2 = d2.height;
 
 			let scale = height2/height1;
@@ -1167,7 +1155,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 			if(isMobile) {
 				for (let i = 0; i < gridTDs.length; i++) {
-					let td = gridTDs[i];
+					const td = gridTDs[i];
 					td.style.width = Math.min(newTdWidth, cellSizeMax) + "px";
 					td.style.height = Math.min(newTdWidth, cellSizeMax) + "px";			
 					td.style.maxWidth = "initial";
@@ -1202,7 +1190,7 @@ OCrossword.prototype.assemble = function assemble() {
 					cluesEl.classList.add('o-crossword-clues-two-columns');										
 				}
 
-				let el = cluesEl.querySelector('.has-hover');
+				const el = cluesEl.querySelector('.has-hover');
 				if(el) {
 					if(clueDisplayer.classList.contains('visually_hidden')) {
 						clueDisplayer.style.height = '';
@@ -1216,14 +1204,14 @@ OCrossword.prototype.assemble = function assemble() {
 
 			} else {
 				for (let i = 0; i < gridTDs.length; i++) {
-					let td = gridTDs[i];
+					const td = gridTDs[i];
 					td.style.removeProperty('width');
 					td.style.removeProperty('height');
 					td.style.removeProperty('max-width');
 					td.style.removeProperty('min-width');
 				}
 
-				let desktopSize = gridTDs[0].getBoundingClientRect().width;
+				const desktopSize = gridTDs[0].getBoundingClientRect().width;
 				inputEl.style.width = desktopSize + "px";
 				inputEl.style.height = desktopSize + "px";
 
@@ -1351,7 +1339,7 @@ OCrossword.prototype.assemble = function assemble() {
 			if(target!== null) {
 				if(target.getAttribute('data-link-identifier')) {
 					const focus = target.getAttribute('data-link-identifier').split('-');
-					trackEvent({action: 'focusClueInput', clueId: focus[0], letterId: focus[1]})
+					trackEvent({action: 'focusClueInput', clueId: focus[0], letterId: focus[1]});
 				} else{
 					const identifier = currentlySelectedGridItem.direction[0].toUpperCase() + currentlySelectedGridItem.number;
 					trackEvent({action: 'focusCell', clueId: identifier, letterId: currentlySelectedGridItem.answerPos});
@@ -1424,12 +1412,12 @@ OCrossword.prototype.destroy = function destroy() {
 module.exports = OCrossword;
 
 function isiOS() {
-	var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+	const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 	return iOS;
 }
 
 function isAndroid() {
-	var android = navigator.userAgent.toLowerCase().indexOf("android") > -1;
+	const android = navigator.userAgent.toLowerCase().indexOf("android") > -1;
 	return android;
 }
 
@@ -1442,15 +1430,15 @@ function isCSSMobile(clueDisplayer) {
 }
 
 function isEquivalent(a, b) {
-    var aProps = Object.getOwnPropertyNames(a);
-    var bProps = Object.getOwnPropertyNames(b);
+    const aProps = Object.getOwnPropertyNames(a);
+    const bProps = Object.getOwnPropertyNames(b);
 
-    if (aProps.length != bProps.length) {
+    if (aProps.length !== bProps.length) {
         return false;
     }
 
-    for (var i = 0; i < aProps.length; i++) {
-        var propName = aProps[i];
+    for (let i = 0; i < aProps.length; i++) {
+        const propName = aProps[i];
         if (a[propName] !== b[propName]) {
             return false;
         }
@@ -1469,7 +1457,7 @@ function initTracking(id, view, column) {
         user: {
             ft_session: oTracking.utils.getValueFromCookie(/FTSession=([^;]+)/)
         }
-    }
+    };
 
 	oTracking.init(config_data);
 	oTracking.page({
@@ -1494,7 +1482,7 @@ function trackEvent(action) {
 
 function joinBlanks (answerValue, filledCount) {
 	let combineCount = 0;
-	let combinedValue = [];
+	const combinedValue = [];
 
 	for(let i = 0; i < answerValue.length; ++i) {
 		if(answerValue[i] === '*') {
