@@ -295,16 +295,16 @@ function expireStorage() {
 	const ts = Date.now();
 
 	for (let i = 0; i < localStorage.length; i++){
-	    if (localStorage.key(i).substring(0,12) === 'FT-crossword') {
-	    	const storedItem = JSON.parse(localStorage.getItem(localStorage.key(i)));
-	    	const difference = ts - storedItem.timestamp;
+		if (localStorage.key(i).substring(0,12) === 'FT-crossword') {
+			const storedItem = JSON.parse(localStorage.getItem(localStorage.key(i)));
+			const difference = ts - storedItem.timestamp;
 
-	    	const daysCreated = difference/1000/60/60/24;
+			const daysCreated = difference/1000/60/60/24;
 
-	    	if(daysCreated > 28) {
-	    		localStorage.removeItem(localStorage.key(i));
-	    	}
-	    }
+			if(daysCreated > 28) {
+				localStorage.removeItem(localStorage.key(i));
+			}
+		}
 	}
 }
 
@@ -1430,34 +1430,34 @@ function isCSSMobile(clueDisplayer) {
 }
 
 function isEquivalent(a, b) {
-    const aProps = Object.getOwnPropertyNames(a);
-    const bProps = Object.getOwnPropertyNames(b);
+	const aProps = Object.getOwnPropertyNames(a);
+	const bProps = Object.getOwnPropertyNames(b);
 
-    if (aProps.length !== bProps.length) {
-        return false;
-    }
+	if (aProps.length !== bProps.length) {
+		return false;
+	}
 
-    for (let i = 0; i < aProps.length; i++) {
-        const propName = aProps[i];
-        if (a[propName] !== b[propName]) {
-            return false;
-        }
-    }
+	for (let i = 0; i < aProps.length; i++) {
+		const propName = aProps[i];
+		if (a[propName] !== b[propName]) {
+			return false;
+		}
+	}
 
-    return true;
+	return true;
 }
 
 function initTracking(id, view, column) {
 	const config_data = {
-        server: 'https://spoor-api.ft.com/px.gif',
-        context: {
-            product: 'o-crossword',
-            crosswordNumber: id
-        },
-        user: {
-            ft_session: oTracking.utils.getValueFromCookie(/FTSession=([^;]+)/)
-        }
-    };
+		server: 'https://spoor-api.ft.com/px.gif',
+		context: {
+			product: 'o-crossword',
+			crosswordNumber: id
+		},
+		user: {
+			ft_session: oTracking.utils.getValueFromCookie(/FTSession=([^;]+)/)
+		}
+	};
 
 	oTracking.init(config_data);
 	oTracking.page({
