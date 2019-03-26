@@ -19,7 +19,8 @@
 			"requestAnimationFrame",
 			"Node.prototype.contains",
 			"Array.prototype.find",
-			"Array.prototype.filter"
+			"Array.prototype.filter",
+			"Promise"
 		]
 	},
 	"demosDefaults": {
