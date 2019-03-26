@@ -1,3 +1,4 @@
+/* eslint-disable no-cond-assign */
 // Using UMD (Universal Module Definition), see https://github.com/umdjs/umd, and Jake,
 // for a js file to be included as-is in Node code and in browser code.
 (function (root, factory) {
@@ -31,9 +32,9 @@
 		const lines = text.split(/\r|\n/);
 
 		for(let line of lines){
-			let match;
 			// strip out comments
-			if (match = /^([^\#]*)\#.*$/.exec(line) ) {
+			let match;
+			if (match = /^([^\#]*)\#.*$/.exec(line)) {
 				line = match[1];
 			}
 			// strip out trailing and leading spaces
@@ -57,10 +58,10 @@
 					break;
 				} else {
 					const clue = {
-						coordinates : [ parseInt(match[1]), parseInt(match[2]) ],
-										 id : parseInt(match[3]),
+						coordinates : [ parseInt(match[1], 10), parseInt(match[2], 10) ],
+										 id : parseInt(match[3], 10),
 									 body : match[4],
-							answerCSV : match[5], // could be in the form of either "A,LIST-OF,WORDS" or "1,4-2,5"
+						answerCSV : match[5], // could be in the form of either "A,LIST-OF,WORDS" or "1,4-2,5"
 							 original : line,
 					};
 					crossword[cluesGrouping].push(clue);
@@ -68,7 +69,7 @@
 			} else {
 				crossword.errors.push("ERROR: couldn't parse line: " + line);
 			}
-		};
+		}
 
 		return crossword;
 	}
@@ -76,21 +77,21 @@
 	// having found the pieces, check that they encode a valid crossword,
 	// creating useful data structures along the way
 	function validateAndEmbellishCrossword( crossword ){
-		const maxCoord = parseInt(crossword.dimensions.split('x')[0]);
+		const maxCoord = parseInt(crossword.dimensions.split('x')[0], 10);
 		crossword.maxCoord = maxCoord;
 		const grid = new Array( maxCoord * maxCoord ).fill(' ');
 		crossword.grid = grid;
 		const groupingPrev = {
 			across : {
-						id : 0,
+				id : 0,
 						 x : 0,
 						 y : 0
-					},
-				down : {
-						id : 0,
+			},
+			down : {
+				id : 0,
 						 x : 0,
 						 y : 0
-					}
+			}
 		};
 		const knownIds = {};
 		crossword.knownIds = knownIds;
@@ -102,41 +103,41 @@
 		};
 
 		// insist on having at least one clue !
-		if ( (crossword['across'].length + crossword['down'].length) === 0) {
+		if ( crossword['across'].length + crossword['down'].length === 0) {
 			crossword.errors.push("Error: no valid clues specified");
+		}
+
+		function clueError(msg, clue, grouping){
+			crossword.errors.push("Error: " + msg + " in " + grouping + " clue=" + clue.original);
 		}
 
 		for(const grouping of ['across', 'down']){
 			const prev = groupingPrev[grouping];
 
 			for(const clue of crossword[grouping]){
-				function clueError(msg){
-					crossword.errors.push("Error: " + msg + " in " + grouping + " clue=" + clue.original);
-				}
-
 				// check non-zero id
 				if (clue.id === 0) {
-					clueError("id must be positive");
+					clueError("id must be positive", clue, grouping);
 					break;
 				}
 
-				maxId = (clue.id > maxId) ? clue.id : maxId;
+				maxId = clue.id > maxId ? clue.id : maxId;
 
 				// check id sequence in order
 				if (clue.id <= prev.id) {
-					clueError("id out of sequence");
+					clueError("id out of sequence", clue, grouping);
 					break;
 				}
 
 				// check x,y within bounds
 				const x = clue.coordinates[0];
 				if (x > maxCoord) {
-					clueError("x coord too large");
+					clueError("x coord too large", clue, grouping);
 					break;
 				}
 				const y = clue.coordinates[1];
 				if (y > maxCoord) {
-					clueError("y coord too large");
+					clueError("y coord too large", clue, grouping);
 					break;
 				}
 
@@ -145,7 +146,7 @@
 					const knownCoords = knownIds[clue.id].coordinates;
 					if ( x !== knownCoords[0]
 						|| y !== knownCoords[1]) {
-						clueError("shared id clashes with previous coordinates");
+						clueError("shared id clashes with previous coordinates", clue, grouping);
 						break;
 					}
 				} else {
@@ -171,14 +172,14 @@
 					const answerPieces = clue.answerCSV.split(/[,-]/);
 					const words = answerPieces.map(p => {
 						if (/^[0-9]+$/.test(p)) {
-							const pInt = parseInt(p);
+							const pInt = parseInt(p, 10);
 							if (pInt === 0) {
-								clueError("answer contains a word size of 0");
+								clueError("answer contains a word size of 0", clue, grouping);
 							}
 							return '*'.repeat( pInt );
 						} else {
 							if (p.length === 0) {
-								clueError("answer contains an empty word");
+								clueError("answer contains an empty word", clue, grouping);
 							}
 							return p;
 						}
@@ -187,7 +188,7 @@
 					const wordsString = words.join('');
 					clue.wordsString = wordsString;
 					if (wordsString.length > maxCoord) {
-						clueError("answer too long for crossword");
+						clueError("answer too long for crossword", clue, grouping);
 						break;
 					}
 					crossword.answers[grouping].push(wordsString);
@@ -198,21 +199,21 @@
 				}
 
 				// check answer + offset within bounds
-				if( (grouping==='across' && (clue.wordsString.length + x - 1 > maxCoord))
-					|| (grouping==='down' && (clue.wordsString.length + y - 1 > maxCoord)) ){
-					clueError("answer too long for crossword from that coord");
+				if( grouping==='across' && clue.wordsString.length + x - 1 > maxCoord
+					|| grouping==='down' && clue.wordsString.length + y - 1 > maxCoord ){
+					clueError("answer too long for crossword from that coord", clue, grouping);
 					break;
 				}
 
 				{
 					// check answer does not clash with previous answers
-					const step = (grouping==='across')? 1 : maxCoord;
+					const step = grouping==='across'? 1 : maxCoord;
 					for (let i = 0; i < clue.wordsString.length; i++) {
-						const pos = (x-1) + (y-1)*maxCoord + i*step;
+						const pos = x-1 + (y-1)*maxCoord + i*step;
 						if (grid[pos] === ' ') {
 							grid[pos] = clue.wordsString[i];
 						} else if( grid[pos] !== clue.wordsString[i] ) {
-							clueError("letter " + (i+1) + " clashes with previous clues");
+							clueError("letter " + (i+1) + " clashes with previous clues", clue, grouping);
 							break;
 						}
 					}
@@ -241,10 +242,10 @@
 				const prevClue = knownIds[i-1];
 				const clue = knownIds[i];
 
-				if ( (clue.coordinates[0] + clue.coordinates[1] * maxCoord) <= (prevClue.coordinates[0] + prevClue.coordinates[1] * maxCoord) ) {
+				if ( clue.coordinates[0] + clue.coordinates[1] * maxCoord <= prevClue.coordinates[0] + prevClue.coordinates[1] * maxCoord ) {
 					if (clue.coordinates[1] < prevClue.coordinates[1]) {
 						crossword.errors.push("Error: clue " + clue.id + " starts above clue " + prevClue.id);
-					} else if ((clue.coordinates[1] === prevClue.coordinates[1]) && (clue.coordinates[0] === prevClue.coordinates[0])) {
+					} else if (clue.coordinates[1] === prevClue.coordinates[1] && clue.coordinates[0] === prevClue.coordinates[0]) {
 						crossword.errors.push("Error: clue " + clue.id + " starts at same coords as clue " + prevClue.id);
 					} else {
 						crossword.errors.push("Error: clue " + clue.id + " starts to the left of clue " + prevClue.id);
@@ -274,7 +275,7 @@
 				const rowSpaces = [' ', ' ', ' '];
 				for (let x = 1; x <= maxCoord; x++) {
 					const num10s = Math.floor(x/10);
-					row10s.push((num10s > 0)? num10s : ' ');
+					row10s.push(num10s > 0? num10s : ' ');
 					row1s.push(x%10);
 					rowSpaces.push(' ');
 				}
@@ -287,13 +288,13 @@
 				const row = [];
 				{
 					const num10s = Math.floor(y/10);
-					row.push((num10s > 0)? num10s : ' ');
+					row.push(num10s > 0? num10s : ' ');
 					row.push(y%10);
 					row.push(' ');
 				}
 				for (let x = 1; x <= maxCoord; x++) {
-					let cell = grid[(x-1) + (y-1)*maxCoord];
-					cell = (cell === " ")? '.' : cell;
+					let cell = grid[x-1 + (y-1)*maxCoord];
+					cell = cell === " "? '.' : cell;
 					row.push( cell );
 				}
 				rows.push( row.join('') );
@@ -309,33 +310,33 @@
 	// assuming a later step will convert it to JSON text
 	function generateSpec(crossword){
 		const spec = {
-					name : crossword.name,
+			name : crossword.name,
 					 author : crossword.author,
 				 editor : crossword.editor,
 			copyright : crossword.copyright,
 			publisher : crossword.publisher,
 					 date : crossword.pubdate,
 					 size : {
-						rows : crossword.maxCoord,
-						cols : crossword.maxCoord,
+				rows : crossword.maxCoord,
+				cols : crossword.maxCoord,
 			},
-				grid : [],
+			grid : [],
 			gridnums : [],
 				 clues : {
-					across : [],
-						down : [],
+				across : [],
+				down : [],
 			},
 			 answers : crossword.answers,
 			 notepad : "",
-						id : crossword.name,
+			id : crossword.name,
 		};
 
 		// flesh out spec grid
 		for (let y = 1; y<=crossword.maxCoord; y++) {
 			const row = [];
 			for (let x = 1; x<=crossword.maxCoord; x++) {
-				const cell = crossword.grid[(x-1) + (y-1)*crossword.maxCoord];
-				row.push( (cell === ' ')? '.' : 'X' );
+				const cell = crossword.grid[x-1 + (y-1)*crossword.maxCoord];
+				row.push( cell === ' '? '.' : 'X' );
 			}
 			spec.grid.push(row);
 		}
@@ -350,7 +351,7 @@
 		for (const id in crossword.knownIds) {
 			if (Object.prototype.hasOwnProperty.call(crossword.knownIds, id)) {
 				const clue = crossword.knownIds[id];
-				spec.gridnums[clue.coordinates[1]-1][clue.coordinates[0]-1] = parseInt(id);
+				spec.gridnums[clue.coordinates[1]-1][clue.coordinates[0]-1] = parseInt(id, 10);
 			}
 		}
 
@@ -359,7 +360,7 @@
 		['across', 'down'].forEach( function(grouping){
 			crossword[grouping].forEach( function(clue) {
 				const item = [
-					parseInt(clue.id),
+					parseInt(clue.id, 10),
 					clue.body + ' (' + clue.numericCSV + ')',
 					clue.wordsLengths,
 					clue.numericCSV
@@ -401,7 +402,7 @@
 					`(${clue.coordinates.join(',')})`,
 					`${clue.id}.`,
 					clue.body,
-					`(${(withAnswers)? clue.answerCSV : clue.numericCSV})`
+					`(${withAnswers? clue.answerCSV : clue.numericCSV})`
 				];
 				lines.push(pieces.join(' '));
 			});

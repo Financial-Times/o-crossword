@@ -1,3 +1,4 @@
+/* eslint-disable no-inner-declarations */
 /**
  * Initialises an o-crossword components inside the element passed as the first parameter
  *
@@ -13,7 +14,7 @@ function prevAll(node) {
 	const nodes = Array.from(node.parentNode.children);
 	const pos = nodes.indexOf(node);
 	return nodes.slice(0, pos);
-};
+}
 
 function writeErrorsAsClues(rootEl, json) {
 	const cluesEl = rootEl.querySelector('ul.o-crossword-clues');
@@ -46,14 +47,14 @@ function writeErrorsAsClues(rootEl, json) {
 
 function buildGrid(
 	rootEl,
-{
-	size,
-	name,
-	gridnums,
-	grid,
-	clues,
-	answers
-}) {
+	{
+		size,
+		name,
+		gridnums,
+		grid,
+		clues,
+		answers
+	}) {
 	const gridEl = rootEl.querySelector('table');
 	const cluesEl = rootEl.querySelector('ul.o-crossword-clues');
 	const {cols, rows} = size;
@@ -99,7 +100,7 @@ function buildGrid(
 	}
 
 	rootEl.parentElement.setAttribute('data-o-crossword-title', name);
-	rootEl.setAttribute('data-answer-version', !!answers);
+	rootEl.setAttribute('data-answer-version', Boolean(answers));
 
 	if (clues) {
 		rootEl.parentElement.setAttribute('data-o-crossword-clue-length', clues.across.length + clues.down.length);
@@ -127,7 +128,7 @@ function buildGrid(
 			tempPartial.classList.add('o-crossword-user-answer');
 
 			const answerLength = across[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
-			tempSpan.innerHTML = across[0] + '<span class="sr-direction" aria-hidden=false>across</span>' + '. ' + across[1] + ' <span class="sr-answer" aria-hidden=false></span> <span class="sr-instruction" aria-hidden=false>Press ENTER to complete your answer</span>';
+			tempSpan.innerHTML = across[0] + '<span class="sr-direction" aria-hidden=false>across</span>. ' + across[1] + ' <span class="sr-answer" aria-hidden=false></span> <span class="sr-instruction" aria-hidden=false>Press ENTER to complete your answer</span>';
 			tempLi.dataset.oCrosswordNumber = across[0];
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'across';
@@ -140,13 +141,13 @@ function buildGrid(
 				tempInput.setAttribute('data-link-identifier', 'A' + across[0] + '-' + i);
 				tempInput.setAttribute('tabindex', -1);
 				if(answers) {
-					const val = (answers.across[index][i] === '*')?'':answers.across[index][i];
+					const val = answers.across[index][i] === '*'?'':answers.across[index][i];
 					tempInput.value = val;
 				}
 
 				if(answerStore) {
 					if(isStorage) {
-						const val = (answerStore.across[index][i] === '*')?'':answerStore.across[index][i];
+						const val = answerStore.across[index][i] === '*'?'':answerStore.across[index][i];
 						tempInput.value = val;
 					} else {
 						if(answerStore.across[index] === undefined) {
@@ -161,7 +162,7 @@ function buildGrid(
 				if(across[3].length > 1) {
 					for(let j = 0; j < across[3].length; ++j) {
 						if(j%2 === 1) {
-							count += parseInt(across[3][j-1]);
+							count += parseInt(across[3][j-1], 10);
 							const separator = document.createElement('span');
 							separator.classList.add('separator');
 
@@ -170,7 +171,7 @@ function buildGrid(
 							} else if(across[3][j] === ',') {
 								separator.innerHTML = '&nbsp;';
 							}
-							
+
 							if(i === count && separator.innerHTML !== '') {
 								tempPartial.appendChild(separator);
 							}
@@ -199,7 +200,7 @@ function buildGrid(
 			tempPartial.classList.add('o-crossword-user-answer');
 
 			const answerLength = down[2].filter(isFinite).filter(isFinite).reduce((a,b)=>a+b,0);
-			tempSpan.innerHTML = down[0] + '<span class="sr-direction" aria-hidden=false>down</span>' + '. ' + down[1] + ' <span class="sr-answer" aria-hidden=false></span> <span class="sr-instruction" aria-hidden=false>Press ENTER to complete your answer</span>';
+			tempSpan.innerHTML = down[0] + '<span class="sr-direction" aria-hidden=false>down</span>. ' + down[1] + ' <span class="sr-answer" aria-hidden=false></span> <span class="sr-instruction" aria-hidden=false>Press ENTER to complete your answer</span>';
 			tempLi.dataset.oCrosswordNumber = down[0];
 			tempLi.dataset.oCrosswordAnswerLength = answerLength;
 			tempLi.dataset.oCrosswordDirection = 'down';
@@ -212,13 +213,13 @@ function buildGrid(
 				tempInput.setAttribute('tabindex', -1);
 
 				if(answers) {
-					const val = (answers.down[index][i] === '*')?'':answers.down[index][i];
+					const val = answers.down[index][i] === '*'?'':answers.down[index][i];
 					tempInput.value = val;
 				}
 
 				if(answerStore) {
 					if(isStorage) {
-						const val = (answerStore.down[index][i] === '*')?'':answerStore.down[index][i];
+						const val = answerStore.down[index][i] === '*'?'':answerStore.down[index][i];
 						tempInput.value = val;
 					} else {
 						if(answerStore.down[index] === undefined) {
@@ -233,7 +234,7 @@ function buildGrid(
 				if(down[3].length > 1) {
 					for(let j = 0; j < down[3].length; ++j) {
 						if(j%2 === 1) {
-							count += parseInt(down[3][j-1]);
+							count += parseInt(down[3][j-1], 10);
 							const separator = document.createElement('span');
 							separator.classList.add('separator');
 
@@ -255,7 +256,7 @@ function buildGrid(
 
 			if(answerStore && !(/^[*,\-]+$/).test(answerStore.down[index])) {
 				const srAnswer = answerStore.down[index];
-				tempSpan.querySelector('.sr-answer').textContent = joinBlanks(srAnswer, 1);	
+				tempSpan.querySelector('.sr-answer').textContent = joinBlanks(srAnswer, 1);
 			}
 
 			downEl.appendChild(tempLi);
@@ -265,12 +266,12 @@ function buildGrid(
 	}
 
 	if (answers || answerStore) {
-		const target = (answers)?answers:answerStore;
+		const target = answers?answers:answerStore;
 		clues.across.forEach(function acrossForEach(across, i) {
 			const answer = target.across[i];
 			const answerLength = answer.length;
 			getGridCellsByNumber(gridEl, across[0], 'across', answerLength).forEach((td, i) => {
-				const val = (answer[i] === '*')?'':answer[i];
+				const val = answer[i] === '*'?'':answer[i];
 				td.textContent = val;
 			});
 		});
@@ -279,7 +280,7 @@ function buildGrid(
 			const answer = target.down[i];
 			const answerLength = answer.length;
 			getGridCellsByNumber(gridEl, down[0], 'down', answerLength).forEach((td, i) => {
-				const val = (answer[i] === '*')?'':answer[i];
+				const val = answer[i] === '*'?'':answer[i];
 				td.textContent = val;
 			});
 		});
@@ -335,20 +336,20 @@ function OCrossword(rootEl) {
 					resolve( this.rootEl.dataset.oCrosswordData );
 				}
 			})
-			.then(text => crosswordParser.intoSpecJson(text))
-			.then(specText => JSON.parse(specText) )
-			.then( json => {
-				if (json.errors){
-					console.log(`Found Errors after invoking crosswordParser.intoSpecJson:\n${json.errors.join("\n")}` );
-					writeErrorsAsClues(rootEl, json);
-					return Promise.reject("Failed to parse crossword data, so cannot generate crossword display");
-				} else {
-					return json;
-				}
-			})
-			.then(json => buildGrid(rootEl, json))
-			.then(()	 => this.assemble() )
-			.catch( reason => console.log("Error caught in OCrossword: ", reason ) )
+				.then(text => crosswordParser.intoSpecJson(text))
+				.then(specText => JSON.parse(specText) )
+				.then( json => {
+					if (json.errors){
+						console.log(`Found Errors after invoking crosswordParser.intoSpecJson:\n${json.errors.join("\n")}` );
+						writeErrorsAsClues(rootEl, json);
+						return Promise.reject(new Error("Failed to parse crossword data, so cannot generate crossword display"));
+					} else {
+						return json;
+					}
+				})
+				.then(json => buildGrid(rootEl, json))
+				.then(()	 => this.assemble() )
+				.catch( reason => console.log("Error caught in OCrossword: ", reason ) )
 			;
 		}
 	}
@@ -362,19 +363,19 @@ function getGridCellsByNumber(gridEl, number, direction, length) {
 		if (direction === 'across') {
 			while (length--) {
 				out.push(el);
-				if (length === 0) break;
+				if (length === 0) {break;}
 				el = el.nextElementSibling;
-				if (!el) break;
+				if (!el) {break;}
 			}
 		}
 		else if (direction === 'down') {
 			const index = prevAll(el).length;
 			while (length--) {
 				out.push(el);
-				if (length === 0) break;
-				if (!el.parentNode.nextElementSibling) break;
+				if (length === 0) {break;}
+				if (!el.parentNode.nextElementSibling) {break;}
 				el = el.parentNode.nextElementSibling.children[index];
-				if (!el) break;
+				if (!el) {break;}
 			}
 		}
 	}
@@ -388,10 +389,10 @@ function getLetterIndex(gridEl, cell, number, direction) {
 	if(direction === 'across') {
 		return cell.cellIndex - el.cellIndex;
 	} else if (direction === 'down'){
-		return parseInt(cell.parentNode.getAttribute('data-tr-index')) - parseInt(el.parentNode.getAttribute('data-tr-index'));
+		return parseInt(cell.parentNode.getAttribute('data-tr-index'), 10) - parseInt(el.parentNode.getAttribute('data-tr-index'), 10);
 	}
 
-	return;
+
 }
 
 OCrossword.prototype.assemble = function assemble() {
@@ -413,14 +414,14 @@ OCrossword.prototype.assemble = function assemble() {
 		});
 	}
 
-	let currentlySelectedGridItem = null;	
+	let currentlySelectedGridItem = null;
 	const answerStore = JSON.parse(this.rootEl.getAttribute('data-storage'));
 	const isAnswerVersion = JSON.parse(this.rootEl.getAttribute('data-answer-version'));
 
 
 	if (cluesEl) {
 		let currentClue = -1;
-		const cluesTotal = parseInt(this.rootEl.parentElement.getAttribute('data-o-crossword-clue-length')) - 1;
+		const cluesTotal = parseInt(this.rootEl.parentElement.getAttribute('data-o-crossword-clue-length'), 10) - 1;
 
 		const gridWrapper = document.createElement('div');
 		gridWrapper.classList.add('o-crossword-grid-wrapper');
@@ -489,7 +490,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 		const buttonRow = document.createElement('div');
 		buttonRow.classList.add('o-crossword-button-row');
-		this.rootEl.insertBefore(buttonRow, wrapper);			
+		this.rootEl.insertBefore(buttonRow, wrapper);
 
 		const resetButton = document.createElement('button');
 		resetButton.classList.add('o-crossword-reset', 'o-buttons', 'o-buttons--mono');
@@ -513,14 +514,14 @@ OCrossword.prototype.assemble = function assemble() {
 		toggleViewButtonTop.textContent = isGridView?'List view':'Grid view';
 
 		this.addEventListener(toggleViewButtonTop, 'click', toggleMobileViews);
-		buttonRow.appendChild(toggleViewButtonTop);	
-		
+		buttonRow.appendChild(toggleViewButtonTop);
+
 		const toggleColumnsButton = document.createElement('button');
 		toggleColumnsButton.classList.add('o-crossword-mobile-toggle', 'o-buttons', 'o-buttons--mono');
 		toggleColumnsButton.textContent = isSingleColumnView?'2 col':'1 col';
 
 		this.addEventListener(toggleColumnsButton, 'click', toggleColumnView);
-		buttonRow.appendChild(toggleColumnsButton);	
+		buttonRow.appendChild(toggleColumnsButton);
 
 		const toggleViewButtonBottom = document.createElement('button');
 		toggleViewButtonBottom.classList.add('o-crossword-mobile-toggle', 'o-buttons', 'o-buttons--mono');
@@ -593,13 +594,13 @@ OCrossword.prototype.assemble = function assemble() {
 				return;
 			}
 
-			if((e.keyCode >= 65 && e.keyCode <= 90) || isAndroid()) {
+			if(e.keyCode >= 65 && e.keyCode <= 90 || isAndroid()) {
 				if(!isAndroid()) {
 					magicInput.value = String.fromCharCode(e.keyCode);
 
 					const last = gridMap.get(magicInputTargetEl);
 					Array.from(last).forEach(cell => {
-						if(parseInt(cell.answerLength) - cell.answerPos === 1) {
+						if(parseInt(cell.answerLength, 10) - cell.answerPos === 1) {
 							e.target.select();
 						}
 					}); //a11y fix for screen reader
@@ -610,7 +611,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 				progress();
 			} else {
-				return;
+
 			}
 		});
 
@@ -654,7 +655,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 				return;
 			}
-			
+
 			if(e.shiftKey && e.keyCode === 9) {
 				return nextInput(e.target, -1);
 			}
@@ -686,7 +687,7 @@ OCrossword.prototype.assemble = function assemble() {
 					nextInput(e.target, -1);
 					updateInBackground(e);
 				}, timer);
-				
+
 				return;
 			}
 
@@ -697,14 +698,14 @@ OCrossword.prototype.assemble = function assemble() {
 				return;
 			}
 
-			if((e.keyCode >= 65 && e.keyCode <= 90) || isAndroid()) {
+			if(e.keyCode >= 65 && e.keyCode <= 90 || isAndroid()) {
 
 				if(!isAndroid()) {
 					e.target.value = String.fromCharCode(e.keyCode);
 				}
 
 				e.target.select();
-				
+
 				const identifier = e.target.getAttribute('data-link-identifier').split('-');
 				trackEvent({action: 'clueInput', clueId: identifier[0], letterId: identifier[1]});
 
@@ -713,9 +714,9 @@ OCrossword.prototype.assemble = function assemble() {
 					updateInBackground(e);
 				}, timer);
 
-				
+
 			} else {
-				return;
+
 			}
 		});
 
@@ -723,13 +724,13 @@ OCrossword.prototype.assemble = function assemble() {
 			getCellFromClue(e.target, gridSync => {
 				gridSync.grid.textContent = e.target.value;
 
-				if(!!gridSync.defSync) {
+				if(gridSync.defSync) {
 					const defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
 					defSync.value = e.target.value;
 				}
 
 				updateScreenReaderAnswer(e.target, gridSync);
-			});	
+			});
 		}
 
 		const progress = debounce(function progress(direction) {
@@ -793,12 +794,12 @@ OCrossword.prototype.assemble = function assemble() {
 
 			const oldClue = currentlySelectedGridItem;
 			const clues = gridMap.get(el);
-			if (!clues) return;
-			currentlySelectedGridItem = clues.find(item => (
+			if (!clues) {return;}
+			currentlySelectedGridItem = clues.find(item =>
 				item.direction === oldClue.direction &&
 				item.number === oldClue.number &&
 				item.answerLength === oldClue.answerLength
-			)) || currentlySelectedGridItem;
+			) || currentlySelectedGridItem;
 
 			Array.from(gridEl.getElementsByClassName('receiving-input')).forEach(el => el.classList.remove('receiving-input'));
 			el.classList.add('receiving-input');
@@ -808,7 +809,7 @@ OCrossword.prototype.assemble = function assemble() {
 			magicInputNextEls = nextEls;
 			magicInput.style.left = magicInputTargetEl.offsetLeft + 'px';
 			magicInput.style.top = magicInputTargetEl.offsetTop + 'px';
-			
+
 			magicInput.focus();
 			magicInput.select();
 		}
@@ -817,7 +818,7 @@ OCrossword.prototype.assemble = function assemble() {
 			const inputID = source.getAttribute('data-link-identifier');
 			const inputGroup = document.querySelectorAll('input[data-link-identifier^="' + inputID.split('-')[0] +'-"]');
 			let currentInput = inputID.split('-')[1];
-			const newInput = (direction === 1)?++currentInput:--currentInput;
+			const newInput = direction === 1?++currentInput:--currentInput;
 
 			if(newInput >= 0 && newInput < inputGroup.length) {
 				const next = cluesEl.querySelector('input[data-link-identifier="' + inputID.split('-')[0] +'-'+ newInput+'"]');
@@ -873,14 +874,14 @@ OCrossword.prototype.assemble = function assemble() {
 				delete o.dataset.oCrosswordHighlighted;
 			}
 			const gridElsToHighlight = getGridCellsByNumber(gridEl, number, direction, length);
-			gridElsToHighlight.forEach(el => el.dataset.oCrosswordHighlighted = direction);
+			gridElsToHighlight.forEach(el => {el.dataset.oCrosswordHighlighted = direction;});
 		}
 
 		function getCellFromClue(clue, callback) {
 			const inputIdentifier = clue.getAttribute('data-link-identifier');
-			const defDirection = (inputIdentifier.slice(0,1) === 'A')?'across':'down';
+			const defDirection = inputIdentifier.slice(0,1) === 'A'?'across':'down';
 			const defNum = inputIdentifier.slice(1,inputIdentifier.length).split('-')[0];
-			const defIndex = parseInt(inputIdentifier.split('-')[1]);
+			const defIndex = parseInt(inputIdentifier.split('-')[1], 10);
 
 			const selectedCell = {};
 
@@ -889,13 +890,13 @@ OCrossword.prototype.assemble = function assemble() {
 				for(let i = 0; i < cellData.length; ++i) {
 					if(
 						cellData[i].direction === defDirection &&
-						parseInt(cellData[i].number) === parseInt(defNum) &&
-						parseInt(cellData[i].answerPos) === parseInt(defIndex)
+						parseInt(cellData[i].number, 10) === parseInt(defNum, 10) &&
+						parseInt(cellData[i].answerPos, 10) === parseInt(defIndex, 10)
 					) {
 						selectedCell.grid = entry[0];
 						if(cellData.length > 1) {
 							selectedCell.defSyncInput = constructInputIdentifier(cellData, defDirection);
-							selectedCell.defSync = (selectedCell.defSyncInput !== undefined);
+							selectedCell.defSync = selectedCell.defSyncInput !== undefined;
 						}
 					}
 				}
@@ -919,7 +920,7 @@ OCrossword.prototype.assemble = function assemble() {
 				});
 				el.classList.add('has-hover');
 				el.querySelector('.o-crossword-user-answer').style.top = clueDisplayerText.clientHeight + 'px';
-				currentClue = parseInt(el.getAttribute('data-o-crossword-clue-id'));
+				currentClue = parseInt(el.getAttribute('data-o-crossword-clue-id'), 10);
 
 				if(isCSSMobile(clueDisplayer)) {
 					onResize(false);
@@ -985,8 +986,8 @@ OCrossword.prototype.assemble = function assemble() {
 
 			if(answerStore) {
 				const dir = targetData.getAttribute('data-o-crossword-direction');
-				const offset = (dir === 'down')?cluesEl.querySelector('.o-crossword-clues-across').childElementCount:0;
-				const targetIndex = parseInt(targetData.getAttribute('data-o-crossword-clue-id')) - offset;
+				const offset = dir === 'down'?cluesEl.querySelector('.o-crossword-clues-across').childElementCount:0;
+				const targetIndex = parseInt(targetData.getAttribute('data-o-crossword-clue-id'), 10) - offset;
 				answerStore[dir][targetIndex] = answerValue.join('');
 
 				saveLocal();
@@ -999,7 +1000,7 @@ OCrossword.prototype.assemble = function assemble() {
 			}
 
 			screenReaderAnswer.textContent = joinBlanks(answerValue, filledCount);
-			
+
 
 			if(dataGrid && dataGrid.defSync) {
 				const syncTarget = cluesEl.querySelector('input[data-link-identifier=' + dataGrid.defSyncInput + ']');
@@ -1059,16 +1060,16 @@ OCrossword.prototype.assemble = function assemble() {
 			trackEvent({action: 'viewToggle', view: isGridView?'grid':'list'});
 
 			const buttonText = isGridView?'List view':'Grid view';
-			toggleViewButtonAboveGrid.textContent = buttonText;			
+			toggleViewButtonAboveGrid.textContent = buttonText;
 			toggleViewButtonTop.textContent = buttonText;
 			toggleViewButtonBottom.textContent = buttonText;
 
 			if (isGridView) {
 				toggleColumnsButton.classList.add('visually_hidden');
-				toggleViewButtonBottom.classList.add('visually_hidden');						
+				toggleViewButtonBottom.classList.add('visually_hidden');
 			} else {
-				toggleColumnsButton.classList.remove('visually_hidden');				
-				toggleViewButtonBottom.classList.remove('visually_hidden');									
+				toggleColumnsButton.classList.remove('visually_hidden');
+				toggleViewButtonBottom.classList.remove('visually_hidden');
 			}
 
 			onResize(false);
@@ -1090,13 +1091,13 @@ OCrossword.prototype.assemble = function assemble() {
 
 			if (isSingleColumnView) {
 				cluesEl.classList.add('o-crossword-clues-single-column');
-				cluesEl.classList.remove('o-crossword-clues-two-columns');				
+				cluesEl.classList.remove('o-crossword-clues-two-columns');
 				// o-crossword-clues-single-column
 			} else {
-				cluesEl.classList.remove('o-crossword-clues-single-column');	
-				cluesEl.classList.add('o-crossword-clues-two-columns');								
+				cluesEl.classList.remove('o-crossword-clues-single-column');
+				cluesEl.classList.add('o-crossword-clues-two-columns');
 			}
-			
+
 			try {
 				localStorage.setItem('FT-crossword_columns', isSingleColumnView);
 			} catch(err){
@@ -1110,7 +1111,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 		const onResize = function onResize(init) {
 			const cellSizeMax = 40;
-			
+
 			if (window.innerWidth <= 739) {
 				isMobile = true;
 			} else if (window.innerWidth > window.innerHeight && window.innerWidth <=739 ) { //rotated phones and small devices, but not iOS
@@ -1119,7 +1120,7 @@ OCrossword.prototype.assemble = function assemble() {
 				isMobile = false;
 			}
 
-			if(isMobile && !!init) {
+			if(isMobile && Boolean(init)) {
 				clueNavigationNext.click();
 			}
 
@@ -1130,7 +1131,7 @@ OCrossword.prototype.assemble = function assemble() {
 			const height2 = d2.height;
 
 			let scale = height2/height1;
-			if (scale > 0.2) scale = 0.2;
+			if (scale > 0.2) {scale = 0.2;}
 
 			this._cluesElHeight = height1;
 			this._cluesElWidth = width1 * scale;
@@ -1142,22 +1143,22 @@ OCrossword.prototype.assemble = function assemble() {
 			//update grid size to fill 100% on mobile view
 			let fullWidth;
 			if (isAndroid()) {
-				fullWidth = Math.min(window.screen.height, window.screen.width);			
+				fullWidth = Math.min(window.screen.height, window.screen.width);
 			} else {
-				fullWidth = Math.min(window.innerHeight, window.innerWidth);				
+				fullWidth = Math.min(window.innerHeight, window.innerWidth);
 			}
-			
+
 			this.rootEl.width = fullWidth + 'px !important';
 			const gridTDs = gridEl.querySelectorAll('td');
 			const gridSize = gridEl.querySelectorAll('tr').length;
-			const newTdWidth = parseInt(fullWidth / (gridSize + 1) );
+			const newTdWidth = parseInt(fullWidth / (gridSize + 1), 10);
 			const inputEl = document.querySelector('.o-crossword-magic-input');
 
 			if(isMobile) {
 				for (let i = 0; i < gridTDs.length; i++) {
 					const td = gridTDs[i];
 					td.style.width = Math.min(newTdWidth, cellSizeMax) + "px";
-					td.style.height = Math.min(newTdWidth, cellSizeMax) + "px";			
+					td.style.height = Math.min(newTdWidth, cellSizeMax) + "px";
 					td.style.maxWidth = "initial";
 					td.style.minWidth = "initial";
 				}
@@ -1168,8 +1169,8 @@ OCrossword.prototype.assemble = function assemble() {
 
 				if(isGridView) {
 					cluesEl.classList.add('visually_hidden');
-					toggleViewButtonBottom.classList.add('visually_hidden');	
-					toggleColumnsButton.classList.add('visually_hidden');					
+					toggleViewButtonBottom.classList.add('visually_hidden');
+					toggleColumnsButton.classList.add('visually_hidden');
 					gridWrapper.classList.remove('visually_hidden');
 					clueDisplayer.classList.remove('visually_hidden');
 					toggleViewButtonAboveGrid.classList.remove('visually_removed');
@@ -1179,15 +1180,15 @@ OCrossword.prototype.assemble = function assemble() {
 					toggleViewButtonAboveGrid.classList.add('visually_removed');
 					cluesEl.classList.remove('visually_hidden');
 					toggleViewButtonBottom.classList.remove('visually_hidden');
-					toggleColumnsButton.classList.remove('visually_hidden');									
+					toggleColumnsButton.classList.remove('visually_hidden');
 				}
 
 				if (isSingleColumnView) {
 					cluesEl.classList.add('o-crossword-clues-single-column');
-					cluesEl.classList.remove('o-crossword-clues-two-columns');					
+					cluesEl.classList.remove('o-crossword-clues-two-columns');
 				} else {
 					cluesEl.classList.remove('o-crossword-clues-single-column');
-					cluesEl.classList.add('o-crossword-clues-two-columns');										
+					cluesEl.classList.add('o-crossword-clues-two-columns');
 				}
 
 				const el = cluesEl.querySelector('.has-hover');
@@ -1198,7 +1199,7 @@ OCrossword.prototype.assemble = function assemble() {
 						clueDisplayer.style.height = clueDisplayerText.clientHeight + 50 +'px';
 						el.querySelector('.o-crossword-user-answer').style.top = clueDisplayerText.clientHeight + 'px';
 					}
-					
+
 					toggleViewButtonAboveGrid.style.marginTop = clueDisplayer.style.height;
 				}
 
@@ -1217,7 +1218,7 @@ OCrossword.prototype.assemble = function assemble() {
 
 				cluesEl.classList.add('o-crossword-clues-two-columns');
 			}
-			
+
 			if(!isCSSMobile(clueDisplayer)){
 				gridEl.style.marginTop = "initial";
 				clueDisplayer.classList.remove('visually_hidden');
@@ -1249,7 +1250,7 @@ OCrossword.prototype.assemble = function assemble() {
 					defEl = navigateClues(e);
 					isNavigation = true;
 				} else {
-					defEl = (e.target.nodeName === 'SPAN')?e.target.parentElement:e.target;
+					defEl = e.target.nodeName === 'SPAN'?e.target.parentElement:e.target;
 				}
 
 				clueDetails = {};
@@ -1264,7 +1265,7 @@ OCrossword.prototype.assemble = function assemble() {
 				if(!isMobile) {
 					defEl.focus();
 				}
-				
+
 				target = gridEl.querySelector(`td[data-o-crossword-number="${clueDetails.number}"]`);
 			}
 
@@ -1298,23 +1299,23 @@ OCrossword.prototype.assemble = function assemble() {
 					const oldClue = currentlySelectedGridItem;
 
 					if(clueDetails !== undefined) {
-						currentlySelectedGridItem = clues.find(item => (
+						currentlySelectedGridItem = clues.find(item =>
 							item.direction === clueDetails.direction &&
 							item.number === clueDetails.number &&
 							item.answerLength === clueDetails.answerLength
-						));
+						);
 					} else {
-						currentlySelectedGridItem = clues.find(item => (
+						currentlySelectedGridItem = clues.find(item =>
 							item.direction === oldClue.direction &&
 							item.number === oldClue.number &&
 							item.answerLength === oldClue.answerLength
-						));
+						);
 					}
 				}
 
 				if (index !== -1 || !currentlySelectedGridItem) {
 					// the same cell has been clicked on again so
-					if (index + 1 === clues.length) index = -1;
+					if (index + 1 === clues.length) {index = -1;}
 					currentlySelectedGridItem = clues[index + 1];
 				}
 
@@ -1345,7 +1346,7 @@ OCrossword.prototype.assemble = function assemble() {
 					trackEvent({action: 'focusCell', clueId: identifier, letterId: currentlySelectedGridItem.answerPos});
 				}
 			}
-		}.bind(this);
+		};
 
 		const navigateClues = function navigateClues (e) {
 			e.preventDefault();
@@ -1364,7 +1365,7 @@ OCrossword.prototype.assemble = function assemble() {
 			}
 
 			return cluesEl.querySelector(`li[data-o-crossword-clue-id="${currentClue}"]`);
-		}.bind(this);
+		};
 
 		this.addEventListener(cluesEl, 'mousemove', e => highlightGridByCluesEl(e.target));
 
@@ -1487,14 +1488,14 @@ function joinBlanks (answerValue, filledCount) {
 	for(let i = 0; i < answerValue.length; ++i) {
 		if(answerValue[i] === '*') {
 			++combineCount;
-			if((i < answerValue.length - 1 && answerValue[i + 1] !== '*') || i === answerValue.length - 1) {
+			if(i < answerValue.length - 1 && answerValue[i + 1] !== '*' || i === answerValue.length - 1) {
 				if(combineCount > 1) {
 					combinedValue.push(" " + combineCount + " blanks ");
 				} else {
 					combinedValue.push(" blank ");
 				}
 			}
-		} else {	
+		} else {
 			combineCount = 0;
 			combinedValue.push(answerValue[i]);
 		}
@@ -1503,6 +1504,6 @@ function joinBlanks (answerValue, filledCount) {
 	if(filledCount > 0) {
 		return 'Your Answer: ' + combinedValue.join('') + '.';
 	}
-	
+
 	return '';
 }
