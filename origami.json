@@ -19,7 +19,8 @@
 			"requestAnimationFrame",
 			"Node.prototype.contains",
 			"Array.prototype.find",
-			"Array.prototype.filter"
+			"Array.prototype.filter",
+			"Promise"
 		]
 	},
 	"demosDefaults": {
@@ -29,14 +30,15 @@
 	"demos": [
 		{
 			"name": "basic",
+			"title": "basic",
+			"hidden": true,
 			"template": "demos/src/basic.mustache",
-			"expanded": true,
 			"description": ""
 		},
 		{
 			"name": "answered",
+			"title": "answered",
 			"template": "demos/src/answered.mustache",
-			"expanded": false,
 			"description": ""
 		}
 	]

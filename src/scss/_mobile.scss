@@ -1,5 +1,8 @@
-@media screen and (max-width: $break-phone) {
-    .o-crossword table, .o-crossword .o-crossword-grid-wrapper .o-crossword-magic-input {
+// sass-lint:disable no-vendor-prefixes
+@mixin _oCrosswordMobile () {
+    @media screen and (max-width: $break-phone) {
+    .o-crossword table, 
+    .o-crossword .o-crossword-grid-wrapper .o-crossword-magic-input {
         font-size: 1.2rem;
     }
 
@@ -24,7 +27,7 @@
 
     .o-crossword .o-crossword-clue-displayer {
         height: 3.6em;
-        font-size: .85rem;
+        font-size: 0.85rem;
         padding: 0 0.5em 1em;
 
         span {
@@ -54,5 +57,6 @@
                 margin: 0 10%;
             }
         }
+    }
     }
 }

@@ -1,11 +1,14 @@
+// sass-lint:disable no-ids
 //below forces portrait mode on mobile phones
 //it uses "min-aspect-ratio" to detect landscape,
 //since keyboard popping will make "orientation" wrong in some cases
-@media screen and (min-aspect-ratio: 13/9) and (max-width: $break-phone) {
-  body:not(.iOS) #main-container {
-    transform: rotate(-90deg);
-    width: 100% /* screen width */ ;
-    height: 100% /* screen height */ ;
-    overflow: scroll;
+@mixin _oCrosswordOrientation () {
+  @media screen and (min-aspect-ratio: 13/9) and (max-width: $break-phone) {
+    body:not(.iOS) #main-container {
+      transform: rotate(-90deg);
+      width: 100% /* screen width */ ;
+      height: 100% /* screen height */ ;
+      overflow: scroll;
+    }
   }
 }
