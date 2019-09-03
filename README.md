@@ -11,11 +11,23 @@ An experimental Origami component to implement a responsive crossword.
    * $ `npm install -g gulp`
    * $ `npm install -g origami-build-tools`
    * $ `npm install -g bower`
-   * $ `bower install`
+   * As described in https://origami.ft.com/docs/tutorials/manual-build/#bower--the-origami-registry
+      * ensure you have ~/.bowerrc configured with
+```
+{
+	"registry": {
+		"search": [
+			"https://origami-bower-registry.ft.com",
+			"https://registry.bower.io"
+		]
+	}
+}
+```
+   * $ `obt install`
    * $ `obt build`
 * deploy locally as described in the [Origami build tools doc](https://github.com/Financial-Times/origami-build-tools#developing-modules-locally)
    * $ `obt demo --runServer --watch`
-   * see a demo of it running at http://localhost:8080/demos/local/basic.html
+   * see a demo of it running at http://localhost:8999/demos/local/basic.html
 * [Bower linking a component](https://oncletom.io/2013/live-development-bower-component/)
 * general Origami [Developer Guide](http://origami.ft.com/docs/developer-guide/)
 
