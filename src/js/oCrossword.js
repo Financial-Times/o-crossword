@@ -422,7 +422,7 @@ OCrossword.prototype.assemble = function assemble() {
 	// and we can use this cached value to compare with to see if something has changed.
 	// [inputID] = "char"
 
-	let  prevValueForClueCellById = {};
+	const prevValueForClueCellById = {};
 
 	if (cluesEl) {
 		let currentClue = -1;
@@ -552,12 +552,12 @@ OCrossword.prototype.assemble = function assemble() {
 
 
 		this.addEventListener(magicInput, 'keydown', function (e) {
-			const shiftKey = e.shiftKey;
-			const keyCode  = e.keyCode;
-			const magicInputValue = magicInput.value;
-			const isAndroidTF = isAndroid();
-
+			// const shiftKey = e.shiftKey;
+			// const keyCode  = e.keyCode;
+			// const magicInputValue = magicInput.value;
+			// const isAndroidTF = isAndroid();
 			// console.log(`DEBUG: this.addEventListener: magicInput: isAndroidTF=${JSON.stringify(isAndroidTF)}, shiftKey=${JSON.stringify(shiftKey)}, keyCode=${keyCode}, magicInputValue=${JSON.stringify(magicInputValue)}`);
+
 			if (!isAndroid()) {
 				e.preventDefault();
 			}
@@ -740,10 +740,10 @@ OCrossword.prototype.assemble = function assemble() {
 					// console.log(`DEBUG: this.addEventListener: cluesEl: setTimeout: start:           e.target.value=${JSON.stringify(e.target.value)}, direction=${direction},  prevValueForClueCellById[${inputID}]=${JSON.stringify( prevValueForClueCellById[inputID])}`);
 					if ( isAndroid() ) {
 						if (
-							 e.target.value ===  prevValueForClueCellById[inputID]
+							 e.target.value === prevValueForClueCellById[inputID]
 						|| e.target.value === ''
 						// || (e.target.value !== '' &&  prevValueForClueCellById[inputID] === '')
-					) {
+						) {
 							e.target.value = '';
 							direction = -1;
 						}
@@ -868,7 +868,7 @@ OCrossword.prototype.assemble = function assemble() {
 		function nextInput(source, direction) {
 			const inputID = source.getAttribute('data-link-identifier');
 			const inputGroup = document.querySelectorAll('input[data-link-identifier^="' + inputID.split('-')[0] +'-"]');
-			const currentInput = parseInt(inputID.split('-')[1]);
+			const currentInput = parseInt(inputID.split('-')[1], 10);
 			const newInput = direction === 1?(currentInput+1):(currentInput-1);
 			// console.log(`DEBUG: nextInput: inputID=${JSON.stringify(inputID)}, direction=${direction}, currentInput=${currentInput}, newInput=${newInput}, inputGroup.length=${inputGroup.length}`);
 
@@ -1081,14 +1081,14 @@ OCrossword.prototype.assemble = function assemble() {
 			const targetValuesPre = [];
 			const targetValuesPost = [];
 
-			targetIds.map( id => {
+			targetIds.forEach( id => {
 				const target = cluesEl.querySelector('input[data-link-identifier="'+id+'"]');
 				targetValuesPre.push( target.value );
 				target.value = newValue;
 				updateScreenReaderAnswer( target );
 				targetValuesPost.push( target.value );
 				prevValueForClueCellById[id] = newValue; // for use when handling clue cells
-			})
+			});
 
 			// console.log(`DEBUG: syncPartialClue: targetIds=${JSON.stringify(targetIds)}, targetValuesPre=${JSON.stringify(targetValuesPre)}, targetValuesPost=${JSON.stringify(targetValuesPost)}`);
 		}
