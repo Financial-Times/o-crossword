@@ -418,6 +418,11 @@ OCrossword.prototype.assemble = function assemble() {
 	const answerStore = JSON.parse(this.rootEl.getAttribute('data-storage'));
 	const isAnswerVersion = JSON.parse(this.rootEl.getAttribute('data-answer-version'));
 
+	// when using the android keyboard, sometimes the e.target.value is updated silently (with keycode 229),
+	// and we can use this cached value to compare with to see if something has changed.
+	// [inputID] = "char"
+
+	let  prevValueForClueCellById = {};
 
 	if (cluesEl) {
 		let currentClue = -1;
@@ -625,19 +630,13 @@ OCrossword.prototype.assemble = function assemble() {
 			}
 		});
 
-		// when using the android keyboard, sometimes the e.target.value is updated silently (with keycode 229),
-		// and we can use this cached value to compare with to see if something has changed.
-		// [inputID] = "char"
-
-		let prevCluesElTargetValues = {};
-
 		this.addEventListener(cluesEl, 'keydown', function(e){
 			const inputID = e.target.getAttribute('data-link-identifier');
-			if (!prevCluesElTargetValues.hasOwnProperty(inputID)) {
-				prevCluesElTargetValues[inputID] = '';
+			if (! prevValueForClueCellById.hasOwnProperty(inputID)) {
+				 prevValueForClueCellById[inputID] = '';
 			}
 
-			console.log(`DEBUG: this.addEventListener: cluesEl: inputID=${inputID}, isAndroid=${JSON.stringify(isAndroid())}, e: shiftKey=${JSON.stringify(e.shiftKey)}, keyCode=${e.keyCode}, prevCluesElTargetValues[inputID]=${JSON.stringify(prevCluesElTargetValues[inputID])}`);
+			console.log(`DEBUG: this.addEventListener: cluesEl: inputID=${inputID}, isAndroid=${JSON.stringify(isAndroid())}, e: shiftKey=${JSON.stringify(e.shiftKey)}, keyCode=${e.keyCode},  prevValueForClueCellById[inputID]=${JSON.stringify( prevValueForClueCellById[inputID])}`);
 			let timer = 0;
 
 			if (!isAndroid()) {
@@ -709,7 +708,7 @@ OCrossword.prototype.assemble = function assemble() {
 					e.target.value = '';
 					nextInput(e.target, -1);
 					updateInBackground(e);
-					prevCluesElTargetValues[inputID] = e.target.value;
+					 prevValueForClueCellById[inputID] = e.target.value;
 				}, timer);
 
 				return;
@@ -738,25 +737,25 @@ OCrossword.prototype.assemble = function assemble() {
 
 				setTimeout(function(){
 					let direction = 1;
-					console.log(`DEBUG: this.addEventListener: cluesEl: setTimeout: start:           e.target.value=${JSON.stringify(e.target.value)}, direction=${direction}, prevCluesElTargetValues[${inputID}]=${JSON.stringify(prevCluesElTargetValues[inputID])}`);
+					console.log(`DEBUG: this.addEventListener: cluesEl: setTimeout: start:           e.target.value=${JSON.stringify(e.target.value)}, direction=${direction},  prevValueForClueCellById[${inputID}]=${JSON.stringify( prevValueForClueCellById[inputID])}`);
 					// const direction = (isAndroid() && e.target.value == '')? -1 : 1;
 					if ( isAndroid() ) {
 						if (
-							 e.target.value === prevCluesElTargetValues[inputID]
+							 e.target.value ===  prevValueForClueCellById[inputID]
 						|| e.target.value === ''
-						// || (e.target.value !== '' && prevCluesElTargetValues[inputID] === '')
+						// || (e.target.value !== '' &&  prevValueForClueCellById[inputID] === '')
 					) {
 							e.target.value = '';
 							direction = -1;
 						}
-						console.log(`DEBUG: this.addEventListener: cluesEl: setTimeout: isAndroid, so...: e.target.value=${JSON.stringify(e.target.value)}, direction=${direction}, prevCluesElTargetValues[${inputID}]=${JSON.stringify(prevCluesElTargetValues[inputID])}`);
+						console.log(`DEBUG: this.addEventListener: cluesEl: setTimeout: isAndroid, so...: e.target.value=${JSON.stringify(e.target.value)}, direction=${direction},  prevValueForClueCellById[${inputID}]=${JSON.stringify( prevValueForClueCellById[inputID])}`);
 					}
 
-					console.log(`DEBUG: this.addEventListener: cluesEl: setTimeout: start:           e.target.value=${JSON.stringify(e.target.value)}, direction=${direction}, prevCluesElTargetValues[${inputID}]=${JSON.stringify(prevCluesElTargetValues[inputID])}`);
+					console.log(`DEBUG: this.addEventListener: cluesEl: setTimeout: start:           e.target.value=${JSON.stringify(e.target.value)}, direction=${direction},  prevValueForClueCellById[${inputID}]=${JSON.stringify( prevValueForClueCellById[inputID])}`);
 					nextInput(e.target, direction);
 					console.log(`DEBUG: this.addEventListener: cluesEl: setTimeout: after nextInput: e.target.value=${JSON.stringify(e.target.value)}`);
 					updateInBackground(e);
-					prevCluesElTargetValues[inputID] = e.target.value;
+					 prevValueForClueCellById[inputID] = e.target.value;
 				}, timer);
 
 
@@ -773,7 +772,7 @@ OCrossword.prototype.assemble = function assemble() {
 				if(gridSync.defSync) {
 					const defSync = cluesEl.querySelector('input[data-link-identifier="' + gridSync.defSyncInput +'"]');
 					defSync.value = e.target.value;
-					prevCluesElTargetValues[gridSync.defSyncInput] = e.target.value;
+					 prevValueForClueCellById[gridSync.defSyncInput] = e.target.value;
 				}
 
 				updateScreenReaderAnswer(e.target, gridSync);
@@ -1068,26 +1067,31 @@ OCrossword.prototype.assemble = function assemble() {
 		}
 
 		function syncPartialClue(letter, src, index) {
-			console.log(`DEBUG: syncPartialClue: letter=${letter}, index=${index}, src.length=${src.length}`);
+			const newValue = letter.substr(0,1);
+			console.log(`DEBUG: syncPartialClue: letter=${letter}, newValue=${newValue}, index=${index}, src.length=${src.length}`);
 			const gridItems = gridMap.get(src[index]);
 			console.log(`DEBUG: syncPartialClue: gridItems=${JSON.stringify(gridItems)}`);
-			const targets = [];
+
+			const targetIds = [];
 			for(let i = 0; i < gridItems.length; ++i) {
-				const linkName = gridItems[i].direction[0].toUpperCase() + gridItems[i].number + '-' + gridItems[i].answerPos;
-				targets.push(cluesEl.querySelector('input[data-link-identifier="'+linkName+'"]'));
+				const id = gridItems[i].direction[0].toUpperCase() + gridItems[i].number + '-' + gridItems[i].answerPos;
+				targetIds.push(id);
+				// targets.push(cluesEl.querySelector('input[data-link-identifier="'+linkName+'"]'));
 			}
 
-			const targetValuesPre = targets.map( target => { return target.value; } );
+			const targetValuesPre = [];
+			const targetValuesPost = [];
 
-			Array.from(targets).forEach((target) => {
-				target.value = letter.substr(0,1);
-				updateScreenReaderAnswer(target);
-			});
+			targetIds.map( id => {
+				const target = cluesEl.querySelector('input[data-link-identifier="'+id+'"]');
+				targetValuesPre.push( target.value );
+				target.value = newValue;
+				updateScreenReaderAnswer( target );
+				targetValuesPost.push( target.value );
+				prevValueForClueCellById[id] = newValue; // for use when handling clue cells
+			})
 
-			const targetValuesPost = targets.map( target => { return target.value; } );
-
-			console.log(`DEBUG: syncPartialClue: targetValuesPre=${JSON.stringify(targetValuesPre)}, targetValuesPost=${JSON.stringify(targetValuesPost)}`);
-
+			console.log(`DEBUG: syncPartialClue: targetIds=${JSON.stringify(targetIds)}, targetValuesPre=${JSON.stringify(targetValuesPre)}, targetValuesPost=${JSON.stringify(targetValuesPost)}`);
 		}
 
 		const saveLocal = function saveLocal() {
