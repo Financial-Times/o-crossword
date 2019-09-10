@@ -616,7 +616,7 @@ OCrossword.prototype.assemble = function assemble() {
 						}
 					}); //a11y fix for screen reader
 				} else {
-					const prevMagicInputValue = magicInput.value;
+					// const prevMagicInputValue = magicInput.value;
 					// console.log(`DEBUG: this.addEventListener: magicInput: else: fudging for android ...`);
 					// if (magicInput.value.length > 1) {
 					// 	magicInput.value = magicInput.value[0];
