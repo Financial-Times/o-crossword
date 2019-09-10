@@ -616,8 +616,16 @@ OCrossword.prototype.assemble = function assemble() {
 						}
 					}); //a11y fix for screen reader
 				} else {
+					const prevMagicInputValue = magicInput.value;
 					// console.log(`DEBUG: this.addEventListener: magicInput: else: fudging for android ...`);
-
+					// if (magicInput.value.length > 1) {
+					// 	magicInput.value = magicInput.value[0];
+					// 	console.log(`DEBUG: this.addEventListener: magicInput: else: shortening ${prevMagicInputValue} to ${magicInput.value}`);
+					// }
+					// if (magicInput.value !== '' && (magicInput.value < 'A' || magicInput.value > 'Z')){
+					// 	magicInput.value = '';
+					// 	console.log(`DEBUG: this.addEventListener: magicInput: else: replacing ${prevMagicInputValue} with ''`);
+					// }
 				}
 
 				const clueId = currentlySelectedGridItem.direction[0].toUpperCase() + currentlySelectedGridItem.number;
@@ -739,13 +747,18 @@ OCrossword.prototype.assemble = function assemble() {
 					let direction = 1;
 					// console.log(`DEBUG: this.addEventListener: cluesEl: setTimeout: start:           e.target.value=${JSON.stringify(e.target.value)}, direction=${direction},  prevValueForClueCellById[${inputID}]=${JSON.stringify( prevValueForClueCellById[inputID])}`);
 					if ( isAndroid() ) {
+						if (e.target.value.length > 1) {
+							e.target.value = e.target.value[0];
+						}
 						if (
 							 e.target.value === prevValueForClueCellById[inputID]
 						|| e.target.value === ''
-						// || (e.target.value !== '' &&  prevValueForClueCellById[inputID] === '')
 						) {
 							e.target.value = '';
 							direction = -1;
+						}
+						if( e.target.value < 'A' || e.targetValue > 'Z') {
+							e.target.value = '';
 						}
 						// console.log(`DEBUG: this.addEventListener: cluesEl: setTimeout: isAndroid, so...: e.target.value=${JSON.stringify(e.target.value)}, direction=${direction},  prevValueForClueCellById[${inputID}]=${JSON.stringify( prevValueForClueCellById[inputID])}`);
 					}
@@ -783,6 +796,19 @@ OCrossword.prototype.assemble = function assemble() {
 			direction = direction === -1 ? -1 : 1;
 			const oldMagicInputEl = magicInputTargetEl;
 			const magicInputValueAsSet = magicInput.value;
+
+			// console.log(`DEBUG: progress: direction=${JSON.stringify(direction)}, magicInputTargetEl.textContent=${magicInputTargetEl.textContent}, magicInputValueAsSet=${magicInputValueAsSet}, magicInput.value=${magicInput.value}`);
+
+			if (isAndroid()) {
+				if (magicInput.value.length > 0) {
+					magicInput.value = magicInput.value[0];
+				}
+				if (magicInput.value < 'A' || magicInput.value > 'Z') {
+					magicInput.value = '';
+				}
+			}
+
+			// console.log(`DEBUG: progress: direction=${JSON.stringify(direction)}, magicInputTargetEl.textContent=${magicInputTargetEl.textContent}, magicInputValueAsSet=${magicInputValueAsSet}, magicInput.value=${magicInput.value}`);
 
 			if (
 				magicInputTargetEl &&
