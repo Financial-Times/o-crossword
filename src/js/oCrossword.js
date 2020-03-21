@@ -1495,7 +1495,11 @@ OCrossword.prototype.addEventListener = function(el, type, callback) {
 
 OCrossword.prototype.removeAllEventListeners = function() {
 	this.listeners.forEach(function remove({el, type, callback}) {
-		el.removeEventListener(type, callback);
+		if (el instanceof NodeList) {
+			el.forEach(node => node.removeEventListener(type, callback));
+		} else {
+			el.removeEventListener(type, callback);
+		}
 	});
 };
 
