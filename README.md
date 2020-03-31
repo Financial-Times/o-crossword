@@ -80,3 +80,10 @@ NB: The preview bar refers to the green and blue clues thumbnail on small screen
 
 1. building from JSON
 1. building from json with answers
+
+---
+
+## Licence
+
+This software is published by the Financial Times under the [MIT licence](http://opensource.org/licenses/MIT).
+
