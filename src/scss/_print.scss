@@ -1,4 +1,4 @@
-// sass-lint:disable no-qualifying-elements, no-important, no-vendor-prefixes
+// stylelint-disable property-no-vendor-prefix, declaration-no-important, selector-no-qualifying-type, max-nesting-depth
 @mixin _oCrosswordPrint () {
 	@media print {
 		@page {

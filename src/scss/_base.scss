@@ -3,7 +3,7 @@
 /// @link http://registry.origami.ft.com/components/o-crossword
 ////
 
-// sass-lint:disable no-important, no-qualifying-elements, mixins-before-declarations, no-duplicate-properties
+// stylelint-disable declaration-block-no-duplicate-properties, declaration-no-important, selector-no-qualifying-type, max-nesting-depth
 @mixin oCrosswordType {
 	font-family: monospace;
 	min-width: 1.5em;
