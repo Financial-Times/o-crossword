@@ -25,14 +25,6 @@
 	@include oTypographyBody;
 	@include oColorsFor(o-crossword, background);
 	@include oTypographySans(-1);
-	position: relative;
-	display: block;
-	max-width: 100%;
-	margin: auto;
-	padding: 1em 0;
-	box-sizing: border-box;
-	overflow-x: hidden;
-	overflow-y: visible;
 
 	@include oGridRespondTo(M) {
 		display: flex;
@@ -53,6 +45,21 @@
 			}
 		}
 	}
+	
+	@include oGridRespondTo(M) {
+		.o-crossword-clues-single-column,
+		.o-crossword-clues-two-columns {
+			display: flex;
+		}
+	}
+	position: relative;
+	display: block;
+	max-width: 100%;
+	margin: auto;
+	padding: 1em 0;
+	box-sizing: border-box;
+	overflow-x: hidden;
+	overflow-y: visible;
 
 	* {
 		box-sizing: border-box;
@@ -69,15 +76,19 @@
 	.visually_hidden {
 		display: inline-block;
 		margin: -1px !important;
-	    overflow: hidden;
-	    padding: 0;
-	    width: 1px;
-	    height: 1px;
-	    min-height: 0;
-	    min-width: 0;
+		overflow: hidden;
+		padding: 0;
+		width: 1px;
+		height: 1px;
+		min-height: 0;
+		min-width: 0;
 	}
 
 	.o-crossword-clue-displayer {
+
+		@include oGridRespondTo(M) {
+			display: none;
+		}
 		font-size: 1rem;
 		min-height: 1.5em;
 		padding: 0.5em;
@@ -99,21 +110,18 @@
 			padding: 0;
 			width: 100%;
 
-			.sr-direction, 
+			.sr-direction,
+ 
 			.sr-instruction,
 			.sr-answer {
 				// display: none;
 				display: inline-block;
 				margin: -1px;
-			    overflow: hidden;
-			    padding: 0;
-			    width: 1px;
-			    height: 1px;
+				overflow: hidden;
+				padding: 0;
+				width: 1px;
+				height: 1px;
 			}
-		}
-
-		@include oGridRespondTo(M) {
-			display: none;
 		}
 	}
 
@@ -156,6 +164,11 @@
 	}
 
 	.o-crossword-grid-wrapper {
+
+		@include oGridRespondTo(M) {
+			margin-bottom: 1.5em;
+			margin-left: 1em;
+		}
 		flex-shrink: 0;
 		position: relative;
 		font-size: 1.5em;
@@ -172,32 +185,31 @@
 			box-sizing: border-box;
 			background: rgba(0, 0, 0, 0.2);
 			font-size: 1.5rem;
-    		text-transform: inherit;
-    		max-width: none !important;
-    		border-radius: 0;
-    		padding: 0;
-		}
-
-		@include oGridRespondTo(M) {
-			margin-bottom: 1.5em;
-			margin-left: 1em;
+			text-transform: inherit;
+			max-width: none !important;
+			border-radius: 0;
+			padding: 0;
 		}
 	}
 
 	table {
+		@include oColorsFor(o-crossword-cell, background);
 		border-collapse: collapse;
 		border-spacing: 0;
 		font-size: 1.5rem;
-		margin: 0 auto;
-		@include oColorsFor(o-crossword-cell, background);		
+		margin: 0 auto;		
 
 		td {
-			border: 1px solid;
-			padding: 0;
 			@include oColorsFor(o-crossword-border, border);
 			@include oCrosswordType;
+			border: 1px solid;
+			padding: 0;
 			position: relative;
 			overflow: hidden;
+
+			text-align: center;
+			vertical-align: middle;
+			position: relative;
 
 			&.empty {
 				@include oColorsFor(o-crossword-empty, background);
@@ -222,10 +234,6 @@
 				background-color: rgba(158, 47, 80, 0.5);
 			}
 
-			text-align: center;
-			vertical-align: middle;
-			position: relative;
-
 			&[data-o-crossword-number]:before {
 				content: attr(data-o-crossword-number);
 				font-size: 0.5em;
@@ -234,25 +242,41 @@
 				left: 0;
 				letter-spacing: 0;
 				line-height: 1em;
-    			background: rgba(255, 255, 255, 0.8);
+				background: rgba(255, 255, 255, 0.8);
 			}
 		}
 	}
 
 	.o-crossword-clues-wrapper {
-		position: relative;
-		margin-top: 2em;
-		padding-left: 1.5em;
-		padding-right: 1.5em;
 
 		@include oGridRespondTo(M) {
 			margin-top: 0;
 			width: 44em;	
 			float: left;		
 		}
+		position: relative;
+		margin-top: 2em;
+		padding-left: 1.5em;
+		padding-right: 1.5em;
 	}
 
 	.o-crossword-clues {
+
+		@include oGridRespondTo(M) {
+			position: relative;
+			opacity: 1;
+			height: auto;
+			margin-left: 0.9em !important;			
+			box-shadow: none;
+			border: 0;
+			transition: none;
+			pointer-events: all;
+			transform: none !important;
+
+			ul {
+				transform: none !important;
+			}
+		}
 		float: left;
 		display: flex;
 
@@ -274,16 +298,17 @@
 					@include oColorsFor(o-crossword-clue-highlight, text);
 				}
 
-				.sr-direction, 
+				.sr-direction,
+ 
 				.sr-instruction,
 				.sr-answer {
 					// display: none;
 					display: inline-block;
 					margin: -1px;
-				    overflow: hidden;
-				    padding: 0;
-				    width: 1px;
-				    height: 1px;
+					overflow: hidden;
+					padding: 0;
+					width: 1px;
+					height: 1px;
 				}
 
 				&:focus {
@@ -351,27 +376,9 @@
 		.o-crossword-clues-across:before {
 			content: 'Across';			
 		}
-
-		@include oGridRespondTo(M) {
-			position: relative;
-			opacity: 1;
-			height: auto;
-			margin-left: 0.9em !important;			
-			box-shadow: none;
-			border: 0;
-			transition: none;
-			pointer-events: all;
-			transform: none !important;
-
-			ul {
-				transform: none !important;
-			}
-		}
 	}
 
 	.o-crossword-reset {
-		margin: 20px 10px;
-		float: right;
 
 		@include oGridRespondTo(M) {
 			margin: 0;
@@ -380,9 +387,15 @@
 			position: absolute;
 			z-index: 2;
 		}
+		margin: 20px 10px;
+		float: right;
 	}
 
 	.o-crossword-mobile-toggle {
+
+		@include oGridRespondTo(M) {
+			display: none;
+		}
 		margin: 20px 10px;
 		float: left;
 
@@ -394,10 +407,6 @@
 		&.visually_removed {
 			display: none;
 		}
-
-		@include oGridRespondTo(M) {
-			display: none;
-		}
 	}
 
 	.o-crossword-button-row {
@@ -405,6 +414,21 @@
 	}
 
 	.o-crossword-clues-single-column {
+
+		@include oGridRespondTo(M) {
+			li span {
+				font-size: 1em;
+			}
+	
+			ul li {
+				margin-top: none;
+			}
+	
+			.o-crossword-clues-down:before,
+			.o-crossword-clues-across:before {
+				font-size: 1.2em;
+			}
+		}
 		display: block;
 		
 		li span {
@@ -431,32 +455,10 @@
 		.o-crossword-user-answer {
 			margin-top: 0.5em;
 		}
-
-		@include oGridRespondTo(M) {
-			li span {
-				font-size: 1em;
-			}
-	
-			ul li {
-				margin-top: none;
-			}
-	
-			.o-crossword-clues-down:before,
-			.o-crossword-clues-across:before {
-				font-size: 1.2em;
-			}
-		}
-    }
-
-    .o-crossword-clues-two-columns {
-		display: flex;
 	}
-	
-	@include oGridRespondTo(M) {
-		.o-crossword-clues-single-column,
-		.o-crossword-clues-two-columns {
-			display: flex;
-		}
+
+	.o-crossword-clues-two-columns {
+		display: flex;
 	}		
 }
 
