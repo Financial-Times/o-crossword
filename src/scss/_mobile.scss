@@ -1,62 +1,63 @@
-// sass-lint:disable no-vendor-prefixes
+// stylelint-disable selector-no-qualifying-type
 @mixin _oCrosswordMobile () {
-    @media screen and (max-width: $break-phone) {
-    .o-crossword table, 
-    .o-crossword .o-crossword-grid-wrapper .o-crossword-magic-input {
-        font-size: 1.2rem;
-    }
+	@media screen and (max-width: $break-phone) {
+		.o-crossword table,
+ 
+		.o-crossword .o-crossword-grid-wrapper .o-crossword-magic-input {
+			font-size: 1.2rem;
+		}
 
-    .o-crossword table td {
-        line-height: 1;
-    }
+		.o-crossword table td {
+			line-height: 1;
+		}
 
-    .o-crossword .o-crossword-clues-wrapper {
-        display: block;
-        width: 100%;
-        overflow: auto;
+		.o-crossword .o-crossword-clues-wrapper {
+			display: block;
+			width: 100%;
+			overflow: auto;
 
-        &.visually_hidden {
-            display: inline-block;
-            margin: -1px;
-            overflow: hidden;
-            padding: 0;
-            width: 1px;
-            height: 1px;
-        }
-    }
+			&.visually_hidden {
+				display: inline-block;
+				margin: -1px;
+				overflow: hidden;
+				padding: 0;
+				width: 1px;
+				height: 1px;
+			}
+		}
 
-    .o-crossword .o-crossword-clue-displayer {
-        height: 3.6em;
-        font-size: 0.85rem;
-        padding: 0 0.5em 1em;
+		.o-crossword .o-crossword-clue-displayer {
+			height: 3.6em;
+			font-size: 0.85rem;
+			padding: 0 0.5em 1em;
 
-        span {
-            padding: 0.5em 10%;
-        }
+			span {
+				padding: 0.5em 10%;
+			}
 
-        &.visually_hidden {
-           visibility: hidden;
-        }
-    }
+			&.visually_hidden {
+				visibility: hidden;
+			}
+		}
 
-    .o-crossword .o-crossword-clue-navigation {
-        display: initial;
-    }
+		.o-crossword .o-crossword-clue-navigation {
+			display: initial;
+		}
 
-    .o-crossword .o-crossword-clues.visually_hidden ul li {
-        &.featured {
-            display: block;
-            visibility: hidden;
+		.o-crossword .o-crossword-clues.visually_hidden ul li {
+			&.featured {
+				display: block;
+				visibility: hidden;
 
-            .o-crossword-user-answer {  
-                position: fixed;
-                -webkit-overflow-scrolling: touch;
-                visibility: visible;
-                left: 0;
-                z-index: 3;
-                margin: 0 10%;
-            }
-        }
-    }
-    }
+				.o-crossword-user-answer {  
+					position: fixed;
+					-webkit-overflow-scrolling: touch;
+					visibility: visible;
+					left: 0;
+					z-index: 3;
+					margin: 0 10%;
+				}
+			}
+		}
+	}
 }

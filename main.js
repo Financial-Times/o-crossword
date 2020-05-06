@@ -1,4 +1,3 @@
-/*global require, module*/
 const OCrossword = module.exports = require('./src/js/oCrossword');
 
 const constructAll = function() {
