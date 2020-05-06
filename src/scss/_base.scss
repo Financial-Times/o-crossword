@@ -162,11 +162,6 @@
 		font-size: 1.5em;
 		text-transform: uppercase;
 
-		@include oGridRespondTo(M) {
-			margin-bottom: 1.5em;
-			margin-left: 1em;
-		}
-
 		.o-crossword-magic-input {
 			@include oCrosswordType;
 			position: absolute;
@@ -182,6 +177,11 @@
 			max-width: none !important;
 			border-radius: 0;
 			padding: 0;
+		}
+
+		@include oGridRespondTo(M) {
+			margin-bottom: 1.5em;
+			margin-left: 1em;
 		}
 	}
 
