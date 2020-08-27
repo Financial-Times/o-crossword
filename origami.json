@@ -8,9 +8,6 @@
 		"email": "ftlabs@ft.com",
 		"slack": "financialtimes/ftlabs"
 	},
-	"ci": {
-		"circle": "https://circleci.com/api/v1/project/ftlabs/o-crossword"
-	},
 	"browserFeatures": {
 		"required": [
 			"fetch",
