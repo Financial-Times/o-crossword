@@ -1,7 +1,7 @@
 {
 	"description": "FT-branded crosswords",
 	"origamiType": "module",
-	"origamiVersion": 1,
+	"origamiVersion": 2,
 	"support": "https://github.com/ftlabs/o-crossword/issues",
 	"supportStatus": "experimental",
 	"supportContact": {

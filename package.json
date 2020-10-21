@@ -1,8 +1,22 @@
 {
-  "devDependencies": {
-    "eslint": "^7.8.1",
-    "eslint-config-origami-component": "^2.1.0",
-    "origami-ci-tools": "^2.0.2",
-    "stylelint-config-origami-component": "^1.0.4"
-  }
+    "devDependencies": {
+        "eslint": "^7.8.1",
+        "eslint-config-origami-component": "^2.1.0",
+        "origami-ci-tools": "^2.0.2",
+        "stylelint-config-origami-component": "^1.0.4"
+    },
+    "main": "main.js",
+    "peerDependencies": {
+        "@financial-times/o-buttons": "^5.16.2",
+        "@financial-times/o-colors": "^4.8.5",
+        "@financial-times/o-grid": "^4.5.1",
+        "@financial-times/o-tracking": "^1.6.0",
+        "@financial-times/o-typography": "^5.10.1",
+        "@financial-times/o-viewport": "^3.3.2"
+    },
+    "description": "FT-branded crosswords",
+    "publishConfig": {
+        "registry": "http://localhost:4873"
+    },
+    "version": "2.0.0-0"
 }
