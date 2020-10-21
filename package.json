@@ -18,6 +18,6 @@
     "publishConfig": {
         "registry": "http://localhost:4873"
     },
-    "version": "100.0.0-1",
+    "version": "100.0.0-2",
     "name": "@financial-times/o-crossword"
 }
