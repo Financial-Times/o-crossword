@@ -7,17 +7,17 @@
     },
     "main": "main.js",
     "peerDependencies": {
-        "@financial-times/o-buttons": "^100.0.0-4",
-        "@financial-times/o-colors": "^100.0.0-4",
-        "@financial-times/o-grid": "^100.0.0-4",
-        "@financial-times/o-tracking": "^100.0.0-4",
-        "@financial-times/o-typography": "^100.0.0-4",
-        "@financial-times/o-viewport": "^100.0.0-4"
+        "@financial-times/o-buttons": "^100.0.0-5",
+        "@financial-times/o-colors": "^100.0.0-5",
+        "@financial-times/o-grid": "^100.0.0-5",
+        "@financial-times/o-tracking": "^100.0.0-5",
+        "@financial-times/o-typography": "^100.0.0-5",
+        "@financial-times/o-viewport": "^100.0.0-5"
     },
     "description": "FT-branded crosswords",
     "publishConfig": {
         "registry": "http://localhost:4873"
     },
-    "version": "100.0.0-4",
+    "version": "100.0.0-5",
     "name": "@financial-times/o-crossword"
 }
