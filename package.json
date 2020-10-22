@@ -5,7 +5,7 @@
         "origami-ci-tools": "^2.0.2",
         "stylelint-config-origami-component": "^1.0.4"
     },
-    "main": "main.js",
+    "browser": "main.js",
     "peerDependencies": {
         "@financial-times/o-buttons": "^100.0.0-6",
         "@financial-times/o-colors": "^100.0.0-6",
