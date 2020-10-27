@@ -1,6 +1,6 @@
 {
     "name": "@financial-times/o-crossword",
-    "version": "100.0.0-7",
+    "version": "100.0.0-8",
     "description": "FT-branded crosswords",
     "license": "MIT",
     "type": "module",
@@ -18,12 +18,12 @@
         "stylelint-config-origami-component": "^1.0.4"
     },
     "peerDependencies": {
-        "@financial-times/o-buttons": "^100.0.0-7",
-        "@financial-times/o-colors": "^100.0.0-7",
-        "@financial-times/o-grid": "^100.0.0-7",
-        "@financial-times/o-tracking": "^100.0.0-7",
-        "@financial-times/o-typography": "^100.0.0-7",
-        "@financial-times/o-viewport": "^100.0.0-7"
+        "@financial-times/o-buttons": "^100.0.0-8",
+        "@financial-times/o-colors": "^100.0.0-8",
+        "@financial-times/o-grid": "^100.0.0-8",
+        "@financial-times/o-tracking": "^100.0.0-8",
+        "@financial-times/o-typography": "^100.0.0-8",
+        "@financial-times/o-viewport": "^100.0.0-8"
     },
     "publishConfig": {
         "registry": "http://localhost:4873"
