@@ -6,9 +6,9 @@
  * @returns {OCrossword} - A single OCrossword instance
  */
 
-const debounce = require('o-viewport/src/utils').debounce;
-const crosswordParser = require('./crossword_parser');
-const oTracking = require('o-tracking');
+import utils from '@financial-times/o-viewport/src/utils.js';
+import crosswordParser from './crossword_parser.js';
+import oTracking from '@financial-times/o-tracking';
 
 function prevAll(node) {
 	const nodes = Array.from(node.parentNode.children);
@@ -791,7 +791,7 @@ OCrossword.prototype.assemble = function assemble() {
 			});
 		}
 
-		const progress = debounce(function progress(direction=1) {
+		const progress = utils.debounce(function progress(direction=1) {
 			// console.log(`DEBUG: progress: direction=${JSON.stringify(direction)}, magicInputTargetEl=${magicInputTargetEl}, magicInputNextEls=${magicInputNextEls}`);
 			direction = direction === -1 ? -1 : 1;
 			const oldMagicInputEl = magicInputTargetEl;
@@ -1328,7 +1328,7 @@ OCrossword.prototype.assemble = function assemble() {
 		}.bind(this);
 
 		if(!isAndroid()) {
-			this.onResize = debounce(onResize, 100);
+			this.onResize = utils.debounce(onResize, 100);
 		}
 
 		const onTap = function onTap(e) {

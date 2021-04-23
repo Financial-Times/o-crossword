@@ -1,8 +1,8 @@
 $o-crossword-is-silent: true !default;
-@import "o-colors/main";
-@import "o-grid/main";
-@import "o-typography/main";
-@import "o-buttons/main";
+@import "@financial-times/o-colors/main";
+@import "@financial-times/o-grid/main";
+@import "@financial-times/o-typography/main";
+@import "@financial-times/o-buttons/main";
 
 @import "src/scss/variables";
 @import "src/scss/color-use-cases";
@@ -18,4 +18,3 @@ $o-crossword-is-silent: true !default;
 	// Set crossword to silent again to avoid being output twice
 	$o-crossword-is-silent: true !global;
 }
-

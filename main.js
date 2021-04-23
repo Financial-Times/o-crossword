@@ -1,4 +1,4 @@
-const OCrossword = module.exports = require('./src/js/oCrossword');
+import OCrossword from './src/js/oCrossword.js';
 
 const constructAll = function() {
 	if (OCrossword.disableAutoInit) {
@@ -12,3 +12,5 @@ const constructAll = function() {
 };
 document.addEventListener('o.DOMContentLoaded', constructAll);
 document.addEventListener('o.CrosswordDataUpdated', constructAll);
+
+export default OCrossword;
