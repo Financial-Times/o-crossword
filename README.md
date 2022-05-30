@@ -1,6 +1,6 @@
 # o-crossword
 
-An experimental Origami component to implement a responsive crossword.
+Deprecated: There is no direct Origami replacement. Formally: An experimental Origami component to implement a responsive crossword.
 
 ## To build this locally
 
